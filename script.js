@@ -181,6 +181,10 @@ function handleTestingModeClick(e) {
     }
 }
 
+let qrScannerActive = false;
+let qrScannerCanvas = null;
+let qrScannerContext = null;
+
 function startQRScanner() {
     const video = document.getElementById('qr-video');
     
@@ -190,8 +194,18 @@ function startQRScanner() {
             .then(stream => {
                 video.srcObject = stream;
                 video.play();
+                qrScannerActive = true;
                 
-                // Simulate QR code detection in testing
+                // Create canvas for QR code detection
+                if (!qrScannerCanvas) {
+                    qrScannerCanvas = document.createElement('canvas');
+                    qrScannerContext = qrScannerCanvas.getContext('2d');
+                }
+                
+                // Start scanning for QR codes
+                requestAnimationFrame(scanQRCode);
+                
+                // Simulate QR code detection in testing mode
                 if (testingMode) {
                     setTimeout(() => {
                         const randomLocation = Object.keys(huntLocations)[Math.floor(Math.random() * Object.keys(huntLocations).length)];
@@ -208,6 +222,70 @@ function startQRScanner() {
             });
     } else {
         showQRCodeOptions();
+    }
+}
+
+function scanQRCode() {
+    const video = document.getElementById('qr-video');
+    
+    if (!qrScannerActive || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+        if (qrScannerActive) {
+            requestAnimationFrame(scanQRCode);
+        }
+        return;
+    }
+    
+    // Set canvas size to match video
+    qrScannerCanvas.width = video.videoWidth;
+    qrScannerCanvas.height = video.videoHeight;
+    
+    // Draw current video frame to canvas
+    qrScannerContext.drawImage(video, 0, 0, qrScannerCanvas.width, qrScannerCanvas.height);
+    
+    // Get image data and scan for QR code
+    const imageData = qrScannerContext.getImageData(0, 0, qrScannerCanvas.width, qrScannerCanvas.height);
+    
+    // Use jsQR library to decode QR code (if available)
+    if (typeof jsQR !== 'undefined') {
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+        });
+        
+        if (code && code.data) {
+            // QR code detected! Process it
+            processQRCode(code.data);
+            return; // Stop scanning
+        }
+    }
+    
+    // Continue scanning
+    if (qrScannerActive) {
+        requestAnimationFrame(scanQRCode);
+    }
+}
+
+function processQRCode(qrData) {
+    // Look for matching location based on QR code data
+    let foundLocationKey = null;
+    
+    for (const [key, location] of Object.entries(huntLocations)) {
+        if (location.qr === qrData) {
+            foundLocationKey = key;
+            break;
+        }
+    }
+    
+    if (foundLocationKey) {
+        if (!foundLocations.has(foundLocationKey)) {
+            qrScannerActive = false;
+            discoverLocation(foundLocationKey);
+            closeModal('qr-modal');
+            showNotification('QR Code scanned successfully!', 'success');
+        } else {
+            showNotification('You already found this location!', 'info');
+        }
+    } else {
+        showNotification('QR code not recognized. Make sure you\'re at a scavenger hunt location.', 'warning');
     }
 }
 
@@ -333,9 +411,11 @@ function closeModal(modalId) {
         
         // Stop video if QR modal
         if (modalId === 'qr-modal') {
+            qrScannerActive = false;
             const video = document.getElementById('qr-video');
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
             }
         }
     }
@@ -460,6 +540,48 @@ function showLocationDetails(locationId) {
             hours: 'Tuesday-Sunday: 10:00 AM - 5:00 PM (Closed Mondays)',
             price: 'Adults: 10 RON, Children: 5 RON, Guided tours: +15 RON',
             tips: 'Guided tours available in English. Photography allowed. Visit local craft demonstrations on weekends.'
+        },
+        bran: {
+            title: 'Bran Castle',
+            description: 'Famous as "Dracula\'s Castle", this Gothic fortress is steeped in legend and history. The castle offers fascinating exhibits about medieval life and the region\'s royal history.',
+            hours: 'Monday: 12:00 PM - 6:00 PM, Tuesday-Sunday: 9:00 AM - 6:00 PM',
+            price: 'Adults: 45 RON, Students: 25 RON, Children: 10 RON',
+            tips: 'Very popular - arrive early or late to avoid crowds. Allow 1.5-2 hours. Combined tickets with Peles available.'
+        },
+        poiana: {
+            title: 'Poiana Brasov Ski Resort',
+            description: 'Premier ski resort with 23km of slopes for all skill levels. In summer, offers hiking, mountain biking, and stunning alpine scenery.',
+            hours: 'Ski Season: December-March, 8:00 AM - 4:00 PM. Summer activities: May-October',
+            price: 'Ski pass: 150 RON/day, Equipment rental: 80 RON/day',
+            tips: 'Book lessons in advance. Multiple difficulty levels available. Great apres-ski scene.'
+        },
+        brasov: {
+            title: 'Brasov Old Town',
+            description: 'Medieval city center featuring the impressive Black Church, colorful baroque buildings, and the famous Council Square. Charming cobblestone streets perfect for walking.',
+            hours: 'Always accessible (individual attractions vary)',
+            price: 'Free to walk around, Black Church: 10 RON',
+            tips: 'Don\'t miss Council Square and Rope Street (narrowest street). Great shopping and dining options.'
+        },
+        peles: {
+            title: 'Peles Castle',
+            description: 'One of Europe\'s most beautiful castles, this Neo-Renaissance masterpiece features 160 rooms with stunning art, furniture, and architecture. Former royal summer residence.',
+            hours: 'Wednesday-Sunday: 9:15 AM - 5:00 PM (Closed Monday-Tuesday)',
+            price: 'Adults: 50 RON, Students: 12.5 RON. Photo permit: 35 RON',
+            tips: 'Book online to skip lines. Guided tours mandatory. Photography not allowed inside without permit.'
+        },
+        'national-park': {
+            title: 'Piatra Craiului National Park',
+            description: 'Protected mountain range with dramatic limestone ridge. Home to rare wildlife including chamois, lynx, and brown bears. Pristine alpine meadows and forests.',
+            hours: 'Always open (visitor center: 9:00 AM - 5:00 PM)',
+            price: 'Free entry, Guided tours: 100-200 RON',
+            tips: 'Stay on marked trails. Bring proper hiking gear. Best months: June-September. Bear-safe practices required.'
+        },
+        'bear-sanctuary': {
+            title: 'Libearty Bear Sanctuary',
+            description: 'Europe\'s largest brown bear sanctuary, home to over 100 rescued bears. Ethical tourism supporting bear conservation and welfare in natural forest habitat.',
+            hours: 'Daily: 9:00 AM - 7:00 PM (April-October), 9:00 AM - 5:00 PM (November-March)',
+            price: 'Adults: 25 RON, Children: 15 RON, Family: 60 RON',
+            tips: 'Allow 1.5 hours. Bears most active in morning/evening. Support conservation by not feeding wildlife.'
         }
     };
     
@@ -501,6 +623,30 @@ function showRestaurantDetails(restaurantId) {
             menu: 'Specialty coffee, Fresh pastries, Breakfast menu, Sandwiches and salads',
             hours: '7:00 AM - 8:00 PM',
             notes: 'Free WiFi available.'
+        },
+        'belvedere-terrace': {
+            title: 'Belvedere Terrace',
+            menu: 'International cuisine, Steaks, Seafood, Fine wines, Gourmet desserts',
+            hours: '12:00 PM - 11:00 PM (Kitchen closes at 10:00 PM)',
+            notes: 'Reservations essential for sunset dining. Dress code: Smart casual.'
+        },
+        'grill-house': {
+            title: 'Grill House Rasnov',
+            menu: 'Mixed grills, BBQ ribs, Chicken skewers, Fresh salads, Local wines and craft beers',
+            hours: '12:00 PM - 11:00 PM',
+            notes: 'Outdoor seating available. Great for groups.'
+        },
+        bistro: {
+            title: 'Bistro Rasnoveana',
+            menu: 'Daily specials, Soups, Burgers, Pasta, Homemade cakes and desserts',
+            hours: '10:00 AM - 10:00 PM',
+            notes: 'Budget-friendly. Quick service. Lunch specials 11:00 AM - 2:00 PM.'
+        },
+        vegetarian: {
+            title: 'Vegetarian Haven',
+            menu: 'Buddha bowls, Vegan burgers, Fresh juices, Smoothies, Plant-based desserts',
+            hours: '9:00 AM - 9:00 PM',
+            notes: 'All organic ingredients. Gluten-free options available.'
         }
     };
     
@@ -545,6 +691,34 @@ function showAccommodationDetails(accommodationId) {
             amenities: 'Shared kitchen, common area, organized trips',
             price: 'From €15/night',
             contact: '+40 268 234 570'
+        },
+        villa: {
+            title: 'Villa Carpathia',
+            description: 'Luxury villa with 5 bedrooms, private garden, outdoor pool, and jacuzzi.',
+            amenities: 'Private pool, garden, BBQ area, full kitchen, parking',
+            price: 'From €300/night (sleeps 10)',
+            contact: '+40 268 234 571'
+        },
+        boutique: {
+            title: 'Boutique Hotel Residence',
+            description: 'Contemporary 4-star boutique hotel with rooftop bar and fitness center.',
+            amenities: 'Rooftop bar, gym, restaurant, spa treatments, free WiFi',
+            price: 'From €90/night',
+            contact: '+40 268 234 572'
+        },
+        cabins: {
+            title: 'Mountain Cabins',
+            description: 'Rustic wooden cabins with modern amenities. Each with fireplace and private terrace.',
+            amenities: 'Fireplace, terrace, kitchenette, WiFi',
+            price: 'From €60/night (2 persons)',
+            contact: '+40 268 234 573'
+        },
+        'casa-maria': {
+            title: 'Casa Maria B&B',
+            description: 'Traditional bed and breakfast run by local family. Authentic experience with homemade meals.',
+            amenities: 'Breakfast included, shared lounge, garden, WiFi',
+            price: 'From €35/night',
+            contact: '+40 268 234 574'
         }
     };
     
@@ -562,33 +736,113 @@ function showAccommodationDetails(accommodationId) {
 }
 
 // Map Loading Function
+let map = null;
+
 function loadMap() {
     const mapDiv = document.getElementById('interactive-map');
-    mapDiv.innerHTML = `
-        <div style="width: 100%; height: 100%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 2rem;">
-            <i class="fas fa-map-marked-alt" style="font-size: 4rem; color: #2c5f8d; margin-bottom: 1rem;"></i>
-            <h3 style="color: #2c5f8d; margin-bottom: 1rem;">Interactive Map</h3>
-            <p style="color: #666; text-align: center;">Showing all locations in Rasnov</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; width: 100%;">
-                <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <strong style="color: #2c5f8d;">📍 Rasnov Fortress</strong><br>
-                    <small>Main attraction - Historic site</small>
+    
+    // Check if Leaflet library is available
+    if (typeof L === 'undefined') {
+        // Fallback for when Leaflet is not available (CDN blocked or offline)
+        mapDiv.innerHTML = `
+            <div id="map-fallback" style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; color: white; border-radius: 12px;">
+                <i class="fas fa-map-marked-alt" style="font-size: 5rem; margin-bottom: 2rem; opacity: 0.9;"></i>
+                <h3 style="color: white; margin-bottom: 1.5rem; font-size: 1.8rem;">Interactive Map</h3>
+                <p style="color: rgba(255,255,255,0.9); text-align: center; margin-bottom: 2rem; max-width: 600px;">
+                    Showing all tourist locations, restaurants, and accommodations in Rasnov
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; width: 100%; max-width: 900px;">
+                    <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
+                        <strong style="color: #2c5f8d; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">📍 Locations</strong>
+                        <small style="color: #666;">Rasnov Fortress, Dino Parc, Piatra Mica Peak, Village Museum, Bran Castle, Poiana Brasov, Brasov Old Town, Peles Castle, National Park, Bear Sanctuary</small>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
+                        <strong style="color: #e8734e; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">🍽️ Restaurants</strong>
+                        <small style="color: #666;">Cetate Restaurant, La Ceaun, Pizzeria Castello, Cafe Central, Belvedere Terrace, Grill House, Bistro Rasnoveana, Vegetarian Haven</small>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
+                        <strong style="color: #4caf50; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">🏨 Accommodations</strong>
+                        <small style="color: #666;">Hotel Ambient, Pension Belvedere, Casa Petre, Mountain Hostel, Villa Carpathia, Boutique Hotel Residence, Mountain Cabins, Casa Maria B&B</small>
+                    </div>
                 </div>
-                <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <strong style="color: #e8734e;">🍽️ Cetate Restaurant</strong><br>
-                    <small>Traditional Romanian cuisine</small>
-                </div>
-                <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <strong style="color: #4caf50;">🏨 Hotel Ambient</strong><br>
-                    <small>4-star accommodation</small>
-                </div>
+                <p style="margin-top: 2rem; color: rgba(255,255,255,0.7); font-size: 0.95rem; text-align: center;">
+                    <i class="fas fa-info-circle"></i> In production, this displays a fully interactive map powered by OpenStreetMap/Leaflet
+                </p>
             </div>
-            <p style="margin-top: 2rem; color: #888; font-size: 0.9rem;">
-                <i class="fas fa-info-circle"></i> In production, this would display a full interactive map with Google Maps or OpenStreetMap
-            </p>
-        </div>
-    `;
+        `;
+        mapDiv.classList.add('loaded');
+        showNotification('Map loaded with all locations!', 'success');
+        return;
+    }
+    
+    // Clear placeholder content
+    mapDiv.innerHTML = '<div id="map-display" style="width: 100%; height: 100%;"></div>';
+    
+    // Initialize Leaflet map
+    map = L.map('map-display').setView([45.5889, 25.4631], 14);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Define custom icons
+    const locationIcon = L.icon({
+        iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDMyIDQwIj48cGF0aCBmaWxsPSIjMmM1ZjhkIiBkPSJNMTYgMEMxMC40ODYgMCA2IDQuNDg2IDYgMTBjMCA3LjUgMTAgMTcuNSAxMCAzMCAwIDAgMTAtMjIuNSAxMC0zMCAwLTUuNTE0LTQuNDg2LTEwLTEwLTEwem0wIDE1Yy0yLjc2MSAwLTUtMi4yMzktNS01czIuMjM5LTUgNS01IDUgMi4yMzkgNSA1LTIuMjM5IDUtNSA1eiIvPjwvc3ZnPg==',
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+    });
+    
+    const restaurantIcon = L.icon({
+        iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDMyIDQwIj48cGF0aCBmaWxsPSIjZTg3MzRlIiBkPSJNMTYgMEMxMC40ODYgMCA2IDQuNDg2IDYgMTBjMCA3LjUgMTAgMTcuNSAxMCAzMCAwIDAgMTAtMjIuNSAxMC0zMCAwLTUuNTE0LTQuNDg2LTEwLTEwLTEwem0wIDE1Yy0yLjc2MSAwLTUtMi4yMzktNS01czIuMjM5LTUgNS01IDUgMi4yMzkgNSA1LTIuMjM5IDUtNSA1eiIvPjwvc3ZnPg==',
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+    });
+    
+    const accommodationIcon = L.icon({
+        iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDMyIDQwIj48cGF0aCBmaWxsPSIjNGNhZjUwIiBkPSJNMTYgMEMxMC40ODYgMCA2IDQuNDg2IDYgMTBjMCA3LjUgMTAgMTcuNSAxMCAzMCAwIDAgMTAtMjIuNSAxMC0zMCAwLTUuNTE0LTQuNDg2LTEwLTEwLTEwem0wIDE1Yy0yLjc2MSAwLTUtMi4yMzktNS01czIuMjM5LTUgNS01IDUgMi4yMzkgNSA1LTIuMjM5IDUtNSA1eiIvPjwvc3ZnPg==',
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+    });
+    
+    // Add locations (showing a representative subset for map clarity)
+    const locations = [
+        // Main attractions
+        { name: 'Rasnov Fortress', lat: 45.5889, lng: 25.4631, type: 'location', desc: 'Medieval citadel with panoramic views' },
+        { name: 'Dino Parc', lat: 45.5895, lng: 25.4625, type: 'location', desc: 'Largest dinosaur park in SE Europe' },
+        { name: 'Piatra Mica Peak', lat: 45.5700, lng: 25.4500, type: 'location', desc: 'Mountain peak with cable car' },
+        { name: 'Village Museum', lat: 45.5850, lng: 25.4600, type: 'location', desc: 'Traditional Romanian artifacts' },
+        // Restaurants
+        { name: 'Cetate Restaurant', lat: 45.5888, lng: 25.4633, type: 'restaurant', desc: 'Traditional Romanian cuisine' },
+        { name: 'La Ceaun', lat: 45.5885, lng: 25.4628, type: 'restaurant', desc: 'Mountain dishes and soups' },
+        { name: 'Pizzeria Castello', lat: 45.5883, lng: 25.4635, type: 'restaurant', desc: 'Italian pizzeria' },
+        { name: 'Cafe Central', lat: 45.5880, lng: 25.4620, type: 'restaurant', desc: 'Coffee and pastries' },
+        { name: 'Belvedere Terrace', lat: 45.5890, lng: 25.4645, type: 'restaurant', desc: 'Panoramic terrace dining' },
+        // Accommodations
+        { name: 'Hotel Ambient', lat: 45.5887, lng: 25.4640, type: 'accommodation', desc: '4-star hotel with spa' },
+        { name: 'Pension Belvedere', lat: 45.5892, lng: 25.4638, type: 'accommodation', desc: 'Family-run guesthouse' },
+        { name: 'Casa Petre', lat: 45.5878, lng: 25.4625, type: 'accommodation', desc: 'Apartments in old town' },
+        { name: 'Mountain Hostel', lat: 45.5875, lng: 25.4615, type: 'accommodation', desc: 'Budget-friendly hostel' },
+        { name: 'Villa Carpathia', lat: 45.5893, lng: 25.4650, type: 'accommodation', desc: 'Luxury villa with pool' }
+    ];
+    
+    // Add markers to map
+    locations.forEach(loc => {
+        let icon = locationIcon;
+        if (loc.type === 'restaurant') icon = restaurantIcon;
+        if (loc.type === 'accommodation') icon = accommodationIcon;
+        
+        L.marker([loc.lat, loc.lng], { icon: icon })
+            .addTo(map)
+            .bindPopup(`<strong>${loc.name}</strong><br>${loc.desc}`);
+    });
+    
     mapDiv.classList.add('loaded');
+    showNotification('Map loaded successfully!', 'success');
 }
 
 // Language Toggle (Basic implementation)
