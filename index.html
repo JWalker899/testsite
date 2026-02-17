@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover Rasnov - Your ultimate guide to visiting this historic Romanian destination">
+    <title>Discover Rasnov | Tourist Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-mountain"></i>
+                    <h1>Discover Rasnov</h1>
+                </div>
+                <nav class="nav-menu">
+                    <button class="nav-toggle" aria-label="Toggle navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <ul class="nav-list">
+                        <li><a href="#home" class="nav-link active">Home</a></li>
+                        <li><a href="#ar-mode" class="nav-link">AR Scavenger Hunt</a></li>
+                        <li><a href="#map" class="nav-link">Map</a></li>
+                        <li><a href="#info" class="nav-link">Info</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="lang-toggle" aria-label="Change language">
+                        <i class="fas fa-globe"></i> EN
+                    </button>
+                    <button class="weather-widget" id="weather-btn">
+                        <i class="fas fa-cloud-sun"></i>
+                        <span id="temp">--°C</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2 class="hero-title">Welcome to Rasnov</h2>
+            <p class="hero-subtitle">Explore Historic Fortress, Stunning Nature & Romanian Culture</p>
+            <button class="cta-button" onclick="scrollToSection('locations')">
+                <i class="fas fa-compass"></i> Start Exploring
+            </button>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Tab Navigation -->
+            <div class="tabs" id="home">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="locations">
+                        <i class="fas fa-landmark"></i>
+                        <span>Locations</span>
+                    </button>
+                    <button class="tab-button" data-tab="restaurants">
+                        <i class="fas fa-utensils"></i>
+                        <span>Restaurants</span>
+                    </button>
+                    <button class="tab-button" data-tab="accommodations">
+                        <i class="fas fa-bed"></i>
+                        <span>Places to Stay</span>
+                    </button>
+                </div>
+
+                <!-- Locations Tab -->
+                <div class="tab-content active" id="locations">
+                    <h2 class="section-title">Top Locations to Visit</h2>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Rasnov Fortress</h3>
+                                <p class="card-description">A medieval citadel built by Teutonic Knights in the 13th century. Offers breathtaking panoramic views of the surrounding Carpathian Mountains.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 2-3 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 20 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('fortress')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Dino Parc</h3>
+                                <p class="card-description">The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs. Perfect for families and children.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 1-2 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 40 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('dinoparc')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Piatra Mica Peak</h3>
+                                <p class="card-description">Hiking trail to a stunning mountain peak. Accessible via cable car or hiking trail, offering spectacular mountain views.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 3-4 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> Free (30 RON cable car)</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('peak')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1605649487212-47e4c5c77215?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Village Museum</h3>
+                                <p class="card-description">Explore traditional Romanian rural life with authentic houses, tools, and artifacts from the region's history.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 1 hour</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 10 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('museum')">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurants Tab -->
+                <div class="tab-content" id="restaurants">
+                    <h2 class="section-title">Best Restaurants</h2>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Cetate Restaurant</h3>
+                                <p class="card-description">Traditional Romanian cuisine in the heart of the fortress. Try their famous sarmale and mici with polenta.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Romanian</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-star"></i> 4.6</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('cetate')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">La Ceaun</h3>
+                                <p class="card-description">Cozy tavern serving hearty mountain dishes. Their ciorbă (sour soup) and grilled trout are must-tries.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Traditional</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-star"></i> 4.5</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('ceaun')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Pizzeria Castello</h3>
+                                <p class="card-description">Italian pizzeria with a Romanian twist. Wood-fired pizzas and pasta dishes with local ingredients.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Italian</span>
+                                    <span><i class="fas fa-euro-sign"></i> €</span>
+                                    <span><i class="fas fa-star"></i> 4.4</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('pizzeria')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Cafe Central</h3>
+                                <p class="card-description">Modern cafe with excellent coffee, pastries, and light meals. Perfect for breakfast or afternoon break.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Cafe</span>
+                                    <span><i class="fas fa-euro-sign"></i> €</span>
+                                    <span><i class="fas fa-star"></i> 4.7</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('cafe')">View Menu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accommodations Tab -->
+                <div class="tab-content" id="accommodations">
+                    <h2 class="section-title">Places to Stay</h2>
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Hotel Ambient</h3>
+                                <p class="card-description">Modern 4-star hotel with spa facilities, mountain views, and excellent breakfast. Close to fortress.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-star"></i> 4 stars</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('ambient')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Pension Belvedere</h3>
+                                <p class="card-description">Family-run guesthouse with traditional Romanian hospitality. Homemade breakfast and stunning views.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-star"></i> 3 stars</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('belvedere')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1587271636175-90d58cdad458?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Casa Petre</h3>
+                                <p class="card-description">Charming apartments in the old town. Fully equipped kitchens and authentic Romanian decor.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-home"></i> Apartment</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('petre')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Mountain Hostel</h3>
+                                <p class="card-description">Budget-friendly hostel perfect for backpackers. Shared kitchen, common area, and organized hiking trips.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-bed"></i> Hostel</span>
+                                    <span><i class="fas fa-euro-sign"></i> €</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('hostel')">Check Availability</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AR Scavenger Hunt Section -->
+            <section class="ar-section" id="ar-mode">
+                <div class="section-header">
+                    <h2 class="section-title">AR Scavenger Hunt</h2>
+                    <p class="section-subtitle">Explore Rasnov in a fun, interactive way!</p>
+                </div>
+                
+                <div class="ar-controls">
+                    <button class="ar-button primary" id="start-hunt">
+                        <i class="fas fa-play"></i> Start Hunt
+                    </button>
+                    <button class="ar-button" id="scan-qr">
+                        <i class="fas fa-qrcode"></i> Scan QR Code
+                    </button>
+                    <button class="ar-button" id="use-location">
+                        <i class="fas fa-map-marker-alt"></i> Use Location
+                    </button>
+                    <button class="ar-button testing-mode" id="testing-mode">
+                        <i class="fas fa-flask"></i> Testing Mode
+                    </button>
+                </div>
+
+                <div class="hunt-status" id="hunt-status">
+                    <div class="progress-container">
+                        <h3>Your Progress</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p class="progress-text"><span id="progress-count">0</span> / <span id="progress-total">8</span> locations found</p>
+                    </div>
+                    
+                    <div class="hunt-items">
+                        <div class="hunt-item" data-location="fortress">
+                            <i class="fas fa-lock"></i>
+                            <span>Rasnov Fortress Gate</span>
+                        </div>
+                        <div class="hunt-item" data-location="well">
+                            <i class="fas fa-lock"></i>
+                            <span>Ancient Well</span>
+                        </div>
+                        <div class="hunt-item" data-location="tower">
+                            <i class="fas fa-lock"></i>
+                            <span>Watch Tower</span>
+                        </div>
+                        <div class="hunt-item" data-location="church">
+                            <i class="fas fa-lock"></i>
+                            <span>Old Church</span>
+                        </div>
+                        <div class="hunt-item" data-location="museum">
+                            <i class="fas fa-lock"></i>
+                            <span>Village Museum</span>
+                        </div>
+                        <div class="hunt-item" data-location="peak">
+                            <i class="fas fa-lock"></i>
+                            <span>Mountain Peak</span>
+                        </div>
+                        <div class="hunt-item" data-location="square">
+                            <i class="fas fa-lock"></i>
+                            <span>Town Square</span>
+                        </div>
+                        <div class="hunt-item" data-location="dino">
+                            <i class="fas fa-lock"></i>
+                            <span>Dino Park Entrance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Scanner Modal -->
+                <div class="modal" id="qr-modal">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeModal('qr-modal')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <h3>Scan QR Code</h3>
+                        <div id="qr-scanner">
+                            <video id="qr-video" autoplay></video>
+                            <div class="scanner-overlay">
+                                <div class="scanner-frame"></div>
+                            </div>
+                        </div>
+                        <p class="help-text">Point your camera at a QR code at any scavenger hunt location</p>
+                    </div>
+                </div>
+
+                <!-- Location Discovery Modal -->
+                <div class="modal" id="discovery-modal">
+                    <div class="modal-content discovery-content">
+                        <button class="modal-close" onclick="closeModal('discovery-modal')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="discovery-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 id="discovery-title">Location Found!</h3>
+                        <p id="discovery-message"></p>
+                        <div id="discovery-fact" class="fact-box"></div>
+                        <button class="cta-button" onclick="closeModal('discovery-modal')">Continue Hunt</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Map Section -->
+            <section class="map-section" id="map">
+                <h2 class="section-title">Interactive Map</h2>
+                <div class="map-container">
+                    <div id="interactive-map" class="map-placeholder">
+                        <div class="map-info">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>Interactive map showing all locations, restaurants, and accommodations</p>
+                            <button class="cta-button" onclick="loadMap()">Load Map</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tourist Info Section -->
+            <section class="info-section" id="info">
+                <h2 class="section-title">Essential Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Emergency</h3>
+                        <p><strong>Police:</strong> 112</p>
+                        <p><strong>Medical:</strong> 112</p>
+                        <p><strong>Tourist Info:</strong> +40 268 234 567</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-bus"></i>
+                        <h3>Transportation</h3>
+                        <p><strong>Bus to Brasov:</strong> Every 30 min</p>
+                        <p><strong>Taxi:</strong> +40 268 111 222</p>
+                        <p><strong>Car Rental:</strong> Available in town</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-language"></i>
+                        <h3>Language</h3>
+                        <p><strong>Main:</strong> Romanian</p>
+                        <p><strong>Common:</strong> English, German</p>
+                        <p><strong>Tip:</strong> Learn basic phrases</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Currency</h3>
+                        <p><strong>Currency:</strong> Romanian Leu (RON)</p>
+                        <p><strong>ATMs:</strong> Available in town</p>
+                        <p><strong>Cards:</strong> Widely accepted</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Opening Hours</h3>
+                        <p><strong>Fortress:</strong> 9:00 - 18:00</p>
+                        <p><strong>Shops:</strong> 10:00 - 20:00</p>
+                        <p><strong>Restaurants:</strong> 11:00 - 23:00</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Best Time to Visit</h3>
+                        <p><strong>Peak:</strong> June - August</p>
+                        <p><strong>Shoulder:</strong> May, September</p>
+                        <p><strong>Winter:</strong> Skiing nearby</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About Rasnov</h4>
+                    <p>Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#ar-mode">Scavenger Hunt</a></li>
+                        <li><a href="#map">Map</a></li>
+                        <li><a href="#info">Info</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-envelope"></i> info@discoverrasnov.ro</p>
+                    <p><i class="fas fa-phone"></i> +40 268 234 567</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Discover Rasnov. Made with <i class="fas fa-heart"></i> for tourists.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
