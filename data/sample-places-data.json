@@ -1,0 +1,237 @@
+{
+  "lastUpdated": "2026-02-17T12:00:00Z",
+  "center": {
+    "lat": 45.5889,
+    "lng": 25.4631
+  },
+  "locations": [
+    {
+      "id": "sample_fortress",
+      "name": "Rasnov Fortress",
+      "coordinates": {
+        "lat": 45.5889,
+        "lng": 25.4631
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 1523,
+      "priceLevel": 2,
+      "address": "Strada Cetății, Râșnov, Romania",
+      "phone": "+40 268 234 567",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 9:00 AM – 6:00 PM",
+          "Tuesday: 9:00 AM – 6:00 PM",
+          "Wednesday: 9:00 AM – 6:00 PM",
+          "Thursday: 9:00 AM – 6:00 PM",
+          "Friday: 9:00 AM – 6:00 PM",
+          "Saturday: 9:00 AM – 7:00 PM",
+          "Sunday: 9:00 AM – 7:00 PM"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "A medieval citadel built by Teutonic Knights in the 13th century."
+    },
+    {
+      "id": "sample_dino",
+      "name": "Dino Parc",
+      "coordinates": {
+        "lat": 45.5895,
+        "lng": 25.4625
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 892,
+      "priceLevel": 2,
+      "address": "Strada Cetatii, Rasnov, Romania",
+      "phone": "+40 268 234 890",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 10:00 AM – 7:00 PM",
+          "Tuesday: 10:00 AM – 7:00 PM",
+          "Wednesday: 10:00 AM – 7:00 PM",
+          "Thursday: 10:00 AM – 7:00 PM",
+          "Friday: 10:00 AM – 8:00 PM",
+          "Saturday: 9:00 AM – 8:00 PM",
+          "Sunday: 9:00 AM – 8:00 PM"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs."
+    },
+    {
+      "id": "sample_peak",
+      "name": "Piatra Mica Peak",
+      "coordinates": {
+        "lat": 45.5700,
+        "lng": 25.4500
+      },
+      "rating": 4.8,
+      "userRatingsTotal": 456,
+      "priceLevel": 1,
+      "address": "Piatra Mica, Rasnov, Romania",
+      "phone": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Hiking trail to a stunning mountain peak with spectacular views."
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "sample_restaurant_1",
+      "name": "La Ceaun Restaurant",
+      "coordinates": {
+        "lat": 45.5880,
+        "lng": 25.4620
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 234,
+      "priceLevel": 2,
+      "address": "Strada Republicii 1, Rasnov, Romania",
+      "phone": "+40 268 234 123",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 11:00 AM – 10:00 PM",
+          "Tuesday: 11:00 AM – 10:00 PM",
+          "Wednesday: 11:00 AM – 10:00 PM",
+          "Thursday: 11:00 AM – 10:00 PM",
+          "Friday: 11:00 AM – 11:00 PM",
+          "Saturday: 10:00 AM – 11:00 PM",
+          "Sunday: 10:00 AM – 10:00 PM"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Traditional Romanian cuisine in a cozy setting."
+    },
+    {
+      "id": "sample_restaurant_2",
+      "name": "Pizzeria Bella",
+      "coordinates": {
+        "lat": 45.5885,
+        "lng": 25.4635
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 189,
+      "priceLevel": 1,
+      "address": "Strada Cetatii 5, Rasnov, Romania",
+      "phone": "+40 268 234 456",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 12:00 PM – 10:00 PM",
+          "Tuesday: 12:00 PM – 10:00 PM",
+          "Wednesday: 12:00 PM – 10:00 PM",
+          "Thursday: 12:00 PM – 10:00 PM",
+          "Friday: 12:00 PM – 11:00 PM",
+          "Saturday: 12:00 PM – 11:00 PM",
+          "Sunday: 12:00 PM – 10:00 PM"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Italian restaurant with wood-fired pizzas."
+    }
+  ],
+  "accommodations": [
+    {
+      "id": "sample_hotel_1",
+      "name": "Hotel Ambient",
+      "coordinates": {
+        "lat": 45.5890,
+        "lng": 25.4638
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 312,
+      "priceLevel": 3,
+      "address": "Strada Cetatii 10, Rasnov, Romania",
+      "phone": "+40 268 234 789",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Modern hotel with excellent amenities and mountain views."
+    },
+    {
+      "id": "sample_hostel_1",
+      "name": "Rasnov Hostel",
+      "coordinates": {
+        "lat": 45.5875,
+        "lng": 25.4615
+      },
+      "rating": 4.1,
+      "userRatingsTotal": 145,
+      "priceLevel": 1,
+      "address": "Strada Republicii 15, Rasnov, Romania",
+      "phone": "+40 268 234 321",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      },
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Budget-friendly hostel for backpackers."
+    }
+  ]
+}
