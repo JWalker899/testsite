@@ -101,7 +101,7 @@ startHuntBtn.addEventListener('click', () => {
     if (!huntActive) {
         huntActive = true;
         startHuntBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Hunt';
-        startHuntBtn.style.background = '#f44336';
+        startHuntBtn.classList.add('active-hunt');
         showNotification('Scavenger hunt started! Find all 8 locations.', 'success');
         
         // Enable other buttons
@@ -110,7 +110,7 @@ startHuntBtn.addEventListener('click', () => {
     } else {
         huntActive = false;
         startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
-        startHuntBtn.style.background = '';
+        startHuntBtn.classList.remove('active-hunt');
         showNotification('Scavenger hunt stopped.', 'info');
     }
 });
@@ -152,8 +152,7 @@ useLocationBtn.addEventListener('click', () => {
 testingModeBtn.addEventListener('click', () => {
     testingMode = !testingMode;
     if (testingMode) {
-        testingModeBtn.style.background = '#ff9800';
-        testingModeBtn.style.color = 'white';
+        testingModeBtn.classList.add('testing-active');
         showNotification('Testing mode enabled! Click on any location to mark it as found.', 'info');
         
         // Add click handlers to hunt items in testing mode
@@ -162,8 +161,7 @@ testingModeBtn.addEventListener('click', () => {
             item.addEventListener('click', handleTestingModeClick);
         });
     } else {
-        testingModeBtn.style.background = '';
-        testingModeBtn.style.color = '';
+        testingModeBtn.classList.remove('testing-active');
         showNotification('Testing mode disabled.', 'info');
         
         // Remove click handlers
@@ -304,7 +302,8 @@ function discoverLocation(locationKey) {
             showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.style.background = '#4caf50';
+            startHuntBtn.classList.remove('active-hunt');
+            startHuntBtn.classList.add('hunt-complete');
         }, 2000);
     }
 }
@@ -466,33 +465,99 @@ function showLocationDetails(locationId) {
     
     const detail = details[locationId];
     if (detail) {
-        alert(`${detail.title}\n\n${detail.description}\n\nHours: ${detail.hours}\nPrice: ${detail.price}\n\nTips: ${detail.tips}`);
+        document.getElementById('details-title').textContent = detail.title;
+        document.getElementById('details-content').innerHTML = `
+            <p><strong>About:</strong> ${detail.description}</p>
+            <p><strong>Hours:</strong> ${detail.hours}</p>
+            <p><strong>Price:</strong> ${detail.price}</p>
+            <p><strong>Tips:</strong> ${detail.tips}</p>
+        `;
+        openModal('details-modal');
     }
 }
 
 function showRestaurantDetails(restaurantId) {
     const details = {
-        cetate: 'Menu highlights: Sarmale (stuffed cabbage rolls), Mici (grilled meat rolls), Polenta with cheese and sour cream, Traditional soups. Open: 11:00 AM - 11:00 PM. Reservations recommended for groups.',
-        ceaun: 'Menu highlights: Ciorbă (sour soup), Grilled trout, Pork steak with mushrooms, Homemade desserts. Open: 12:00 PM - 10:00 PM. Cozy atmosphere with fireplace.',
-        pizzeria: 'Menu highlights: Wood-fired pizzas, Fresh pasta, Romanian-Italian fusion dishes, Tiramisu. Open: 11:00 AM - 11:00 PM. Delivery available.',
-        cafe: 'Menu highlights: Specialty coffee, Fresh pastries, Breakfast menu, Sandwiches and salads. Open: 7:00 AM - 8:00 PM. Free WiFi available.'
+        cetate: {
+            title: 'Cetate Restaurant',
+            menu: 'Sarmale (stuffed cabbage rolls), Mici (grilled meat rolls), Polenta with cheese and sour cream, Traditional soups',
+            hours: '11:00 AM - 11:00 PM',
+            notes: 'Reservations recommended for groups.'
+        },
+        ceaun: {
+            title: 'La Ceaun',
+            menu: 'Ciorbă (sour soup), Grilled trout, Pork steak with mushrooms, Homemade desserts',
+            hours: '12:00 PM - 10:00 PM',
+            notes: 'Cozy atmosphere with fireplace.'
+        },
+        pizzeria: {
+            title: 'Pizzeria Castello',
+            menu: 'Wood-fired pizzas, Fresh pasta, Romanian-Italian fusion dishes, Tiramisu',
+            hours: '11:00 AM - 11:00 PM',
+            notes: 'Delivery available.'
+        },
+        cafe: {
+            title: 'Cafe Central',
+            menu: 'Specialty coffee, Fresh pastries, Breakfast menu, Sandwiches and salads',
+            hours: '7:00 AM - 8:00 PM',
+            notes: 'Free WiFi available.'
+        }
     };
     
-    if (details[restaurantId]) {
-        alert(details[restaurantId]);
+    const detail = details[restaurantId];
+    if (detail) {
+        document.getElementById('details-title').textContent = detail.title;
+        document.getElementById('details-content').innerHTML = `
+            <p><strong>Menu Highlights:</strong> ${detail.menu}</p>
+            <p><strong>Hours:</strong> ${detail.hours}</p>
+            <p><strong>Note:</strong> ${detail.notes}</p>
+        `;
+        openModal('details-modal');
     }
 }
 
 function showAccommodationDetails(accommodationId) {
     const details = {
-        ambient: 'Hotel Ambient: 4-star hotel with spa, indoor pool, restaurant, and mountain-view rooms. Amenities: Free WiFi, parking, breakfast included. From €80/night. Book: +40 268 234 567',
-        belvedere: 'Pension Belvedere: Family-run guesthouse with traditional rooms and homemade breakfast. Amenities: Free WiFi, parking, garden. From €40/night. Book: +40 268 234 568',
-        petre: 'Casa Petre: Fully equipped apartments in old town. Perfect for families or longer stays. Amenities: Kitchen, WiFi, parking. From €50/night. Book: +40 268 234 569',
-        hostel: 'Mountain Hostel: Budget-friendly with dorms and private rooms. Amenities: Shared kitchen, common area, organized trips. From €15/night. Book: +40 268 234 570'
+        ambient: {
+            title: 'Hotel Ambient',
+            description: '4-star hotel with spa, indoor pool, restaurant, and mountain-view rooms.',
+            amenities: 'Free WiFi, parking, breakfast included',
+            price: 'From €80/night',
+            contact: '+40 268 234 567'
+        },
+        belvedere: {
+            title: 'Pension Belvedere',
+            description: 'Family-run guesthouse with traditional rooms and homemade breakfast.',
+            amenities: 'Free WiFi, parking, garden',
+            price: 'From €40/night',
+            contact: '+40 268 234 568'
+        },
+        petre: {
+            title: 'Casa Petre',
+            description: 'Fully equipped apartments in old town. Perfect for families or longer stays.',
+            amenities: 'Kitchen, WiFi, parking',
+            price: 'From €50/night',
+            contact: '+40 268 234 569'
+        },
+        hostel: {
+            title: 'Mountain Hostel',
+            description: 'Budget-friendly with dorms and private rooms.',
+            amenities: 'Shared kitchen, common area, organized trips',
+            price: 'From €15/night',
+            contact: '+40 268 234 570'
+        }
     };
     
-    if (details[accommodationId]) {
-        alert(details[accommodationId]);
+    const detail = details[accommodationId];
+    if (detail) {
+        document.getElementById('details-title').textContent = detail.title;
+        document.getElementById('details-content').innerHTML = `
+            <p><strong>Description:</strong> ${detail.description}</p>
+            <p><strong>Amenities:</strong> ${detail.amenities}</p>
+            <p><strong>Price:</strong> ${detail.price}</p>
+            <p><strong>Book:</strong> ${detail.contact}</p>
+        `;
+        openModal('details-modal');
     }
 }
 
@@ -543,6 +608,10 @@ if (langToggle) {
 
 // Initialize progress display
 updateProgress();
+
+// Initialize button states
+scanQrBtn.disabled = true;
+useLocationBtn.disabled = true;
 
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';

@@ -367,6 +367,26 @@ body {
     color: white;
 }
 
+.ar-button.active-hunt {
+    background: #f44336;
+    color: white;
+}
+
+.ar-button.testing-active {
+    background: var(--warning-color);
+    color: white;
+}
+
+.ar-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ar-button.hunt-complete {
+    background: var(--success-color);
+    color: white;
+}
+
 .hunt-status {
     margin-top: 2rem;
 }
