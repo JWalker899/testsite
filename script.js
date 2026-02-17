@@ -539,6 +539,28 @@ async function launchARExperience(locationKey, isTestMode = false) {
         
     } catch (error) {
         console.error('AR Camera Error:', error);
+        
+        // In test mode, show demo view even without camera
+        if (isTestMode) {
+            arLoading.classList.add('hidden');
+            
+            // Setup AR scene without camera (will show placeholder)
+            setupARScene(locationKey);
+            
+            // Update text overlay
+            arLocationName.textContent = `You found ${location.name}!`;
+            arLocationHint.textContent = location.hint || 'Great job exploring Rasnov!';
+            
+            // Mark location as discovered after a delay
+            setTimeout(() => {
+                if (!foundLocations.has(locationKey)) {
+                    discoverLocationQuietly(locationKey);
+                }
+            }, 2000);
+            
+            return;
+        }
+        
         arLoading.classList.add('hidden');
         
         // Show user-friendly error message
@@ -604,10 +626,26 @@ function setupARScene(locationKey) {
         z-index: 1;
     `;
     
-    // Attach camera stream to video
+    // Attach camera stream to video or show placeholder
     if (arStream) {
         video.srcObject = arStream;
         video.play().catch(err => console.warn('Video autoplay failed:', err));
+    } else {
+        // Show placeholder when camera is not available (for demo/testing)
+        video.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        const placeholder = document.createElement('div');
+        placeholder.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 2;
+        `;
+        placeholder.innerHTML = '📷<br>Camera View<br><small style="font-size: 14px;">(Placeholder)</small>';
+        arSceneContainer.appendChild(placeholder);
     }
     
     // Create mascot overlay
