@@ -275,12 +275,14 @@ function startQRScanner() {
                         if (locationKey) {
                             // Valid QR code found
                             if (!foundLocations.has(locationKey)) {
+                                // New location discovered - stop scanning
                                 scanningActive = false;
                                 stopVideoStream();
                                 discoverLocation(locationKey);
                                 closeModal('qr-modal');
-                                return; // Exit early, don't continue scanning
+                                return;
                             } else {
+                                // Already found this location
                                 showNotification('You already found this location!', 'info');
                             }
                         } else {
@@ -289,7 +291,7 @@ function startQRScanner() {
                         }
                     }
                     
-                    // Continue scanning after debounce
+                    // Continue scanning
                     requestAnimationFrame(scanQRCode);
                 } else {
                     // No QR code detected, continue scanning
