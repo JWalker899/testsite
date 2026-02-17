@@ -417,7 +417,7 @@ function closeModal(modalId) {
         if (modalId === 'qr-modal') {
             stopVideoStream();
             const video = document.getElementById('qr-video');
-            if (video.srcObject) {
+            if (video && video.srcObject) {
                 video.srcObject = null;
             }
         }
