@@ -23,14 +23,14 @@ let userLocation = null;
 
 // Scavenger Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
-    fortress: { lat: 45.5889, lng: 25.4631, name: 'Rasnov Fortress Gate', qr: 'RASNOV_FORTRESS', fact: 'The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.' },
-    well: { lat: 45.5892, lng: 25.4635, name: 'Ancient Well', qr: 'RASNOV_WELL', fact: 'This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.' },
-    tower: { lat: 45.5885, lng: 25.4640, name: 'Watch Tower', qr: 'RASNOV_TOWER', fact: 'The watch tower provided 360-degree views to spot approaching enemies from miles away.' },
-    church: { lat: 45.5890, lng: 25.4638, name: 'Old Church', qr: 'RASNOV_CHURCH', fact: 'This Gothic church dates back to the 14th century and still holds services today.' },
-    museum: { lat: 45.5850, lng: 25.4600, name: 'Village Museum', qr: 'RASNOV_MUSEUM', fact: 'The museum houses over 300 artifacts showcasing traditional Romanian village life.' },
-    peak: { lat: 45.5700, lng: 25.4500, name: 'Mountain Peak', qr: 'RASNOV_PEAK', fact: 'At 1650m elevation, this peak offers views of the entire Barsa region on clear days.' },
-    square: { lat: 45.5880, lng: 25.4620, name: 'Town Square', qr: 'RASNOV_SQUARE', fact: 'The town square has been a gathering place for markets and festivals for over 600 years.' },
-    dino: { lat: 45.5895, lng: 25.4625, name: 'Dino Park Entrance', qr: 'RASNOV_DINO', fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.' }
+    fortress: { lat: 45.5889, lng: 25.4631, name: 'Rasnov Fortress Gate', qr: '1', fact: 'The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.' },
+    well: { lat: 45.5892, lng: 25.4635, name: 'Ancient Well', qr: '2', fact: 'This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.' },
+    tower: { lat: 45.5885, lng: 25.4640, name: 'Watch Tower', qr: '3', fact: 'The watch tower provided 360-degree views to spot approaching enemies from miles away.' },
+    church: { lat: 45.5890, lng: 25.4638, name: 'Old Church', qr: '4', fact: 'This Gothic church dates back to the 14th century and still holds services today.' },
+    museum: { lat: 45.5850, lng: 25.4600, name: 'Village Museum', qr: '5', fact: 'The museum houses over 300 artifacts showcasing traditional Romanian village life.' },
+    peak: { lat: 45.5700, lng: 25.4500, name: 'Mountain Peak', qr: '6', fact: 'At 1650m elevation, this peak offers views of the entire Barsa region on clear days.' },
+    square: { lat: 45.5880, lng: 25.4620, name: 'Town Square', qr: '7', fact: 'The town square has been a gathering place for markets and festivals for over 600 years.' },
+    dino: { lat: 45.5895, lng: 25.4625, name: 'Dino Park Entrance', qr: '8', fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.' }
 };
 
 // Tab Functionality
@@ -181,23 +181,42 @@ function handleTestingModeClick(e) {
     }
 }
 
+// QR Code mapping function
+function getLocationKeyFromQR(qrData) {
+    const qrMap = {
+        '1': 'fortress',
+        '2': 'well',
+        '3': 'tower',
+        '4': 'church',
+        '5': 'museum',
+        '6': 'peak',
+        '7': 'square',
+        '8': 'dino'
+    };
+    return qrMap[qrData];
+}
+
+// Variable to store video stream for cleanup
+let videoStream = null;
+let scanningActive = false;
+
 function startQRScanner() {
     const video = document.getElementById('qr-video');
+    const canvas = document.getElementById('qr-canvas');
+    const canvasContext = canvas.getContext('2d');
+    
+    scanningActive = true;
     
     // Check if browser supports getUserMedia
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
             .then(stream => {
+                videoStream = stream;
                 video.srcObject = stream;
                 video.play();
                 
-                // Simulate QR code detection in testing
-                if (testingMode) {
-                    setTimeout(() => {
-                        const randomLocation = Object.keys(huntLocations)[Math.floor(Math.random() * Object.keys(huntLocations).length)];
-                        simulateQRScan(randomLocation);
-                    }, 2000);
-                }
+                // Start scanning for QR codes
+                requestAnimationFrame(scanQRCode);
             })
             .catch(err => {
                 console.error('Error accessing camera:', err);
@@ -208,6 +227,69 @@ function startQRScanner() {
             });
     } else {
         showQRCodeOptions();
+    }
+    
+    function scanQRCode() {
+        if (!scanningActive) {
+            return;
+        }
+        
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            // Set canvas size to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw video frame to canvas
+            canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Get image data from canvas
+            const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // Scan for QR code using jsQR
+            if (typeof jsQR !== 'undefined') {
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    // QR code detected
+                    const qrData = code.data;
+                    const locationKey = getLocationKeyFromQR(qrData);
+                    
+                    if (locationKey) {
+                        // Valid QR code found
+                        if (!foundLocations.has(locationKey)) {
+                            scanningActive = false;
+                            stopVideoStream();
+                            discoverLocation(locationKey);
+                            closeModal('qr-modal');
+                        } else {
+                            showNotification('You already found this location!', 'info');
+                        }
+                    } else {
+                        // Invalid QR code (readable but not 1-8)
+                        showNotification('This QR code is not part of the scavenger hunt. Please scan a code numbered 1-8.', 'warning');
+                        // Continue scanning
+                        requestAnimationFrame(scanQRCode);
+                    }
+                } else {
+                    // No QR code detected, continue scanning
+                    requestAnimationFrame(scanQRCode);
+                }
+            } else {
+                // jsQR not loaded, continue scanning
+                requestAnimationFrame(scanQRCode);
+            }
+        } else {
+            // Video not ready, continue scanning
+            requestAnimationFrame(scanQRCode);
+        }
+    }
+}
+
+function stopVideoStream() {
+    scanningActive = false;
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
     }
 }
 
@@ -333,9 +415,10 @@ function closeModal(modalId) {
         
         // Stop video if QR modal
         if (modalId === 'qr-modal') {
+            stopVideoStream();
             const video = document.getElementById('qr-video');
             if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
             }
         }
     }

@@ -323,6 +323,7 @@
                         <h3>Scan QR Code</h3>
                         <div id="qr-scanner">
                             <video id="qr-video" autoplay></video>
+                            <canvas id="qr-canvas" style="display: none;"></canvas>
                             <div class="scanner-overlay">
                                 <div class="scanner-frame"></div>
                             </div>
@@ -459,6 +460,7 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
