@@ -52,14 +52,14 @@ Interactive gamification to explore Rasnov:
 
 #### For Real Use with QR Codes
 1. Print QR codes with these values at each location:
-   - Fortress: `RASNOV_FORTRESS`
-   - Well: `RASNOV_WELL`
-   - Tower: `RASNOV_TOWER`
-   - Church: `RASNOV_CHURCH`
-   - Museum: `RASNOV_MUSEUM`
-   - Peak: `RASNOV_PEAK`
-   - Square: `RASNOV_SQUARE`
-   - Dino: `RASNOV_DINO`
+   - Fortress: `1`
+   - Well: `2`
+   - Tower: `3`
+   - Church: `4`
+   - Museum: `5`
+   - Peak: `6`
+   - Square: `7`
+   - Dino: `8`
 2. Click **"Start Hunt"**
 3. Click **"Scan QR Code"** and allow camera access
 4. Point camera at QR codes at each location
