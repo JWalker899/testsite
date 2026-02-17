@@ -9,28 +9,89 @@ const navList = document.querySelector('.nav-list');
 const startHuntBtn = document.getElementById('start-hunt');
 const scanQrBtn = document.getElementById('scan-qr');
 const useLocationBtn = document.getElementById('use-location');
+const testLocationBtn = document.getElementById('test-location');
 const testingModeBtn = document.getElementById('testing-mode');
 const progressFill = document.getElementById('progress-fill');
 const progressCount = document.getElementById('progress-count');
 const progressTotal = document.getElementById('progress-total');
 const huntItems = document.querySelectorAll('.hunt-item');
 
+// AR Modal Elements
+const arModal = document.getElementById('ar-modal');
+const arLoading = document.getElementById('ar-loading');
+const arCloseBtn = document.getElementById('ar-close-btn');
+const arSceneContainer = document.getElementById('ar-scene-container');
+const arOverlayText = document.getElementById('ar-overlay-text');
+const arLocationName = document.getElementById('ar-location-name');
+const arLocationHint = document.getElementById('ar-location-hint');
+const arTestModeIndicator = document.getElementById('ar-test-mode-indicator');
+
 // State Management
 let huntActive = false;
 let testingMode = false;
 let foundLocations = new Set();
 let userLocation = null;
+let arStream = null;
+let currentARLocation = null;
 
 // Scavenger Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
-    fortress: { lat: 45.5889, lng: 25.4631, name: 'Rasnov Fortress Gate', qr: 'RASNOV_FORTRESS', fact: 'The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.' },
-    well: { lat: 45.5892, lng: 25.4635, name: 'Ancient Well', qr: 'RASNOV_WELL', fact: 'This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.' },
-    tower: { lat: 45.5885, lng: 25.4640, name: 'Watch Tower', qr: 'RASNOV_TOWER', fact: 'The watch tower provided 360-degree views to spot approaching enemies from miles away.' },
-    church: { lat: 45.5890, lng: 25.4638, name: 'Old Church', qr: 'RASNOV_CHURCH', fact: 'This Gothic church dates back to the 14th century and still holds services today.' },
-    museum: { lat: 45.5850, lng: 25.4600, name: 'Village Museum', qr: 'RASNOV_MUSEUM', fact: 'The museum houses over 300 artifacts showcasing traditional Romanian village life.' },
-    peak: { lat: 45.5700, lng: 25.4500, name: 'Mountain Peak', qr: 'RASNOV_PEAK', fact: 'At 1650m elevation, this peak offers views of the entire Barsa region on clear days.' },
-    square: { lat: 45.5880, lng: 25.4620, name: 'Town Square', qr: 'RASNOV_SQUARE', fact: 'The town square has been a gathering place for markets and festivals for over 600 years.' },
-    dino: { lat: 45.5895, lng: 25.4625, name: 'Dino Park Entrance', qr: 'RASNOV_DINO', fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.' }
+    fortress: { 
+        lat: 45.5889, lng: 25.4631, 
+        name: 'Rasnov Fortress Gate', 
+        qr: 'RASNOV_FORTRESS', 
+        fact: 'The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.',
+        hint: 'Next, discover the legendary source of water that saved the fortress during sieges - the Ancient Well!'
+    },
+    well: { 
+        lat: 45.5892, lng: 25.4635, 
+        name: 'Ancient Well', 
+        qr: 'RASNOV_WELL', 
+        fact: 'This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.',
+        hint: 'Now climb high to the Watch Tower where guards kept lookout for approaching enemies!'
+    },
+    tower: { 
+        lat: 45.5885, lng: 25.4640, 
+        name: 'Watch Tower', 
+        qr: 'RASNOV_TOWER', 
+        fact: 'The watch tower provided 360-degree views to spot approaching enemies from miles away.',
+        hint: 'Seek the Old Church where villagers found sanctuary and spiritual guidance for centuries!'
+    },
+    church: { 
+        lat: 45.5890, lng: 25.4638, 
+        name: 'Old Church', 
+        qr: 'RASNOV_CHURCH', 
+        fact: 'This Gothic church dates back to the 14th century and still holds services today.',
+        hint: 'Journey to the Village Museum to explore authentic Romanian traditions and artifacts!'
+    },
+    museum: { 
+        lat: 45.5850, lng: 25.4600, 
+        name: 'Village Museum', 
+        qr: 'RASNOV_MUSEUM', 
+        fact: 'The museum houses over 300 artifacts showcasing traditional Romanian village life.',
+        hint: 'Adventure awaits at the Mountain Peak - breathtaking views from 1650m elevation!'
+    },
+    peak: { 
+        lat: 45.5700, lng: 25.4500, 
+        name: 'Mountain Peak', 
+        qr: 'RASNOV_PEAK', 
+        fact: 'At 1650m elevation, this peak offers views of the entire Barsa region on clear days.',
+        hint: 'Head down to the historic Town Square where markets and festivals have thrived for 600 years!'
+    },
+    square: { 
+        lat: 45.5880, lng: 25.4620, 
+        name: 'Town Square', 
+        qr: 'RASNOV_SQUARE', 
+        fact: 'The town square has been a gathering place for markets and festivals for over 600 years.',
+        hint: 'One more adventure awaits - visit the amazing Dino Park with life-size dinosaur replicas!'
+    },
+    dino: { 
+        lat: 45.5895, lng: 25.4625, 
+        name: 'Dino Park Entrance', 
+        qr: 'RASNOV_DINO', 
+        fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
+        hint: 'Congratulations! You\'ve completed the entire Rasnov scavenger hunt! 🎉'
+    }
 };
 
 // Tab Functionality
@@ -170,6 +231,34 @@ testingModeBtn.addEventListener('click', () => {
             item.removeEventListener('click', handleTestingModeClick);
         });
     }
+});
+
+// Test Location Button - Launch AR for first unfound location
+testLocationBtn.addEventListener('click', () => {
+    // Find first unfound location
+    const locationKeys = Object.keys(huntLocations);
+    let targetLocation = locationKeys[0]; // Default to fortress
+    
+    for (const key of locationKeys) {
+        if (!foundLocations.has(key)) {
+            targetLocation = key;
+            break;
+        }
+    }
+    
+    // Check if browser supports getUserMedia
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showNotification('Camera access is not supported on this browser. Please use a modern browser with HTTPS.', 'error');
+        return;
+    }
+    
+    showNotification(`Testing AR at ${huntLocations[targetLocation].name}...`, 'info');
+    launchARExperience(targetLocation, true);
+});
+
+// AR Close Button
+arCloseBtn.addEventListener('click', () => {
+    closeARView();
 });
 
 function handleTestingModeClick(e) {
@@ -328,7 +417,8 @@ function checkNearbyLocations() {
             const threshold = testingMode ? 50000 : 100;
             
             if (distance < threshold) {
-                discoverLocation(key);
+                // Launch AR experience instead of just discovering
+                launchARExperience(key, false);
                 foundNearby = true;
             }
         }
@@ -394,6 +484,250 @@ function updateProgress() {
     progressFill.style.width = `${percentage}%`;
     progressCount.textContent = found;
     progressTotal.textContent = total;
+}
+
+// AR Camera Functions
+async function launchARExperience(locationKey, isTestMode = false) {
+    currentARLocation = locationKey;
+    const location = huntLocations[locationKey];
+    
+    // Check if HTTPS (required for camera access)
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        // Show warning but continue for development
+        console.warn('AR camera requires HTTPS in production');
+    }
+    
+    // Show AR modal
+    arModal.classList.add('active');
+    arLoading.classList.remove('hidden');
+    
+    // Show test mode indicator if applicable
+    if (isTestMode) {
+        arTestModeIndicator.style.display = 'flex';
+    } else {
+        arTestModeIndicator.style.display = 'none';
+    }
+    
+    try {
+        // Request camera permission and initialize
+        await initializeARCamera();
+        
+        // Setup AR scene
+        setupARScene(locationKey);
+        
+        // Update text overlay
+        arLocationName.textContent = `You found ${location.name}!`;
+        arLocationHint.textContent = location.hint || 'Great job exploring Rasnov!';
+        
+        // Hide loading indicator
+        arLoading.classList.add('hidden');
+        
+        // Mark location as discovered after a delay (allowing user to view AR)
+        setTimeout(() => {
+            if (!foundLocations.has(locationKey)) {
+                discoverLocationQuietly(locationKey);
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('AR Camera Error:', error);
+        arLoading.classList.add('hidden');
+        
+        // Show user-friendly error message
+        let errorMessage = 'Unable to access camera. ';
+        if (error.name === 'NotAllowedError') {
+            errorMessage += 'Please allow camera access to use AR features.';
+        } else if (error.name === 'NotFoundError') {
+            errorMessage += 'No camera found on this device.';
+        } else if (error.name === 'NotSupportedError') {
+            errorMessage += 'Camera not supported on this browser. Please use HTTPS.';
+        } else {
+            errorMessage += 'Please check your camera settings.';
+        }
+        
+        showNotification(errorMessage, 'error');
+        
+        // Close AR modal and fallback to regular discovery
+        closeARView();
+        setTimeout(() => {
+            discoverLocation(locationKey);
+        }, 500);
+    }
+}
+
+async function initializeARCamera() {
+    try {
+        // Request camera access
+        const constraints = {
+            video: {
+                facingMode: 'environment', // Use back camera on mobile
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+        
+        arStream = await navigator.mediaDevices.getUserMedia(constraints);
+        return arStream;
+    } catch (error) {
+        throw error;
+    }
+}
+
+function setupARScene(locationKey) {
+    const location = huntLocations[locationKey];
+    
+    // Clear previous scene
+    arSceneContainer.innerHTML = '';
+    
+    // Create A-Frame scene
+    const scene = document.createElement('a-scene');
+    scene.setAttribute('embedded', '');
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;');
+    scene.setAttribute('vr-mode-ui', 'enabled: false');
+    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true; precision: medium;');
+    
+    // Add camera entity
+    const camera = document.createElement('a-entity');
+    camera.setAttribute('camera', '');
+    
+    // Add marker (for markerless AR, we use a simple pattern)
+    const marker = document.createElement('a-marker');
+    marker.setAttribute('type', 'pattern');
+    marker.setAttribute('preset', 'custom');
+    marker.setAttribute('emitevents', 'true');
+    marker.setAttribute('id', 'marker');
+    
+    // Create 3D mascot based on location
+    const mascot = createMascotForLocation(locationKey);
+    marker.appendChild(mascot);
+    
+    // Add entities to scene
+    scene.appendChild(marker);
+    scene.appendChild(camera);
+    
+    // Append scene to container
+    arSceneContainer.appendChild(scene);
+    
+    // If we have a stream, attach it to the AR.js video element
+    if (arStream) {
+        setTimeout(() => {
+            const arVideo = scene.querySelector('video');
+            if (arVideo && arStream) {
+                arVideo.srcObject = arStream;
+                arVideo.play();
+            }
+        }, 1000);
+    }
+}
+
+function createMascotForLocation(locationKey) {
+    // Create a container for the mascot
+    const container = document.createElement('a-entity');
+    container.setAttribute('position', '0 0 0');
+    
+    // Create different mascots for different locations using A-Frame primitives
+    const mascotColors = {
+        fortress: '#8B4513',  // Brown for fortress
+        well: '#4169E1',      // Blue for well
+        tower: '#DC143C',     // Red for tower
+        church: '#FFD700',    // Gold for church
+        museum: '#9370DB',    // Purple for museum
+        peak: '#00CED1',      // Cyan for peak
+        square: '#FF6347',    // Tomato for square
+        dino: '#32CD32'       // Green for dino park
+    };
+    
+    const color = mascotColors[locationKey] || '#FF6347';
+    
+    // Main body (sphere)
+    const body = document.createElement('a-sphere');
+    body.setAttribute('position', '0 0.5 0');
+    body.setAttribute('radius', '0.3');
+    body.setAttribute('color', color);
+    body.setAttribute('animation', 'property: position; to: 0 0.7 0; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate');
+    
+    // Eyes (small spheres)
+    const leftEye = document.createElement('a-sphere');
+    leftEye.setAttribute('position', '-0.1 0.6 0.25');
+    leftEye.setAttribute('radius', '0.05');
+    leftEye.setAttribute('color', '#000000');
+    
+    const rightEye = document.createElement('a-sphere');
+    rightEye.setAttribute('position', '0.1 0.6 0.25');
+    rightEye.setAttribute('radius', '0.05');
+    rightEye.setAttribute('color', '#000000');
+    
+    // Smile (cylinder rotated)
+    const smile = document.createElement('a-torus');
+    smile.setAttribute('position', '0 0.45 0.25');
+    smile.setAttribute('rotation', '0 0 0');
+    smile.setAttribute('radius', '0.1');
+    smile.setAttribute('radius-tubular', '0.02');
+    smile.setAttribute('arc', '180');
+    smile.setAttribute('color', '#000000');
+    
+    // Hat/crown on top
+    const hat = document.createElement('a-cone');
+    hat.setAttribute('position', '0 0.85 0');
+    hat.setAttribute('radius-bottom', '0.2');
+    hat.setAttribute('radius-top', '0.05');
+    hat.setAttribute('height', '0.3');
+    hat.setAttribute('color', '#FFD700');
+    hat.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3000; easing: linear; loop: true');
+    
+    // Add all parts to container
+    container.appendChild(body);
+    container.appendChild(leftEye);
+    container.appendChild(rightEye);
+    container.appendChild(smile);
+    container.appendChild(hat);
+    
+    return container;
+}
+
+function discoverLocationQuietly(locationKey) {
+    // Same as discoverLocation but without showing the modal
+    foundLocations.add(locationKey);
+    
+    // Update UI
+    const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
+    if (huntItem) {
+        huntItem.classList.add('found');
+        huntItem.querySelector('i').className = 'fas fa-check-circle';
+    }
+    
+    // Update progress
+    updateProgress();
+    
+    // Check if hunt is complete
+    if (foundLocations.size === Object.keys(huntLocations).length) {
+        setTimeout(() => {
+            showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
+            huntActive = false;
+            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
+            startHuntBtn.classList.remove('active-hunt');
+            startHuntBtn.classList.add('hunt-complete');
+        }, 1000);
+    }
+}
+
+function closeARView() {
+    // Hide AR modal
+    arModal.classList.remove('active');
+    
+    // Stop camera stream
+    if (arStream) {
+        arStream.getTracks().forEach(track => track.stop());
+        arStream = null;
+    }
+    
+    // Clear AR scene
+    arSceneContainer.innerHTML = '';
+    
+    // Reset state
+    currentARLocation = null;
+    arTestModeIndicator.style.display = 'none';
 }
 
 // Modal Functions

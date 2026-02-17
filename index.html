@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- A-Frame and AR.js for AR functionality -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -441,6 +444,9 @@
                     <button class="ar-button" id="use-location">
                         <i class="fas fa-map-marker-alt"></i> Use Location
                     </button>
+                    <button class="ar-button test-location-button" id="test-location">
+                        <i class="fas fa-camera"></i> Test Location
+                    </button>
                     <button class="ar-button testing-mode" id="testing-mode">
                         <i class="fas fa-flask"></i> Testing Mode
                     </button>
@@ -634,6 +640,29 @@
             </div>
         </div>
     </footer>
+
+    <!-- AR Camera Modal -->
+    <div class="ar-modal" id="ar-modal">
+        <div class="ar-loading" id="ar-loading">
+            <div class="loading-spinner"></div>
+            <p>Initializing AR Camera...</p>
+        </div>
+        <button class="ar-close-btn" id="ar-close-btn" aria-label="Close AR View">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="ar-scene-container" id="ar-scene-container">
+            <!-- A-Frame scene will be dynamically inserted here -->
+        </div>
+        <div class="ar-overlay-text" id="ar-overlay-text">
+            <div class="ar-success-message">
+                <h2 id="ar-location-name">You found me!</h2>
+                <p id="ar-location-hint" class="ar-hint-text"></p>
+            </div>
+        </div>
+        <div class="ar-test-mode-indicator" id="ar-test-mode-indicator" style="display: none;">
+            <i class="fas fa-flask"></i> Test Mode Active
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
