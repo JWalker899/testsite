@@ -134,7 +134,10 @@ function getGooglePhotoUrl(photoReference, maxWidth = 800) {
  * Fetch Unsplash photos as fallback
  */
 async function fetchUnsplashPhoto(query) {
-  if (!CONFIG.UNSPLASH_API_KEY || CONFIG.UNSPLASH_API_KEY === 'your_unsplash_access_key_here') {
+  // Check if Unsplash API key is configured (not placeholder)
+  if (!CONFIG.UNSPLASH_API_KEY || 
+      CONFIG.UNSPLASH_API_KEY === 'your_unsplash_access_key_here' ||
+      CONFIG.UNSPLASH_API_KEY.startsWith('your_')) {
     return null;
   }
 
@@ -230,7 +233,9 @@ async function main() {
   console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m`);
 
   // Validate API key
-  if (!CONFIG.GOOGLE_API_KEY || CONFIG.GOOGLE_API_KEY === 'your_google_places_api_key_here') {
+  if (!CONFIG.GOOGLE_API_KEY || 
+      CONFIG.GOOGLE_API_KEY === 'your_google_places_api_key_here' ||
+      CONFIG.GOOGLE_API_KEY.startsWith('your_')) {
     console.error('\n❌ ERROR: GOOGLE_PLACES_API_KEY not set in .env file');
     console.error('Please create a .env file based on .env.example and add your API key.');
     process.exit(1);

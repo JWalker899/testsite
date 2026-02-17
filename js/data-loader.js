@@ -155,6 +155,7 @@
     const card = document.createElement('div');
     card.className = 'card';
     card.setAttribute('data-place-id', place.id);
+    card.setAttribute('data-category', category);
 
     // Get primary photo or use placeholder
     const photoUrl = place.photos && place.photos.length > 0 
@@ -163,7 +164,7 @@
 
     // Create card HTML
     card.innerHTML = `
-      <div class="card-image" style="background-image: url('${photoUrl}')">
+      <div class="card-image" style="background-image: url('${escapeHtml(photoUrl)}')">
         ${place.rating ? `
           <div class="card-badge">
             <i class="fas fa-star"></i> ${place.rating.toFixed(1)}
@@ -176,11 +177,19 @@
         <div class="card-meta">
           ${getMetaInfo(place, category)}
         </div>
-        <button class="card-button" onclick="showDynamicDetails('${place.id}', '${category}')">
+        <button class="card-button" data-action="show-details">
           Learn More
         </button>
       </div>
     `;
+
+    // Add event listener to button
+    const button = card.querySelector('[data-action="show-details"]');
+    if (button) {
+      button.addEventListener('click', () => {
+        showDynamicDetails(place.id, category);
+      });
+    }
 
     return card;
   }

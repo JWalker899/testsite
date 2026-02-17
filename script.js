@@ -820,12 +820,11 @@ function loadMap() {
  * Load map markers from places data
  */
 async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
-    const placesData = window.getPlacesData ? window.getPlacesData() : null;
+    // Use event-based approach to wait for data
+    const placesData = await waitForPlacesData();
     
     if (!placesData) {
-        console.log('⏳ Waiting for places data to load...');
-        // Wait a bit for data loader to finish
-        setTimeout(() => loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon), 500);
+        console.error('❌ Could not load places data for map');
         return;
     }
     
@@ -856,6 +855,23 @@ async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
 }
 
 /**
+ * Wait for places data to be loaded with retry logic
+ */
+async function waitForPlacesData(maxAttempts = 10, delayMs = 500) {
+    for (let i = 0; i < maxAttempts; i++) {
+        const placesData = window.getPlacesData ? window.getPlacesData() : null;
+        if (placesData) {
+            return placesData;
+        }
+        if (i < maxAttempts - 1) {
+            console.log(`⏳ Waiting for places data (attempt ${i + 1}/${maxAttempts})...`);
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+    }
+    return null;
+}
+
+/**
  * Add a marker to the map
  */
 function addMarkerToMap(place, type, icon) {
@@ -867,7 +883,7 @@ function addMarkerToMap(place, type, icon) {
     const popupContent = `
         <div class="map-popup">
             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; color: #2c3e50;">
-                ${place.name}
+                ${escapeHtml(place.name)}
             </h3>
             ${place.rating ? `
                 <div style="margin-bottom: 0.5rem;">
@@ -877,12 +893,12 @@ function addMarkerToMap(place, type, icon) {
             ` : ''}
             ${place.address ? `
                 <p style="margin: 0.3rem 0; font-size: 0.9rem; color: #666;">
-                    📍 ${place.address}
+                    📍 ${escapeHtml(place.address)}
                 </p>
             ` : ''}
             ${place.phone ? `
                 <p style="margin: 0.3rem 0; font-size: 0.9rem; color: #666;">
-                    📞 ${place.phone}
+                    📞 ${escapeHtml(place.phone)}
                 </p>
             ` : ''}
             ${place.openingHours ? `
@@ -890,9 +906,23 @@ function addMarkerToMap(place, type, icon) {
                     ${place.openingHours.openNow ? '✅ Open now' : '❌ Closed'}
                 </p>
             ` : ''}
-            <button 
-                onclick="showDynamicDetails('${place.id}', '${type === 'location' ? 'locations' : type + 's'}')"
-                style="
+        </div>
+    `;
+    
+    const marker = L.marker([lat, lng], { icon: icon })
+        .addTo(window.map)
+        .bindPopup(popupContent);
+    
+    // Add click handler to marker to show details
+    marker.on('popupopen', () => {
+        // Add event listener to the popup after it opens
+        setTimeout(() => {
+            const popup = marker.getPopup();
+            const popupElement = popup.getElement();
+            if (popupElement) {
+                const button = document.createElement('button');
+                button.textContent = 'View Details';
+                button.style.cssText = `
                     margin-top: 0.8rem;
                     padding: 0.5rem 1rem;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -902,16 +932,27 @@ function addMarkerToMap(place, type, icon) {
                     cursor: pointer;
                     font-size: 0.9rem;
                     width: 100%;
-                "
-            >
-                View Details
-            </button>
-        </div>
-    `;
-    
-    L.marker([lat, lng], { icon: icon })
-        .addTo(window.map)
-        .bindPopup(popupContent);
+                `;
+                button.addEventListener('click', () => {
+                    showDynamicDetails(place.id, type === 'location' ? 'locations' : type + 's');
+                });
+                const popupContent = popupElement.querySelector('.map-popup');
+                if (popupContent) {
+                    popupContent.appendChild(button);
+                }
+            }
+        }, 50);
+    });
+}
+
+/**
+ * Helper function to escape HTML (avoid XSS)
+ */
+function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Language Toggle (Basic implementation)
