@@ -7,6 +7,7 @@
     <title>Discover Rasnov | Tourist Guide</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
     <!-- Header -->
@@ -125,6 +126,78 @@
                                 <button class="card-button" onclick="showLocationDetails('museum')">Learn More</button>
                             </div>
                         </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Bran Castle</h3>
+                                <p class="card-description">Famous Dracula's Castle, just 15 minutes away. Gothic fortress with fascinating history and stunning architecture.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 2 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 45 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('bran')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Poiana Brasov Ski Resort</h3>
+                                <p class="card-description">Premier ski resort nearby with 23km of slopes. Great for winter sports enthusiasts and summer hiking.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> Full day</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 150 RON/day</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('poiana')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1548013146-72479768bada?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Brasov Old Town</h3>
+                                <p class="card-description">Medieval city center with Council Square, Black Church, and charming cobblestone streets. Only 15km away.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 3-4 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> Free</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('brasov')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Peles Castle</h3>
+                                <p class="card-description">Neo-Renaissance masterpiece in Sinaia. One of Europe's most beautiful castles with 160 lavishly decorated rooms.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 2-3 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 50 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('peles')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Piatra Craiului National Park</h3>
+                                <p class="card-description">Protected natural area with dramatic limestone ridge. Excellent hiking, wildlife watching, and pristine nature.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> Full day</span>
+                                    <span><i class="fas fa-ticket-alt"></i> Free</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('national-park')">Learn More</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Libearty Bear Sanctuary</h3>
+                                <p class="card-description">Europe's largest brown bear sanctuary. Home to rescued bears in natural habitat. Educational and ethical tourism.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-clock"></i> 1-2 hours</span>
+                                    <span><i class="fas fa-ticket-alt"></i> 25 RON</span>
+                                </div>
+                                <button class="card-button" onclick="showLocationDetails('bear-sanctuary')">Learn More</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -184,6 +257,58 @@
                                 <button class="card-button" onclick="showRestaurantDetails('cafe')">View Menu</button>
                             </div>
                         </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Belvedere Terrace</h3>
+                                <p class="card-description">Restaurant with panoramic terrace. International cuisine with spectacular mountain views and sunset dining.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> International</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€€</span>
+                                    <span><i class="fas fa-star"></i> 4.8</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('belvedere-terrace')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Grill House Rasnov</h3>
+                                <p class="card-description">BBQ specialist with outdoor grill. Famous for mixed grills, fresh salads, and local wines.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> BBQ/Grill</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-star"></i> 4.5</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('grill-house')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Bistro Rasnoveana</h3>
+                                <p class="card-description">Casual bistro in town center. Daily specials, homemade desserts, and friendly atmosphere.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Bistro</span>
+                                    <span><i class="fas fa-euro-sign"></i> €</span>
+                                    <span><i class="fas fa-star"></i> 4.3</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('bistro')">View Menu</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Vegetarian Haven</h3>
+                                <p class="card-description">Plant-based restaurant with creative dishes. Vegan options, organic ingredients, and healthy bowls.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-utensils"></i> Vegetarian</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-star"></i> 4.6</span>
+                                </div>
+                                <button class="card-button" onclick="showRestaurantDetails('vegetarian')">View Menu</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -241,6 +366,58 @@
                                     <span><i class="fas fa-wifi"></i> Free WiFi</span>
                                 </div>
                                 <button class="card-button" onclick="showAccommodationDetails('hostel')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Villa Carpathia</h3>
+                                <p class="card-description">Luxury villa with private garden and pool. Perfect for families or groups seeking privacy and comfort.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-home"></i> Villa</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€€€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('villa')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Boutique Hotel Residence</h3>
+                                <p class="card-description">Stylish boutique hotel with modern amenities. Rooftop bar, gym, and contemporary design throughout.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-star"></i> 4 stars</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('boutique')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Mountain Cabins</h3>
+                                <p class="card-description">Cozy wooden cabins in nature. Perfect for romantic getaways with fireplace and private terrace.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-home"></i> Cabin</span>
+                                    <span><i class="fas fa-euro-sign"></i> €€</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('cabins')">Check Availability</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=800')"></div>
+                            <div class="card-body">
+                                <h3 class="card-title">Casa Maria B&B</h3>
+                                <p class="card-description">Traditional bed and breakfast with local charm. Hearty homemade meals and personal service.</p>
+                                <div class="card-meta">
+                                    <span><i class="fas fa-bed"></i> B&B</span>
+                                    <span><i class="fas fa-euro-sign"></i> €</span>
+                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                </div>
+                                <button class="card-button" onclick="showAccommodationDetails('casa-maria')">Check Availability</button>
                             </div>
                         </div>
                     </div>
@@ -459,6 +636,8 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
