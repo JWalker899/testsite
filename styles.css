@@ -819,3 +819,189 @@ body {
         padding: 1.5rem;
     }
 }
+
+/* Loading State Styles */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Last Updated Indicator */
+.last-updated-indicator {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.last-updated-indicator i {
+    font-size: 1.2rem;
+}
+
+/* Card Badge (for ratings) */
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #f39c12;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-badge i {
+    font-size: 0.85rem;
+}
+
+/* Modal Styles Enhancement */
+.modal-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.modal-title-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+.modal-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f39c12;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-rating .rating-count {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.modal-info-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.modal-info-item i {
+    font-size: 1.5rem;
+    color: #3498db;
+    margin-top: 0.2rem;
+}
+
+.modal-info-item strong {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #2c3e50;
+}
+
+.modal-info-item p {
+    color: #666;
+    margin: 0;
+}
+
+.modal-info-item a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.modal-info-item a:hover {
+    text-decoration: underline;
+}
+
+.opening-hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.opening-hours-list li {
+    padding: 0.3rem 0;
+    color: #666;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.modal-button {
+    flex: 1;
+    min-width: 150px;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.modal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.modal-button i {
+    font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .last-updated-indicator {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-button {
+        width: 100%;
+    }
+}
