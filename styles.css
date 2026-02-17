@@ -797,6 +797,165 @@ body {
     }
 }
 
+/* AR Modal Styles */
+.ar-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 3000;
+    animation: fadeIn 0.3s ease;
+}
+
+.ar-modal.active {
+    display: block;
+}
+
+.ar-scene-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.ar-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 3001;
+}
+
+.ar-loading.hidden {
+    display: none;
+}
+
+.ar-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 3002;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ar-close-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.ar-overlay-text {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: white;
+    z-index: 3001;
+    width: 90%;
+    max-width: 500px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    animation: slideDown 0.5s ease;
+}
+
+.ar-success-message h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: var(--success-color);
+}
+
+.ar-hint-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-top: 0.5rem;
+}
+
+.ar-test-mode-indicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: var(--warning-color);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 3001;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Test Location Button Styles */
+.test-location-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid transparent;
+}
+
+.test-location-button:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* AR Scene Animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Mobile optimizations for AR */
+@media (max-width: 768px) {
+    .ar-close-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .ar-overlay-text {
+        top: 15%;
+        padding: 1rem;
+    }
+    
+    .ar-success-message h2 {
+        font-size: 1.5rem;
+    }
+    
+    .ar-hint-text {
+        font-size: 1rem;
+    }
+    
+    .ar-test-mode-indicator {
+        top: 15px;
+        left: 15px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 0 15px;
