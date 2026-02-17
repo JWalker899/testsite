@@ -337,7 +337,7 @@ function scanQRCode() {
     // Use jsQR library to decode QR code (if available)
     if (typeof jsQR !== 'undefined') {
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
+            inversionAttempts: "attemptBoth",
         });
         
         if (code && code.data) {

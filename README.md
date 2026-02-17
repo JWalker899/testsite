@@ -85,6 +85,12 @@ For real-time data from Google Places API:
    ```bash
    npm start
    ```
+   
+   **Or use the combined command**:
+   ```bash
+   npm run fetch-and-start
+   ```
+   This will fetch fresh data and immediately start the server.
 
 📖 **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed instructions with screenshots
 
