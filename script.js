@@ -199,13 +199,22 @@ function getLocationKeyFromQR(qrData) {
 // Variable to store video stream for cleanup
 let videoStream = null;
 let scanningActive = false;
+let lastQRCode = null;
+let lastQRCodeTime = 0;
 
 function startQRScanner() {
+    // Prevent starting scanner if already active
+    if (scanningActive) {
+        return;
+    }
+    
     const video = document.getElementById('qr-video');
     const canvas = document.getElementById('qr-canvas');
     const canvasContext = canvas.getContext('2d');
     
     scanningActive = true;
+    lastQRCode = null;
+    lastQRCodeTime = 0;
     
     // Check if browser supports getUserMedia
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -221,11 +230,13 @@ function startQRScanner() {
             .catch(err => {
                 console.error('Error accessing camera:', err);
                 showNotification('Could not access camera. Testing mode allows manual selection.', 'warning');
+                scanningActive = false;
                 
                 // In testing mode or if camera fails, show QR code options
                 showQRCodeOptions();
             });
     } else {
+        scanningActive = false;
         showQRCodeOptions();
     }
     
@@ -252,24 +263,34 @@ function startQRScanner() {
                 if (code) {
                     // QR code detected
                     const qrData = code.data;
-                    const locationKey = getLocationKeyFromQR(qrData);
+                    const currentTime = Date.now();
                     
-                    if (locationKey) {
-                        // Valid QR code found
-                        if (!foundLocations.has(locationKey)) {
-                            scanningActive = false;
-                            stopVideoStream();
-                            discoverLocation(locationKey);
-                            closeModal('qr-modal');
+                    // Debounce: only process if it's a different code or 2 seconds have passed
+                    if (qrData !== lastQRCode || currentTime - lastQRCodeTime > 2000) {
+                        lastQRCode = qrData;
+                        lastQRCodeTime = currentTime;
+                        
+                        const locationKey = getLocationKeyFromQR(qrData);
+                        
+                        if (locationKey) {
+                            // Valid QR code found
+                            if (!foundLocations.has(locationKey)) {
+                                scanningActive = false;
+                                stopVideoStream();
+                                discoverLocation(locationKey);
+                                closeModal('qr-modal');
+                                return; // Exit early, don't continue scanning
+                            } else {
+                                showNotification('You already found this location!', 'info');
+                            }
                         } else {
-                            showNotification('You already found this location!', 'info');
+                            // Invalid QR code (readable but not 1-8)
+                            showNotification('This QR code is not part of the scavenger hunt. Please scan a code numbered 1-8.', 'warning');
                         }
-                    } else {
-                        // Invalid QR code (readable but not 1-8)
-                        showNotification('This QR code is not part of the scavenger hunt. Please scan a code numbered 1-8.', 'warning');
-                        // Continue scanning
-                        requestAnimationFrame(scanQRCode);
                     }
+                    
+                    // Continue scanning after debounce
+                    requestAnimationFrame(scanQRCode);
                 } else {
                     // No QR code detected, continue scanning
                     requestAnimationFrame(scanQRCode);
