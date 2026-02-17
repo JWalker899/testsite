@@ -491,10 +491,17 @@ async function launchARExperience(locationKey, isTestMode = false) {
     currentARLocation = locationKey;
     const location = huntLocations[locationKey];
     
-    // Check if HTTPS (required for camera access)
-    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        // Show warning but continue for development
-        console.warn('AR camera requires HTTPS in production');
+    // Check if HTTPS (required for camera access in production)
+    const isSecure = window.location.protocol === 'https:';
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (!isSecure && !isLocalhost) {
+        showNotification('AR camera requires HTTPS. Please access the site via https:// to use AR features.', 'error');
+        // Fallback to regular discovery for non-HTTPS production
+        setTimeout(() => {
+            discoverLocation(locationKey);
+        }, 500);
+        return;
     }
     
     // Show AR modal
@@ -522,7 +529,8 @@ async function launchARExperience(locationKey, isTestMode = false) {
         // Hide loading indicator
         arLoading.classList.add('hidden');
         
-        // Mark location as discovered after a delay (allowing user to view AR)
+        // Mark location as discovered after a delay (allowing user to view AR mascot)
+        // This gives users time to appreciate the AR experience before updating progress
         setTimeout(() => {
             if (!foundLocations.has(locationKey)) {
                 discoverLocationQuietly(locationKey);
@@ -580,10 +588,10 @@ function setupARScene(locationKey) {
     // Clear previous scene
     arSceneContainer.innerHTML = '';
     
-    // Create A-Frame scene
+    // Create A-Frame scene for marker-less AR
     const scene = document.createElement('a-scene');
     scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;');
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
     scene.setAttribute('vr-mode-ui', 'enabled: false');
     scene.setAttribute('renderer', 'logarithmicDepthBuffer: true; precision: medium;');
     
@@ -591,33 +599,37 @@ function setupARScene(locationKey) {
     const camera = document.createElement('a-entity');
     camera.setAttribute('camera', '');
     
-    // Add marker (for markerless AR, we use a simple pattern)
-    const marker = document.createElement('a-marker');
-    marker.setAttribute('type', 'pattern');
-    marker.setAttribute('preset', 'custom');
-    marker.setAttribute('emitevents', 'true');
-    marker.setAttribute('id', 'marker');
-    
-    // Create 3D mascot based on location
+    // Create 3D mascot - place directly in scene for marker-less AR
     const mascot = createMascotForLocation(locationKey);
-    marker.appendChild(mascot);
+    mascot.setAttribute('position', '0 0 -3'); // Place 3 units in front of camera
     
     // Add entities to scene
-    scene.appendChild(marker);
+    scene.appendChild(mascot);
     scene.appendChild(camera);
     
     // Append scene to container
     arSceneContainer.appendChild(scene);
     
-    // If we have a stream, attach it to the AR.js video element
+    // Attach camera stream to AR.js video element with polling
     if (arStream) {
-        setTimeout(() => {
+        let attempts = 0;
+        const maxAttempts = 20; // Try for 2 seconds (20 * 100ms)
+        
+        const attachStream = () => {
             const arVideo = scene.querySelector('video');
             if (arVideo && arStream) {
                 arVideo.srcObject = arStream;
-                arVideo.play();
+                arVideo.play().catch(err => console.warn('Video autoplay failed:', err));
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(attachStream, 100);
+            } else {
+                console.warn('Failed to find AR video element after', maxAttempts * 100, 'ms');
             }
-        }, 1000);
+        };
+        
+        // Start polling after a short delay to let A-Frame initialize
+        setTimeout(attachStream, 100);
     }
 }
 
@@ -640,12 +652,12 @@ function createMascotForLocation(locationKey) {
     
     const color = mascotColors[locationKey] || '#FF6347';
     
-    // Main body (sphere)
+    // Main body (sphere) - use scale animation for better performance
     const body = document.createElement('a-sphere');
-    body.setAttribute('position', '0 0.5 0');
+    body.setAttribute('position', '0 0.6 0');
     body.setAttribute('radius', '0.3');
     body.setAttribute('color', color);
-    body.setAttribute('animation', 'property: position; to: 0 0.7 0; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate');
+    body.setAttribute('animation', 'property: scale; to: 1.1 1.1 1.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate');
     
     // Eyes (small spheres)
     const leftEye = document.createElement('a-sphere');
