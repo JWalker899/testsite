@@ -644,7 +644,18 @@ function setupARScene(locationKey) {
             text-align: center;
             z-index: 2;
         `;
-        placeholder.innerHTML = '📷<br>Camera View<br><small style="font-size: 14px;">(Placeholder)</small>';
+        placeholder.textContent = '📷';
+        const lineBreak1 = document.createElement('br');
+        const cameraText = document.createTextNode('Camera View');
+        const lineBreak2 = document.createElement('br');
+        const smallText = document.createElement('small');
+        smallText.style.fontSize = '14px';
+        smallText.textContent = '(Placeholder)';
+        
+        placeholder.appendChild(lineBreak1);
+        placeholder.appendChild(cameraText);
+        placeholder.appendChild(lineBreak2);
+        placeholder.appendChild(smallText);
         arSceneContainer.appendChild(placeholder);
     }
     
@@ -689,7 +700,7 @@ function createMascotOverlay(locationKey) {
         well: '💧',       // Water drop for well
         tower: '🗼',      // Tower
         church: '⛪',     // Church
-        museum: '🏛️',     // Museum
+        museum: '🎨',     // Art palette for museum
         peak: '⛰️',       // Mountain for peak
         square: '🏛️',     // Building for square
         dino: '🦕'        // Dinosaur for dino park
