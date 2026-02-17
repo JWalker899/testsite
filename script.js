@@ -809,20 +809,25 @@ function loadMap() {
         popupAnchor: [0, -40]
     });
     
-    // Add locations
+    // Add locations (showing a representative subset for map clarity)
     const locations = [
+        // Main attractions
         { name: 'Rasnov Fortress', lat: 45.5889, lng: 25.4631, type: 'location', desc: 'Medieval citadel with panoramic views' },
         { name: 'Dino Parc', lat: 45.5895, lng: 25.4625, type: 'location', desc: 'Largest dinosaur park in SE Europe' },
         { name: 'Piatra Mica Peak', lat: 45.5700, lng: 25.4500, type: 'location', desc: 'Mountain peak with cable car' },
         { name: 'Village Museum', lat: 45.5850, lng: 25.4600, type: 'location', desc: 'Traditional Romanian artifacts' },
+        // Restaurants
         { name: 'Cetate Restaurant', lat: 45.5888, lng: 25.4633, type: 'restaurant', desc: 'Traditional Romanian cuisine' },
         { name: 'La Ceaun', lat: 45.5885, lng: 25.4628, type: 'restaurant', desc: 'Mountain dishes and soups' },
         { name: 'Pizzeria Castello', lat: 45.5883, lng: 25.4635, type: 'restaurant', desc: 'Italian pizzeria' },
         { name: 'Cafe Central', lat: 45.5880, lng: 25.4620, type: 'restaurant', desc: 'Coffee and pastries' },
+        { name: 'Belvedere Terrace', lat: 45.5890, lng: 25.4645, type: 'restaurant', desc: 'Panoramic terrace dining' },
+        // Accommodations
         { name: 'Hotel Ambient', lat: 45.5887, lng: 25.4640, type: 'accommodation', desc: '4-star hotel with spa' },
         { name: 'Pension Belvedere', lat: 45.5892, lng: 25.4638, type: 'accommodation', desc: 'Family-run guesthouse' },
         { name: 'Casa Petre', lat: 45.5878, lng: 25.4625, type: 'accommodation', desc: 'Apartments in old town' },
-        { name: 'Mountain Hostel', lat: 45.5875, lng: 25.4615, type: 'accommodation', desc: 'Budget-friendly hostel' }
+        { name: 'Mountain Hostel', lat: 45.5875, lng: 25.4615, type: 'accommodation', desc: 'Budget-friendly hostel' },
+        { name: 'Villa Carpathia', lat: 45.5893, lng: 25.4650, type: 'accommodation', desc: 'Luxury villa with pool' }
     ];
     
     // Add markers to map
