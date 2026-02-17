@@ -85,6 +85,12 @@ For real-time data from Google Places API:
    ```bash
    npm start
    ```
+   
+   **Or use the combined command**:
+   ```bash
+   npm run fetch-and-start
+   ```
+   This will fetch fresh data and immediately start the server.
 
 📖 **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed instructions with screenshots
 
@@ -305,7 +311,9 @@ The site is 100% static - just copy all files to any web server!
 
 **Cause**: `places-data.json` doesn't exist yet
 
-**Solution**: Run `npm run fetch-data` to generate real data
+**Solution**: Run `npm run fetch-data` to generate real data. The data will be saved to `data/places-data.json` (which is gitignored).
+
+**Note**: After running `npm run fetch-data`, the data file persists on your local machine and the server will use it instead of sample data. You don't need to fetch data every time you restart the server - only when you want fresh data from Google Places API.
 
 ### Cards not loading / Empty tabs
 

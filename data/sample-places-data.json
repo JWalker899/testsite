@@ -73,8 +73,8 @@
       "id": "sample_peak",
       "name": "Piatra Mica Peak",
       "coordinates": {
-        "lat": 45.5700,
-        "lng": 25.4500
+        "lat": 45.57,
+        "lng": 25.45
       },
       "rating": 4.8,
       "userRatingsTotal": 456,
@@ -100,6 +100,66 @@
         }
       ],
       "description": "Hiking trail to a stunning mountain peak with spectacular views."
+    },
+    {
+      "id": "sample_museum",
+      "name": "Village Museum",
+      "coordinates": {
+        "lat": 45.585,
+        "lng": 25.46
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 234,
+      "priceLevel": 1,
+      "address": "Rasnov Village, Romania",
+      "phone": "+40 268 234 123",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1605649487212-47e4c5c77215?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Explore traditional Romanian rural life with authentic houses and artifacts."
+    },
+    {
+      "id": "sample_bran",
+      "name": "Bran Castle",
+      "coordinates": {
+        "lat": 45.5152,
+        "lng": 25.3674
+      },
+      "rating": 4.7,
+      "userRatingsTotal": 5234,
+      "priceLevel": 3,
+      "address": "Strada General Traian Moșoiu 24, Bran, Romania",
+      "phone": "+40 268 237 700",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Famous Dracula's Castle with Gothic architecture and fascinating history."
+    },
+    {
+      "id": "sample_poiana",
+      "name": "Poiana Brasov Ski Resort",
+      "coordinates": {
+        "lat": 45.5903,
+        "lng": 25.5486
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 1892,
+      "priceLevel": 3,
+      "address": "Poiana Brasov, Romania",
+      "phone": "+40 268 407 330",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Premier ski resort with 23km of slopes, great for winter sports."
     }
   ],
   "restaurants": [
@@ -107,8 +167,8 @@
       "id": "sample_restaurant_1",
       "name": "La Ceaun Restaurant",
       "coordinates": {
-        "lat": 45.5880,
-        "lng": 25.4620
+        "lat": 45.588,
+        "lng": 25.462
       },
       "rating": 4.4,
       "userRatingsTotal": 234,
@@ -166,6 +226,46 @@
         }
       ],
       "description": "Italian restaurant with wood-fired pizzas."
+    },
+    {
+      "id": "sample_restaurant3",
+      "name": "Coliba Haiducilor",
+      "coordinates": {
+        "lat": 45.5895,
+        "lng": 25.464
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 567,
+      "priceLevel": 2,
+      "address": "DN73A, Rasnov, Romania",
+      "phone": "+40 268 234 456",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Traditional Romanian cuisine in a rustic mountain setting."
+    },
+    {
+      "id": "sample_restaurant4",
+      "name": "Restaurant Transilvania",
+      "coordinates": {
+        "lat": 45.5888,
+        "lng": 25.4635
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 423,
+      "priceLevel": 2,
+      "address": "Rasnov Center, Romania",
+      "phone": "+40 268 234 789",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Local dishes with a modern twist and scenic views."
     }
   ],
   "accommodations": [
@@ -173,7 +273,7 @@
       "id": "sample_hotel_1",
       "name": "Hotel Ambient",
       "coordinates": {
-        "lat": 45.5890,
+        "lat": 45.589,
         "lng": 25.4638
       },
       "rating": 4.3,
@@ -232,6 +332,46 @@
         }
       ],
       "description": "Budget-friendly hostel for backpackers."
+    },
+    {
+      "id": "sample_accommodation3",
+      "name": "Alpin Resort Hotel",
+      "coordinates": {
+        "lat": 45.59,
+        "lng": 25.548
+      },
+      "rating": 4.7,
+      "userRatingsTotal": 892,
+      "priceLevel": 3,
+      "address": "Poiana Brasov, Romania",
+      "phone": "+40 268 407 500",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Luxury mountain resort with spa and restaurant facilities."
+    },
+    {
+      "id": "sample_accommodation4",
+      "name": "Pensiunea Belvedere",
+      "coordinates": {
+        "lat": 45.588,
+        "lng": 25.462
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 234,
+      "priceLevel": 2,
+      "address": "Str. Cetatii 12, Rasnov, Romania",
+      "phone": "+40 268 234 567",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+          "attribution": "Photo by Unsplash"
+        }
+      ],
+      "description": "Cozy guesthouse with beautiful mountain views and breakfast."
     }
   ]
 }

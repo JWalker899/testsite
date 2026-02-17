@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "fetch-data": "node build-scripts/fetch-places-data.js",
+    "fetch-and-start": "node build-scripts/fetch-places-data.js && node server.js",
     "dev": "node server.js"
   },
   "dependencies": {
