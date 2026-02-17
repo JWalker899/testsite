@@ -779,13 +779,13 @@ function loadMap() {
     mapDiv.innerHTML = '<div id="map-display" style="width: 100%; height: 100%;"></div>';
     
     // Initialize Leaflet map
-    map = L.map('map-display').setView([45.5889, 25.4631], 14);
+    window.map = L.map('map-display').setView([45.5889, 25.4631], 14);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
-    }).addTo(map);
+    }).addTo(window.map);
     
     // Define custom icons
     const locationIcon = L.icon({
@@ -809,40 +809,109 @@ function loadMap() {
         popupAnchor: [0, -40]
     });
     
-    // Add locations (showing a representative subset for map clarity)
-    const locations = [
-        // Main attractions
-        { name: 'Rasnov Fortress', lat: 45.5889, lng: 25.4631, type: 'location', desc: 'Medieval citadel with panoramic views' },
-        { name: 'Dino Parc', lat: 45.5895, lng: 25.4625, type: 'location', desc: 'Largest dinosaur park in SE Europe' },
-        { name: 'Piatra Mica Peak', lat: 45.5700, lng: 25.4500, type: 'location', desc: 'Mountain peak with cable car' },
-        { name: 'Village Museum', lat: 45.5850, lng: 25.4600, type: 'location', desc: 'Traditional Romanian artifacts' },
-        // Restaurants
-        { name: 'Cetate Restaurant', lat: 45.5888, lng: 25.4633, type: 'restaurant', desc: 'Traditional Romanian cuisine' },
-        { name: 'La Ceaun', lat: 45.5885, lng: 25.4628, type: 'restaurant', desc: 'Mountain dishes and soups' },
-        { name: 'Pizzeria Castello', lat: 45.5883, lng: 25.4635, type: 'restaurant', desc: 'Italian pizzeria' },
-        { name: 'Cafe Central', lat: 45.5880, lng: 25.4620, type: 'restaurant', desc: 'Coffee and pastries' },
-        { name: 'Belvedere Terrace', lat: 45.5890, lng: 25.4645, type: 'restaurant', desc: 'Panoramic terrace dining' },
-        // Accommodations
-        { name: 'Hotel Ambient', lat: 45.5887, lng: 25.4640, type: 'accommodation', desc: '4-star hotel with spa' },
-        { name: 'Pension Belvedere', lat: 45.5892, lng: 25.4638, type: 'accommodation', desc: 'Family-run guesthouse' },
-        { name: 'Casa Petre', lat: 45.5878, lng: 25.4625, type: 'accommodation', desc: 'Apartments in old town' },
-        { name: 'Mountain Hostel', lat: 45.5875, lng: 25.4615, type: 'accommodation', desc: 'Budget-friendly hostel' },
-        { name: 'Villa Carpathia', lat: 45.5893, lng: 25.4650, type: 'accommodation', desc: 'Luxury villa with pool' }
-    ];
-    
-    // Add markers to map
-    locations.forEach(loc => {
-        let icon = locationIcon;
-        if (loc.type === 'restaurant') icon = restaurantIcon;
-        if (loc.type === 'accommodation') icon = accommodationIcon;
-        
-        L.marker([loc.lat, loc.lng], { icon: icon })
-            .addTo(map)
-            .bindPopup(`<strong>${loc.name}</strong><br>${loc.desc}`);
-    });
+    // Load markers from places data
+    loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon);
     
     mapDiv.classList.add('loaded');
     showNotification('Map loaded successfully!', 'success');
+}
+
+/**
+ * Load map markers from places data
+ */
+async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
+    const placesData = window.getPlacesData ? window.getPlacesData() : null;
+    
+    if (!placesData) {
+        console.log('⏳ Waiting for places data to load...');
+        // Wait a bit for data loader to finish
+        setTimeout(() => loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon), 500);
+        return;
+    }
+    
+    console.log('📍 Loading map markers from places data...');
+    
+    // Add locations
+    if (placesData.locations) {
+        placesData.locations.forEach(place => {
+            addMarkerToMap(place, 'location', locationIcon);
+        });
+    }
+    
+    // Add restaurants
+    if (placesData.restaurants) {
+        placesData.restaurants.forEach(place => {
+            addMarkerToMap(place, 'restaurant', restaurantIcon);
+        });
+    }
+    
+    // Add accommodations
+    if (placesData.accommodations) {
+        placesData.accommodations.forEach(place => {
+            addMarkerToMap(place, 'accommodation', accommodationIcon);
+        });
+    }
+    
+    console.log('✅ Map markers loaded successfully');
+}
+
+/**
+ * Add a marker to the map
+ */
+function addMarkerToMap(place, type, icon) {
+    if (!window.map || !place.coordinates) return;
+    
+    const { lat, lng } = place.coordinates;
+    
+    // Create popup content with enhanced information
+    const popupContent = `
+        <div class="map-popup">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; color: #2c3e50;">
+                ${place.name}
+            </h3>
+            ${place.rating ? `
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #f39c12;">⭐ ${place.rating.toFixed(1)}</span>
+                    <span style="color: #666; font-size: 0.9rem;"> (${place.userRatingsTotal} reviews)</span>
+                </div>
+            ` : ''}
+            ${place.address ? `
+                <p style="margin: 0.3rem 0; font-size: 0.9rem; color: #666;">
+                    📍 ${place.address}
+                </p>
+            ` : ''}
+            ${place.phone ? `
+                <p style="margin: 0.3rem 0; font-size: 0.9rem; color: #666;">
+                    📞 ${place.phone}
+                </p>
+            ` : ''}
+            ${place.openingHours ? `
+                <p style="margin: 0.3rem 0; font-size: 0.9rem; color: ${place.openingHours.openNow ? '#27ae60' : '#e74c3c'};">
+                    ${place.openingHours.openNow ? '✅ Open now' : '❌ Closed'}
+                </p>
+            ` : ''}
+            <button 
+                onclick="showDynamicDetails('${place.id}', '${type === 'location' ? 'locations' : type + 's'}')"
+                style="
+                    margin-top: 0.8rem;
+                    padding: 0.5rem 1rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                    width: 100%;
+                "
+            >
+                View Details
+            </button>
+        </div>
+    `;
+    
+    L.marker([lat, lng], { icon: icon })
+        .addTo(window.map)
+        .bindPopup(popupContent);
 }
 
 // Language Toggle (Basic implementation)
