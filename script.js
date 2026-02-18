@@ -88,11 +88,23 @@ const huntLocations = {
     dino: { 
         lat: 45.5895, lng: 25.4625, 
         name: 'Dino Park Entrance', 
+        name_ro: 'Intrarea Dino Parc',
         qr: 'RASNOV_DINO', 
         fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
-        hint: 'Congratulations! You\'ve completed the entire Rasnov scavenger hunt! 🎉'
+        fact_ro: 'Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.',
+        hint: 'Congratulations! You\'ve completed the entire Rasnov scavenger hunt! 🎉',
+        hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov! 🎉'
     }
 };
+
+// Helper to get localized field from objects like huntLocations
+function localizedField(obj, field) {
+    if (currentLang && currentLang !== 'en') {
+        const key = `${field}_` + currentLang;
+        if (obj[key]) return obj[key];
+    }
+    return obj[field] || '';
+}
 
 // Tab Functionality
 tabButtons.forEach(button => {
@@ -380,12 +392,13 @@ function processQRCode(qrData) {
 
 function showQRCodeOptions() {
     const qrScanner = document.getElementById('qr-scanner');
+    const header = translateMessage('Select a QR Code to Scan:');
     qrScanner.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
-            <h4>Select a QR Code to Scan:</h4>
+            <h4>${header}</h4>
             <div style="display: grid; gap: 1rem; margin-top: 1rem;">
                 ${Object.entries(huntLocations).map(([key, loc]) => `
-                    <button class="card-button" onclick="simulateQRScan('${key}')">${loc.name}</button>
+                    <button class="card-button" onclick="simulateQRScan('${key}')">${localizedField(loc, 'name') || loc.name}</button>
                 `).join('')}
             </div>
         </div>
@@ -459,9 +472,13 @@ function discoverLocation(locationKey) {
     
     // Show discovery modal
     const location = huntLocations[locationKey];
-    document.getElementById('discovery-title').textContent = `You found ${location.name}!`;
-    document.getElementById('discovery-message').textContent = 'Great job exploring Rasnov!';
-    document.getElementById('discovery-fact').innerHTML = `<strong>Fun Fact:</strong> ${location.fact}`;
+    const localizedName = localizedField(location, 'name') || location.name;
+    const localizedFact = localizedField(location, 'fact') || location.fact || '';
+    const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
+
+    document.getElementById('discovery-title').textContent = (currentLang === 'ro') ? `Ai găsit ${localizedName}!` : `You found ${localizedName}!`;
+    document.getElementById('discovery-message').textContent = discoveryMsg;
+    document.getElementById('discovery-fact').innerHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
     openModal('discovery-modal');
     
     // Check if hunt is complete
@@ -523,8 +540,9 @@ async function launchARExperience(locationKey, isTestMode = false) {
         setupARScene(locationKey);
         
         // Update text overlay
-        arLocationName.textContent = `You found ${location.name}!`;
-        arLocationHint.textContent = location.hint || 'Great job exploring Rasnov!';
+        const locName = localizedField(location, 'name') || location.name;
+        arLocationName.textContent = (currentLang === 'ro') ? `Ai găsit ${locName}!` : `You found ${locName}!`;
+        arLocationHint.textContent = localizedField(location, 'hint') || (currentLang === 'ro' ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!');
         
         // Hide loading indicator
         arLoading.classList.add('hidden');
@@ -853,6 +871,9 @@ document.querySelectorAll('.modal').forEach(modal => {
 
 // Notification System
 function showNotification(message, type = 'info') {
+    // Translate notifications if needed
+    message = translateMessage(message);
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -936,14 +957,18 @@ function showLocationDetails(locationId) {
     const details = {
         fortress: {
             title: 'Rasnov Fortress',
+            title_ro: 'Cetatea Râșnov',
             description: 'Built in the 13th century by Teutonic Knights, Rasnov Fortress is a stunning example of medieval defensive architecture. The fortress sits atop a rocky hilltop and offers breathtaking panoramic views of the surrounding Carpathian Mountains and Barsa Valley.',
+            description_ro: 'Construită în secolul al XIII-lea de Cavalerii Teutoni, Cetatea Râșnov este un exemplu impresionant de arhitectură defensivă medievală. Aflată pe un deal stâncos, oferă priveliști panoramice spectaculoase ale Munților Carpați și ale Văii Bârsei.',
             hours: 'Daily: 9:00 AM - 6:00 PM (Summer), 9:00 AM - 5:00 PM (Winter)',
             price: 'Adults: 20 RON, Children: 10 RON, Students: 15 RON',
             tips: 'Wear comfortable shoes for climbing. Visit early morning for best photos. Allow 2-3 hours for full exploration.'
         },
         dinoparc: {
             title: 'Dino Parc',
+            title_ro: 'Dino Parc',
             description: 'The largest dinosaur park in Southeast Europe featuring over 100 life-size animatronic dinosaurs. An educational and entertaining experience for the whole family with interactive exhibits and fossil displays.',
+            description_ro: 'Cel mai mare parc cu dinozauri din Europa de Sud-Est, cu peste 100 de replici animatronice la scară naturală. Experiență educațională și distractivă pentru întreaga familie.',
             hours: 'Daily: 10:00 AM - 7:00 PM (April-October)',
             price: 'Adults: 40 RON, Children (3-14): 30 RON, Family pass: 120 RON',
             tips: 'Perfect for families with children. Best visited in good weather. Combined tickets with fortress available.'
@@ -1008,12 +1033,15 @@ function showLocationDetails(locationId) {
     
     const detail = details[locationId];
     if (detail) {
-        document.getElementById('details-title').textContent = detail.title;
+        const title = (currentLang === 'ro' && detail.title_ro) ? detail.title_ro : detail.title;
+        const description = (currentLang === 'ro' && detail.description_ro) ? detail.description_ro : detail.description;
+
+        document.getElementById('details-title').textContent = title;
         document.getElementById('details-content').innerHTML = `
-            <p><strong>About:</strong> ${detail.description}</p>
-            <p><strong>Hours:</strong> ${detail.hours}</p>
-            <p><strong>Price:</strong> ${detail.price}</p>
-            <p><strong>Tips:</strong> ${detail.tips}</p>
+            <p><strong>${currentLang === 'ro' ? 'Despre' : 'About'}:</strong> ${description}</p>
+            <p><strong>${currentLang === 'ro' ? 'Ore' : 'Hours'}:</strong> ${detail.hours}</p>
+            <p><strong>${currentLang === 'ro' ? 'Preț' : 'Price'}:</strong> ${detail.price}</p>
+            <p><strong>${currentLang === 'ro' ? 'Sfaturi' : 'Tips'}:</strong> ${detail.tips}</p>
         `;
         openModal('details-modal');
     }
@@ -1023,13 +1051,17 @@ function showRestaurantDetails(restaurantId) {
     const details = {
         cetate: {
             title: 'Cetate Restaurant',
+            title_ro: 'Restaurant Cetate',
             menu: 'Sarmale (stuffed cabbage rolls), Mici (grilled meat rolls), Polenta with cheese and sour cream, Traditional soups',
+            menu_ro: 'Sarmale, Mici, Mămăligă cu brânză și smântână, supe tradiționale',
             hours: '11:00 AM - 11:00 PM',
             notes: 'Reservations recommended for groups.'
         },
         ceaun: {
             title: 'La Ceaun',
+            title_ro: 'La Ceaun',
             menu: 'Ciorbă (sour soup), Grilled trout, Pork steak with mushrooms, Homemade desserts',
+            menu_ro: 'Ciorbă, păstrăv la grătar, friptură de porc cu ciuperci, deserturi de casă',
             hours: '12:00 PM - 10:00 PM',
             notes: 'Cozy atmosphere with fireplace.'
         },
@@ -1073,11 +1105,14 @@ function showRestaurantDetails(restaurantId) {
     
     const detail = details[restaurantId];
     if (detail) {
-        document.getElementById('details-title').textContent = detail.title;
+        const title = (currentLang === 'ro' && detail.title_ro) ? detail.title_ro : detail.title;
+        const menu = (currentLang === 'ro' && detail.menu_ro) ? detail.menu_ro : detail.menu;
+
+        document.getElementById('details-title').textContent = title;
         document.getElementById('details-content').innerHTML = `
-            <p><strong>Menu Highlights:</strong> ${detail.menu}</p>
-            <p><strong>Hours:</strong> ${detail.hours}</p>
-            <p><strong>Note:</strong> ${detail.notes}</p>
+            <p><strong>${currentLang === 'ro' ? 'Meniu (repere)' : 'Menu Highlights'}:</strong> ${menu}</p>
+            <p><strong>${currentLang === 'ro' ? 'Ore' : 'Hours'}:</strong> ${detail.hours}</p>
+            <p><strong>${currentLang === 'ro' ? 'Notă' : 'Note'}:</strong> ${detail.notes}</p>
         `;
         openModal('details-modal');
     }
@@ -1087,8 +1122,11 @@ function showAccommodationDetails(accommodationId) {
     const details = {
         ambient: {
             title: 'Hotel Ambient',
+            title_ro: 'Hotel Ambient',
             description: '4-star hotel with spa, indoor pool, restaurant, and mountain-view rooms.',
+            description_ro: 'Hotel de 4 stele cu spa, piscină interioară, restaurant și camere cu vedere la munte.',
             amenities: 'Free WiFi, parking, breakfast included',
+            amenities_ro: 'WiFi gratuit, parcare, mic dejun inclus',
             price: 'From €80/night',
             contact: '+40 268 234 567'
         },
@@ -1145,12 +1183,16 @@ function showAccommodationDetails(accommodationId) {
     
     const detail = details[accommodationId];
     if (detail) {
-        document.getElementById('details-title').textContent = detail.title;
+        const title = (currentLang === 'ro' && detail.title_ro) ? detail.title_ro : detail.title;
+        const description = (currentLang === 'ro' && detail.description_ro) ? detail.description_ro : detail.description;
+        const amenities = (currentLang === 'ro' && detail.amenities_ro) ? detail.amenities_ro : detail.amenities;
+
+        document.getElementById('details-title').textContent = title;
         document.getElementById('details-content').innerHTML = `
-            <p><strong>Description:</strong> ${detail.description}</p>
-            <p><strong>Amenities:</strong> ${detail.amenities}</p>
-            <p><strong>Price:</strong> ${detail.price}</p>
-            <p><strong>Book:</strong> ${detail.contact}</p>
+            <p><strong>${currentLang === 'ro' ? 'Descriere' : 'Description'}:</strong> ${description}</p>
+            <p><strong>${currentLang === 'ro' ? 'Facilități' : 'Amenities'}:</strong> ${amenities}</p>
+            <p><strong>${currentLang === 'ro' ? 'Preț' : 'Price'}:</strong> ${detail.price}</p>
+            <p><strong>${currentLang === 'ro' ? 'Contact' : 'Book'}:</strong> ${detail.contact}</p>
         `;
         openModal('details-modal');
     }
@@ -1165,29 +1207,35 @@ function loadMap() {
     // Check if Leaflet library is available
     if (typeof L === 'undefined') {
         // Fallback for when Leaflet is not available (CDN blocked or offline)
+        const title = translateMessage('Interactive map showing all locations, restaurants, and accommodations');
+        const locationsLabel = translateMessage('📍 Locations');
+        const restaurantsLabel = translateMessage('🍽️ Restaurants');
+        const accommodationsLabel = translateMessage('🏨 Accommodations');
+        const infoLine = translateMessage('In production, this displays a fully interactive map powered by OpenStreetMap/Leaflet');
+
         mapDiv.innerHTML = `
             <div id="map-fallback" style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; color: white; border-radius: 12px;">
                 <i class="fas fa-map-marked-alt" style="font-size: 5rem; margin-bottom: 2rem; opacity: 0.9;"></i>
-                <h3 style="color: white; margin-bottom: 1.5rem; font-size: 1.8rem;">Interactive Map</h3>
+                <h3 style="color: white; margin-bottom: 1.5rem; font-size: 1.8rem;">${translateMessage('Interactive Map')}</h3>
                 <p style="color: rgba(255,255,255,0.9); text-align: center; margin-bottom: 2rem; max-width: 600px;">
-                    Showing all tourist locations, restaurants, and accommodations in Rasnov
+                    ${title}
                 </p>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; width: 100%; max-width: 900px;">
                     <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
-                        <strong style="color: #2c5f8d; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">📍 Locations</strong>
+                        <strong style="color: #2c5f8d; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">${locationsLabel}</strong>
                         <small style="color: #666;">Rasnov Fortress, Dino Parc, Piatra Mica Peak, Village Museum, Bran Castle, Poiana Brasov, Brasov Old Town, Peles Castle, National Park, Bear Sanctuary</small>
                     </div>
                     <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
-                        <strong style="color: #e8734e; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">🍽️ Restaurants</strong>
+                        <strong style="color: #e8734e; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">${restaurantsLabel}</strong>
                         <small style="color: #666;">Cetate Restaurant, La Ceaun, Pizzeria Castello, Cafe Central, Belvedere Terrace, Grill House, Bistro Rasnoveana, Vegetarian Haven</small>
                     </div>
                     <div style="background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333;">
-                        <strong style="color: #4caf50; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">🏨 Accommodations</strong>
+                        <strong style="color: #4caf50; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">${accommodationsLabel}</strong>
                         <small style="color: #666;">Hotel Ambient, Pension Belvedere, Casa Petre, Mountain Hostel, Villa Carpathia, Boutique Hotel Residence, Mountain Cabins, Casa Maria B&B</small>
                     </div>
                 </div>
                 <p style="margin-top: 2rem; color: rgba(255,255,255,0.7); font-size: 0.95rem; text-align: center;">
-                    <i class="fas fa-info-circle"></i> In production, this displays a fully interactive map powered by OpenStreetMap/Leaflet
+                    <i class="fas fa-info-circle"></i> ${infoLine}
                 </p>
             </div>
         `;
@@ -1378,14 +1426,317 @@ function escapeHtml(text) {
 
 // Language Toggle (Basic implementation)
 const langToggle = document.querySelector('.lang-toggle');
+let currentLang = 'en';
+
+// Minimal set of translations for Romanian
+const I18N = {
+    ro: {
+        htmlLang: 'ro',
+        logo: 'Descoperă Râșnov',
+        nav: {
+            '#home': 'Acasă',
+            '#ar-mode': 'Vânătoare AR',
+            '#map': 'Hartă',
+            '#info': 'Info'
+        },
+        heroTitle: 'Bun venit în Râșnov',
+        heroSubtitle: 'Explorați Cetatea istorică, natura uimitoare și cultura românească',
+        heroCta: 'Începe Explorarea',
+        tabs: {
+            locations: 'Locații',
+            restaurants: 'Restaurante',
+            accommodations: 'Cazare'
+        },
+        ar: {
+            title: 'Vânătoare AR',
+            subtitle: 'Explorează Râșnov într-un mod distractiv și interactiv!',
+            startHunt: '<i class="fas fa-play"></i> Începe Vânătoarea',
+            scanQr: '<i class="fas fa-qrcode"></i> Scanează QR',
+            useLocation: '<i class="fas fa-map-marker-alt"></i> Folosește Locația',
+            testLocation: '<i class="fas fa-camera"></i> Testează Locație',
+            testingMode: '<i class="fas fa-flask"></i> Mod Testare'
+        },
+        progressText: 'locații găsite',
+        qrModalTitle: 'Scanează codul QR',
+        qrHelp: 'Îndreptați camera către un cod QR la una dintre locațiile vânătorii',
+        mapCta: 'Încarcă Harta',
+        discoveryContinue: 'Continuă Vânătoarea',
+        footer: {
+            about: 'Despre Râșnov',
+            quickLinks: 'Linkuri rapide',
+            contact: 'Contact'
+        }
+    }
+};
+
+// Message mapping for simple substring replacement translations
+const MESSAGE_MAP = {
+    ro: {
+        'Please start the hunt first!': 'Vă rugăm să porniți vânătoarea mai întâi!',
+        'Getting your location...': 'Se obține locația dvs...',
+        'Could not get your location. Please enable location services.': 'Nu s-a putut obține locația. Activați serviciile de localizare.',
+        'Geolocation is not supported by your browser.': 'Geolocalizarea nu este acceptată de browserul dvs.',
+        'Testing mode enabled! Click on any location to mark it as found.': 'Mod testare activat! Apăsați pe orice locație pentru a o marca ca găsită.',
+        'Testing mode disabled.': 'Mod testare dezactivat.',
+        'Camera access is not supported on this browser. Please use a modern browser with HTTPS.': 'Accesul la cameră nu este acceptat de acest browser. Folosiți un browser modern cu HTTPS.',
+        'Could not access camera. Testing mode allows manual selection.': 'Nu se poate accesa camera. Modul testare permite selecție manuală.',
+        'QR Code scanned successfully!': 'Cod QR scanat cu succes!',
+        'You already found this location!': 'Ai găsit deja această locație!',
+        "QR code not recognized. Make sure you\'re at a scavenger hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
+        'No locations nearby. Keep exploring!': 'Nicio locație în apropiere. Continuați explorarea!',
+        'Unable to access camera. ': 'Imposibil de accesat camera. ',
+        'Please allow camera access to use AR features.': 'Permiteți accesul la cameră pentru a folosi funcțiile AR.',
+        'No camera found on this device.': 'Nu s-a găsit nicio cameră pe acest dispozitiv.',
+        'Camera not supported on this browser. Please use HTTPS.': 'Camera nu este acceptată de acest browser. Folosiți HTTPS.',
+        'Please check your camera settings.': 'Verificați setările camerei.',
+        'AR camera requires HTTPS. Please access the site via https:// to use AR features.': 'Camera AR necesită HTTPS. Accesați site-ul prin https:// pentru a folosi funcțiile AR.',
+        'Map loaded with all locations!': 'Harta încărcată cu toate locațiile!',
+        'Map loaded successfully!': 'Harta a fost încărcată cu succes!',
+        'Select a QR Code to Scan:': 'Selectați un cod QR pentru scanare:',
+        'Initializing AR Camera...': 'Se inițializează camera AR...',
+        'Scavenger hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
+        'Scavenger hunt stopped.': 'Vânătoarea a fost oprită.',
+        'Testing AR at ': 'Testare AR la ',
+        'Interactive map showing all locations, restaurants, and accommodations': 'Hartă interactivă care afișează toate locațiile, restaurantele și cazări',
+        'Open now': 'Deschis acum',
+        '❌ Closed': '❌ Închis',
+        '✅ Open now': '✅ Deschis acum'
+    }
+};
+
+function translateMessage(message) {
+    if (!message || currentLang === 'en') return message;
+    const map = MESSAGE_MAP[currentLang];
+    if (!map) return message;
+
+    // Replace known substrings to support dynamic messages
+    let out = String(message);
+    // Sort keys by length desc to avoid partial overlaps
+    Object.keys(map).sort((a,b) => b.length - a.length).forEach(key => {
+        if (out.indexOf(key) !== -1) {
+            out = out.split(key).join(map[key]);
+        }
+    });
+    return out;
+}
+
+function applyTranslations(lang) {
+    const dict = I18N[lang];
+    if (!dict) return;
+
+    // set html lang
+    document.documentElement.lang = dict.htmlLang || lang;
+
+    // Logo
+    const logoH1 = document.querySelector('.logo h1');
+    if (logoH1) logoH1.textContent = dict.logo;
+
+    // Nav links
+    Object.entries(dict.nav).forEach(([href, text]) => {
+        const a = document.querySelector(`.nav-list a[href="${href}"]`);
+        if (a) a.textContent = text;
+    });
+
+    // Hero
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) heroTitle.textContent = dict.heroTitle;
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    if (heroSubtitle) heroSubtitle.textContent = dict.heroSubtitle;
+    const heroCta = document.querySelector('.hero .cta-button');
+    if (heroCta) heroCta.innerHTML = `<i class="fas fa-compass"></i> ${dict.heroCta}`;
+
+    // Tabs
+    tabButtons.forEach(btn => {
+        const key = btn.dataset.tab;
+        const span = btn.querySelector('span');
+        if (span && dict.tabs[key]) span.textContent = dict.tabs[key];
+    });
+
+    // Section titles - common replacements
+    const sectionMap = {
+        'Top Locations to Visit': 'Cele mai bune locații de vizitat',
+        'Best Restaurants': 'Cele mai bune restaurante',
+        'Places to Stay': 'Locuri de cazare',
+        'AR Scavenger Hunt': dict.ar.title,
+        'Interactive Map': 'Hartă Interactivă',
+        'Essential Information': 'Informații esențiale',
+        'Your Progress': 'Progresul tău'
+    };
+    document.querySelectorAll('.section-title, .section-header h2, .progress-container h3').forEach(el => {
+        const txt = el.textContent.trim();
+        if (sectionMap[txt]) el.textContent = sectionMap[txt];
+    });
+
+    // AR buttons
+    if (startHuntBtn) startHuntBtn.innerHTML = dict.ar.startHunt;
+    if (scanQrBtn) scanQrBtn.innerHTML = dict.ar.scanQr;
+    if (useLocationBtn) useLocationBtn.innerHTML = dict.ar.useLocation;
+    if (testLocationBtn) testLocationBtn.innerHTML = dict.ar.testLocation;
+    if (testingModeBtn) testingModeBtn.innerHTML = dict.ar.testingMode;
+
+    // Progress text suffix
+    const progressText = document.querySelector('.progress-text');
+    if (progressText) {
+        const count = document.getElementById('progress-count').textContent;
+        const total = document.getElementById('progress-total').textContent;
+        progressText.innerHTML = `<span id="progress-count">${count}</span> / <span id="progress-total">${total}</span> ${dict.progressText}`;
+    }
+
+    // QR modal
+    const qrModalH3 = document.querySelector('#qr-modal h3');
+    if (qrModalH3) qrModalH3.textContent = dict.qrModalTitle;
+    const qrHelp = document.querySelector('#qr-modal .help-text');
+    if (qrHelp) qrHelp.textContent = dict.qrHelp;
+
+    // AR loading text
+    const arLoadingP = document.querySelector('#ar-loading p');
+    if (arLoadingP) arLoadingP.textContent = translateMessage('Initializing AR Camera...');
+
+    // Map CTA
+    const mapCtaBtn = document.querySelector('#interactive-map .cta-button');
+    if (mapCtaBtn) mapCtaBtn.textContent = dict.mapCta;
+
+    // Discovery modal continue button
+    const discoveryContinueBtn = document.querySelector('#discovery-modal .cta-button');
+    if (discoveryContinueBtn) discoveryContinueBtn.textContent = dict.discoveryContinue;
+
+    // Footer headings
+    const footerAbout = document.querySelector('.footer-section:first-child h4');
+    if (footerAbout) footerAbout.textContent = dict.footer.about;
+    const footerQuick = document.querySelectorAll('.footer-section h4')[1];
+    if (footerQuick) footerQuick.textContent = dict.footer.quickLinks;
+    const footerContact = document.querySelectorAll('.footer-section h4')[2];
+    if (footerContact) footerContact.textContent = dict.footer.contact;
+
+    // Translate card titles/descriptions by scanning buttons that open details
+    // Locations
+    document.querySelectorAll('button[onclick^="showLocationDetails("]').forEach(btn => {
+        const m = btn.getAttribute('onclick').match(/showLocationDetails\('([^']+)'\)/);
+        if (!m) return;
+        const key = m[1];
+        const card = btn.closest('.card');
+        if (!card) return;
+
+        // Attempt to use details translations defined in showLocationDetails
+        // We'll construct simple translation map here to avoid moving existing objects
+        const detailsMap = {
+            fortress: {
+                en: { title: 'Rasnov Fortress', desc: 'A medieval citadel built by Teutonic Knights in the 13th century. Offers breathtaking panoramic views of the surrounding Carpathian Mountains.' },
+                ro: { title: 'Cetatea Râșnov', desc: 'O cetate medievală construită de Cavalerii Teutoni în secolul al XIII-lea. Oferă priveliști panoramice impresionante ale Munților Carpați.' }
+            },
+            dinoparc: {
+                en: { title: 'Dino Parc', desc: 'The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs. Perfect for families and children.' },
+                ro: { title: 'Dino Parc', desc: 'Cel mai mare parc cu dinozauri din Europa de Sud-Est, ideal pentru familii și copii.' }
+            },
+            peak: {
+                en: { title: 'Piatra Mica Peak', desc: 'Hiking trail to a stunning mountain peak. Accessible via cable car or hiking trail, offering spectacular mountain views.' },
+                ro: { title: 'Piatra Mică', desc: 'Traseu de drumeție către un vârf montan impresionant. Accesibil cu telescaunul sau pe traseu.' }
+            },
+            museum: {
+                en: { title: 'Village Museum', desc: 'Explore traditional Romanian rural life with authentic houses, tools, and artifacts from the region\'s history.' },
+                ro: { title: 'Muzeul Satului', desc: 'Explorează viața rurală tradițională românească cu case autentice, unelte și artefacte.' }
+            },
+            bran: {
+                en: { title: 'Bran Castle', desc: 'Famous Dracula\'s Castle, just 15 minutes away. Gothic fortress with fascinating history and stunning architecture.' },
+                ro: { title: 'Castelul Bran', desc: 'Faimosul Castel al lui Dracula, la doar 15 minute. Fortăreață gotică cu o istorie fascinantă.' }
+            },
+            poiana: {
+                en: { title: 'Poiana Brasov Ski Resort', desc: 'Premier ski resort nearby with 23km of slopes. Great for winter sports enthusiasts and summer hiking.' },
+                ro: { title: 'Stațiunea Poiana Brașov', desc: 'Stațiune de schi cu 23 km de pârtii. Excelentă pentru sporturi de iarnă și drumeții de vară.' }
+            },
+            brasov: {
+                en: { title: 'Brasov Old Town', desc: 'Medieval city center with Council Square, Black Church, and charming cobblestone streets.' },
+                ro: { title: 'Centrul Istoric Brașov', desc: 'Centru medieval cu Piața Sfatului, Biserica Neagră și străzi pietruite pitorești.' }
+            },
+            peles: {
+                en: { title: 'Peles Castle', desc: 'Neo-Renaissance masterpiece in Sinaia. One of Europe\'s most beautiful castles with 160 lavishly decorated rooms.' },
+                ro: { title: 'Castelul Peleș', desc: 'Capodoperă neo-renascentistă din Sinaia. Unul dintre cele mai frumoase castele din Europa.' }
+            },
+            'national-park': {
+                en: { title: 'Piatra Craiului National Park', desc: 'Protected natural area with dramatic limestone ridge. Excellent hiking, wildlife watching, and pristine nature.' },
+                ro: { title: 'Parcul Național Piatra Craiului', desc: 'Areal natural protejat cu creastă calcaroasă dramatică. Potrivit pentru drumeții și observarea faunei.' }
+            },
+            'bear-sanctuary': {
+                en: { title: 'Libearty Bear Sanctuary', desc: 'Europe\'s largest brown bear sanctuary. Home to rescued bears in natural habitat. Educational and ethical tourism.' },
+                ro: { title: 'Sanctuarul pentru Urși Libearty', desc: 'Cel mai mare sanctuar pentru urși bruni din Europa. Urși salvați trăind în habitat natural.' }
+            }
+        };
+
+        const mapEntry = detailsMap[key];
+        if (mapEntry) {
+            const titleEl = card.querySelector('.card-title');
+            const descEl = card.querySelector('.card-description');
+            if (titleEl) titleEl.textContent = (currentLang === 'ro') ? mapEntry.ro.title : mapEntry.en.title;
+            if (descEl) descEl.textContent = (currentLang === 'ro') ? mapEntry.ro.desc : mapEntry.en.desc;
+        }
+    });
+
+    // Restaurants
+    document.querySelectorAll('button[onclick^="showRestaurantDetails("]').forEach(btn => {
+        const m = btn.getAttribute('onclick').match(/showRestaurantDetails\('([^']+)'\)/);
+        if (!m) return;
+        const key = m[1];
+        const card = btn.closest('.card');
+        if (!card) return;
+        const restMap = {
+            cetate: { en: { title: 'Cetate Restaurant', desc: 'Traditional Romanian cuisine in the heart of the fortress.' }, ro: { title: 'Restaurant Cetate', desc: 'Bucătărie tradițională românească în inima cetății.' } },
+            ceaun: { en: { title: 'La Ceaun', desc: 'Cozy tavern serving hearty mountain dishes.' }, ro: { title: 'La Ceaun', desc: 'Han primitor cu mâncăruri montane consistente.' } },
+            pizzeria: { en: { title: 'Pizzeria Castello', desc: 'Italian pizzeria with a Romanian twist.' }, ro: { title: 'Pizzeria Castello', desc: 'Pizzerie italiană cu influențe românești.' } },
+            cafe: { en: { title: 'Cafe Central', desc: 'Modern cafe with excellent coffee, pastries, and light meals.' }, ro: { title: 'Cafe Central', desc: 'Cafenea modernă cu cafea excelentă și patiserie.' } },
+            'belvedere-terrace': { en: { title: 'Belvedere Terrace', desc: 'Restaurant with panoramic terrace and international cuisine.' }, ro: { title: 'Terasă Belvedere', desc: 'Restaurant cu terasă panoramică și bucătărie internațională.' } },
+            'grill-house': { en: { title: 'Grill House Rasnov', desc: 'BBQ specialist with outdoor grill.' }, ro: { title: 'Grill House Rasnov', desc: 'Specialist în BBQ cu grătar în aer liber.' } },
+            bistro: { en: { title: 'Bistro Rasnoveana', desc: 'Casual bistro in town center.' }, ro: { title: 'Bistro Rasnoveana', desc: 'Bistro casual în centrul orașului.' } },
+            vegetarian: { en: { title: 'Vegetarian Haven', desc: 'Plant-based restaurant with creative dishes.' }, ro: { title: 'Vegetarian Haven', desc: 'Restaurant pe bază de plante cu preparate creative.' } }
+        };
+        const entry = restMap[key];
+        if (entry) {
+            const titleEl = card.querySelector('.card-title');
+            const descEl = card.querySelector('.card-description');
+            if (titleEl) titleEl.textContent = (currentLang === 'ro') ? entry.ro.title : entry.en.title;
+            if (descEl) descEl.textContent = (currentLang === 'ro') ? entry.ro.desc : entry.en.desc;
+        }
+    });
+
+    // Accommodations
+    document.querySelectorAll('button[onclick^="showAccommodationDetails("]').forEach(btn => {
+        const m = btn.getAttribute('onclick').match(/showAccommodationDetails\('([^']+)'\)/);
+        if (!m) return;
+        const key = m[1];
+        const card = btn.closest('.card');
+        if (!card) return;
+        const accMap = {
+            ambient: { en: { title: 'Hotel Ambient', desc: 'Modern 4-star hotel with spa facilities, mountain views.' }, ro: { title: 'Hotel Ambient', desc: 'Hotel modern de 4 stele cu spa și vedere la munte.' } },
+            belvedere: { en: { title: 'Pension Belvedere', desc: 'Family-run guesthouse with traditional hospitality.' }, ro: { title: 'Pensiunea Belvedere', desc: 'Pensiune de familie cu ospitalitate tradițională.' } },
+            petre: { en: { title: 'Casa Petre', desc: 'Charming apartments in the old town.' }, ro: { title: 'Casa Petre', desc: 'Apartamente fermecătoare în centrul vechi.' } },
+            hostel: { en: { title: 'Mountain Hostel', desc: 'Budget-friendly hostel perfect for backpackers.' }, ro: { title: 'Hostel Montan', desc: 'Hostel economic, ideal pentru backpackeri.' } },
+            villa: { en: { title: 'Villa Carpathia', desc: 'Luxury villa with private garden and pool.' }, ro: { title: 'Villa Carpathia', desc: 'Vilă de lux cu grădină privată și piscină.' } },
+            boutique: { en: { title: 'Boutique Hotel Residence', desc: 'Stylish boutique hotel with modern amenities.' }, ro: { title: 'Boutique Hotel Residence', desc: 'Hotel boutique stilat cu facilități moderne.' } },
+            cabins: { en: { title: 'Mountain Cabins', desc: 'Cozy wooden cabins in nature.' }, ro: { title: 'Căsuțe Montane', desc: 'Căsuțe din lemn, confortabile, în natură.' } },
+            'casa-maria': { en: { title: 'Casa Maria B&B', desc: 'Traditional bed and breakfast with local charm.' }, ro: { title: 'Casa Maria B&B', desc: 'Pensiune tradițională cu farmec local.' } }
+        };
+        const entry = accMap[key];
+        if (entry) {
+            const titleEl = card.querySelector('.card-title');
+            const descEl = card.querySelector('.card-description');
+            if (titleEl) titleEl.textContent = (currentLang === 'ro') ? entry.ro.title : entry.en.title;
+            if (descEl) descEl.textContent = (currentLang === 'ro') ? entry.ro.desc : entry.en.desc;
+        }
+    });
+}
+
 if (langToggle) {
     langToggle.addEventListener('click', () => {
-        const currentLang = langToggle.textContent.trim();
-        if (currentLang.includes('EN')) {
+        if (currentLang === 'en') {
+            currentLang = 'ro';
             langToggle.innerHTML = '<i class="fas fa-globe"></i> RO';
-            showNotification('Language changed to Romanian (Demo)', 'info');
+            applyTranslations('ro');
+            showNotification('Limba a fost schimbată în Română', 'info');
         } else {
+            currentLang = 'en';
             langToggle.innerHTML = '<i class="fas fa-globe"></i> EN';
+            // For now, reload to restore original English texts (simple revert)
+            // Alternatively we could store English strings and reapply them.
+            window.location.reload();
             showNotification('Language changed to English', 'info');
         }
     });
