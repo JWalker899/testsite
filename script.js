@@ -34,6 +34,237 @@ let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
 
+// ==================== User Account & Points System ====================
+let currentUser = null;
+const POINTS_PER_LOCATION = 10;
+const COMPLETION_BONUS = 50;
+
+// Initialize user from localStorage or create anonymous session
+function initializeUser() {
+    const savedUser = localStorage.getItem('rasnov_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+        } catch (e) {
+            console.error('Failed to load user from localStorage:', e);
+            createAnonymousUser();
+        }
+    } else {
+        createAnonymousUser();
+    }
+    updateUserDisplayUI();
+}
+
+// Create an anonymous user account
+function createAnonymousUser() {
+    const timestamp = Date.now();
+    currentUser = {
+        username: `guest_${timestamp}`,
+        totalPoints: 0,
+        locationsFound: [],
+        completedAt: null,
+        createdAt: new Date().toISOString(),
+        isAnonymous: true
+    };
+    saveUserToLocalStorage();
+}
+
+// Save user to localStorage
+function saveUserToLocalStorage() {
+    localStorage.setItem('rasnov_user', JSON.stringify(currentUser));
+}
+
+// Set a custom username for the user
+function setUsername(username) {
+    if (!username || username.trim() === '') {
+        showNotification('Please enter a valid username', 'warning');
+        return false;
+    }
+    
+    currentUser.username = username.trim();
+    currentUser.isAnonymous = false;
+    saveUserToLocalStorage();
+    updateUserDisplayUI();
+    showNotification(`Welcome, ${username}!`, 'success');
+    return true;
+}
+
+// Award points for finding a location
+async function awardPoints(locationKey, locationName) {
+    if (!currentUser) return;
+    
+    const isAlreadyFound = currentUser.locationsFound.includes(locationKey);
+    if (isAlreadyFound) {
+        console.log(`Location ${locationKey} already found by user`);
+        return;
+    }
+    
+    const isCompletion = foundLocations.size === Object.keys(huntLocations).length;
+    
+    // Add to user's found locations
+    currentUser.locationsFound.push(locationKey);
+    
+    // Calculate points
+    const pointsAwarded = POINTS_PER_LOCATION;
+    let bonusPoints = 0;
+    
+    if (isCompletion) {
+        bonusPoints = COMPLETION_BONUS;
+        currentUser.completedAt = new Date().toISOString();
+    }
+    
+    currentUser.totalPoints += pointsAwarded + bonusPoints;
+    
+    // Save to localStorage
+    saveUserToLocalStorage();
+    
+    // Try to sync with server if endpoint is available (optional)
+    try {
+        const response = await fetch(`/api/user/${encodeURIComponent(currentUser.username)}/location-found`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                locationKey,
+                locationName,
+                isCompletion
+            })
+        });
+        
+        if (!response.ok && response.status !== 400) {
+            console.warn('Failed to sync points with server:', response.statusText);
+        }
+    } catch (e) {
+        console.log('Server sync unavailable (offline mode):', e.message);
+    }
+    
+    // Update UI
+    updateUserDisplayUI();
+    
+    // Show points notification
+    showPointsNotification(pointsAwarded, bonusPoints, locationName);
+    
+    return {
+        pointsAwarded,
+        bonusPoints,
+        totalPoints: currentUser.totalPoints
+    };
+}
+
+// Update user display in header
+function updateUserDisplayUI() {
+    const userElement = document.getElementById('user-points-display');
+    if (userElement && currentUser) {
+        userElement.innerHTML = `
+            <span class="user-name">${currentUser.username}</span>
+            <span class="user-points">⭐ ${currentUser.totalPoints} pts</span>
+        `;
+    }
+}
+
+// Show a celebration notification when points are earned
+function showPointsNotification(points, bonusPoints = 0, locationName = '') {
+    let message = `<strong>+${points} points</strong>`;
+    if (locationName) {
+        message = `<strong>${locationName}</strong><br>+${points} points`;
+    }
+    if (bonusPoints > 0) {
+        message += `<br><strong>🎉 +${bonusPoints} completion bonus!</strong>`;
+    }
+    
+    const notificationEl = document.createElement('div');
+    notificationEl.className = 'points-notification';
+    notificationEl.innerHTML = message;
+    document.body.appendChild(notificationEl);
+    
+    // Animate in
+    setTimeout(() => notificationEl.classList.add('show'), 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notificationEl.classList.remove('show');
+        setTimeout(() => notificationEl.remove(), 300);
+    }, 3000);
+}
+
+// Show user profile modal
+function showUserProfile() {
+    if (!currentUser) return;
+    
+    const profileHTML = `
+        <div class="user-profile-modal">
+            <div class="profile-header">
+                <h2>Your Profile</h2>
+                <button class="modal-close" onclick="closeModal('user-profile-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="profile-content">
+                <div class="profile-stat">
+                    <span class="stat-label">Username</span>
+                    <span class="stat-value">${currentUser.username}</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Total Points</span>
+                    <span class="stat-value" style="color: #f39c12; font-weight: bold;">⭐ ${currentUser.totalPoints}</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Locations Found</span>
+                    <span class="stat-value">${currentUser.locationsFound.length} / 8</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Hunt Status</span>
+                    <span class="stat-value">${currentUser.completedAt ? '✅ Completed' : '🔄 In Progress'}</span>
+                </div>
+                ${currentUser.completedAt ? `
+                    <div class="profile-stat">
+                        <span class="stat-label">Completed Date</span>
+                        <span class="stat-value">${new Date(currentUser.completedAt).toLocaleDateString()}</span>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="profile-actions">
+                ${currentUser.isAnonymous ? `
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" id="new-username" placeholder="Enter username" maxlength="20" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                        <button class="card-button" style="width: 100%; margin-top: 0.5rem;" onclick="updateUsernameInModal()">Set Username</button>
+                    </div>
+                ` : ''}
+                <button class="card-button" onclick="resetProgress()">Reset Progress</button>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.getElementById('user-profile-modal');
+    if (modal) {
+        modal.querySelector('.modal-content').innerHTML = profileHTML;
+    }
+}
+
+// Update username from profile modal
+function updateUsernameInModal() {
+    const input = document.getElementById('new-username');
+    if (input && setUsername(input.value)) {
+        showUserProfile();
+    }
+}
+
+// Reset all hunt progress
+function resetProgress() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+        currentUser.locationsFound = [];
+        currentUser.totalPoints = 0;
+        currentUser.completedAt = null;
+        foundLocations.clear();
+        saveUserToLocalStorage();
+        updateUserDisplayUI();
+        updateProgress();
+        closeModal('user-profile-modal');
+        showNotification('Progress reset successfully', 'info');
+    }
+}
+
+// ==================== Scavenger Hunt Locations ====================
+
 // Scavenger Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
     fortress: { 
@@ -467,24 +698,42 @@ function discoverLocation(locationKey) {
         huntItem.querySelector('i').className = 'fas fa-check-circle';
     }
     
+    // Award points to user
+    const location = huntLocations[locationKey];
+    const localizedName = localizedField(location, 'name') || location.name;
+    const isCompletion = foundLocations.size === Object.keys(huntLocations).length;
+    const pointsResult = awardPoints(locationKey, localizedName);
+    
     // Update progress
     updateProgress();
     
-    // Show discovery modal
-    const location = huntLocations[locationKey];
-    const localizedName = localizedField(location, 'name') || location.name;
+    // Show discovery modal with points
     const localizedFact = localizedField(location, 'fact') || location.fact || '';
     const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
 
     document.getElementById('discovery-title').textContent = (currentLang === 'ro') ? `Ai găsit ${localizedName}!` : `You found ${localizedName}!`;
     document.getElementById('discovery-message').textContent = discoveryMsg;
-    document.getElementById('discovery-fact').innerHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
+    
+    let factHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
+    if (pointsResult) {
+        let pointsText = `<br><br><strong>Points Earned: +${pointsResult.pointsAwarded}</strong>`;
+        if (pointsResult.bonusPoints > 0) {
+            pointsText += `<br><strong>🎉 Completion Bonus: +${pointsResult.bonusPoints}</strong>`;
+            pointsText += `<br><strong>Total Points: ${pointsResult.totalPoints}</strong>`;
+        }
+        factHTML += pointsText;
+    }
+    
+    document.getElementById('discovery-fact').innerHTML = factHTML;
     openModal('discovery-modal');
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
+            const celebrationMsg = (currentLang === 'ro') 
+                ? `🎉 Felicitări! Ai completat vânătoarea! Total puncte: ${currentUser.totalPoints}` 
+                : `🎉 Congratulations! You completed the scavenger hunt! Total points: ${currentUser.totalPoints}`;
+            showNotification(celebrationMsg, 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
@@ -961,73 +1210,119 @@ function showLocationDetails(locationId) {
             description: 'Built in the 13th century by Teutonic Knights, Rasnov Fortress is a stunning example of medieval defensive architecture. The fortress sits atop a rocky hilltop and offers breathtaking panoramic views of the surrounding Carpathian Mountains and Barsa Valley.',
             description_ro: 'Construită în secolul al XIII-lea de Cavalerii Teutoni, Cetatea Râșnov este un exemplu impresionant de arhitectură defensivă medievală. Aflată pe un deal stâncos, oferă priveliști panoramice spectaculoase ale Munților Carpați și ale Văii Bârsei.',
             hours: 'Daily: 9:00 AM - 6:00 PM (Summer), 9:00 AM - 5:00 PM (Winter)',
+            hours_ro: 'Zilnic: 9:00 AM - 6:00 PM (Vară), 9:00 AM - 5:00 PM (Iarnă)',
             price: 'Adults: 20 RON, Children: 10 RON, Students: 15 RON',
-            tips: 'Wear comfortable shoes for climbing. Visit early morning for best photos. Allow 2-3 hours for full exploration.'
+            price_ro: 'Adulți: 20 RON, Copii: 10 RON, Studenți: 15 RON',
+            tips: 'Wear comfortable shoes for climbing. Visit early morning for best photos. Allow 2-3 hours for full exploration.',
+            tips_ro: 'Purtați pantofi confortabili pentru urcare. Vizitați dimineață devreme pentru cele mai bune fotografii. Acordați 2-3 ore pentru explorare completă.'
         },
         dinoparc: {
             title: 'Dino Parc',
             title_ro: 'Dino Parc',
             description: 'The largest dinosaur park in Southeast Europe featuring over 100 life-size animatronic dinosaurs. An educational and entertaining experience for the whole family with interactive exhibits and fossil displays.',
-            description_ro: 'Cel mai mare parc cu dinozauri din Europa de Sud-Est, cu peste 100 de replici animatronice la scară naturală. Experiență educațională și distractivă pentru întreaga familie.',
+            description_ro: 'Cel mai mare parc cu dinozauri din Europa de Sud-Est, cu peste 100 de replici animatronice la scară naturală. Experiență educațională și distractivă pentru întreaga familie cu expozițiile interactive și colecția de fosile.',
             hours: 'Daily: 10:00 AM - 7:00 PM (April-October)',
+            hours_ro: 'Zilnic: 10:00 AM - 7:00 PM (Aprilie-Octombrie)',
             price: 'Adults: 40 RON, Children (3-14): 30 RON, Family pass: 120 RON',
-            tips: 'Perfect for families with children. Best visited in good weather. Combined tickets with fortress available.'
+            price_ro: 'Adulți: 40 RON, Copii (3-14): 30 RON, Abonament familial: 120 RON',
+            tips: 'Perfect for families with children. Best visited in good weather. Combined tickets with fortress available.',
+            tips_ro: 'Perfect pentru familii cu copii. Best vizitat în vreme bună. Bilete combinate cu cetatea disponibile.'
         },
         peak: {
             title: 'Piatra Mica Peak',
+            title_ro: 'Piatra Mică',
             description: 'A stunning mountain peak accessible by cable car or hiking trail. The peak offers spectacular 360-degree views of the Carpathian Mountains, Bucegi Plateau, and surrounding valleys.',
+            description_ro: 'Un vârf montan impresionant accesibil cu telescaunul sau pe traseu de drumeție. Vârful oferă priveliști spectaculoase de 360 de grade ale Munților Carpați, Platoul Bucegi și ale văilor înconjurătoare.',
             hours: 'Cable car: 9:00 AM - 5:00 PM (Weather dependent)',
+            hours_ro: 'Telescaun: 9:00 AM - 5:00 PM (În funcție de vreme)',
             price: 'Cable car round trip: 30 RON, Hiking: Free',
-            tips: 'Check weather before going. Bring warm layers as it can be windy. Hiking takes 3-4 hours up.'
+            price_ro: 'Telescaun dus-întors: 30 RON, Drumeție: Gratuit',
+            tips: 'Check weather before going. Bring warm layers as it can be windy. Hiking takes 3-4 hours up.',
+            tips_ro: 'Verificați vremea înainte de plecare. Duceți straturi calde deoarece poate fi vântos. Drumeția durează 3-4 ore în sus.'
         },
         museum: {
             title: 'Village Museum',
+            title_ro: 'Muzeul Satului',
             description: 'An authentic collection of traditional Romanian rural houses, tools, and artifacts. Learn about the rich cultural heritage and daily life of Transylvanian villages through the centuries.',
+            description_ro: 'O colecție autentică de case tradiționale românești, unelte și artefacte. Aflați despre moștenirea culturală bogată și viața cotidiană a satelor transilvane de-a lungul secolelor.',
             hours: 'Tuesday-Sunday: 10:00 AM - 5:00 PM (Closed Mondays)',
+            hours_ro: 'Marți-Duminică: 10:00 AM - 5:00 PM (Închis luni)',
             price: 'Adults: 10 RON, Children: 5 RON, Guided tours: +15 RON',
-            tips: 'Guided tours available in English. Photography allowed. Visit local craft demonstrations on weekends.'
+            price_ro: 'Adulți: 10 RON, Copii: 5 RON, Ture ghidate: +15 RON',
+            tips: 'Guided tours available in English. Photography allowed. Visit local craft demonstrations on weekends.',
+            tips_ro: 'Ture ghidate disponibile în limba engleză. Fotografia este permisă. Vizitați demonstrații locale de meșteșuguri în weekend.'
         },
         bran: {
             title: 'Bran Castle',
+            title_ro: 'Castelul Bran',
             description: 'Famous as "Dracula\'s Castle", this Gothic fortress is steeped in legend and history. The castle offers fascinating exhibits about medieval life and the region\'s royal history.',
+            description_ro: 'Faimos ca "Castelul lui Dracula", această fortăreață gotică este plinul de legendă și istorie. Castelul oferă expozițiile fascinante despre viața medievală și istoria regală a regiunii.',
             hours: 'Monday: 12:00 PM - 6:00 PM, Tuesday-Sunday: 9:00 AM - 6:00 PM',
+            hours_ro: 'Luni: 12:00 PM - 6:00 PM, Marți-Duminică: 9:00 AM - 6:00 PM',
             price: 'Adults: 45 RON, Students: 25 RON, Children: 10 RON',
-            tips: 'Very popular - arrive early or late to avoid crowds. Allow 1.5-2 hours. Combined tickets with Peles available.'
+            price_ro: 'Adulți: 45 RON, Studenți: 25 RON, Copii: 10 RON',
+            tips: 'Very popular - arrive early or late to avoid crowds. Allow 1.5-2 hours. Combined tickets with Peles available.',
+            tips_ro: 'Foarte popular - sosire devreme sau târziu pentru a evita aglomerația. Acordați 1,5-2 ore. Bilete combinate cu Peleș disponibile.'
         },
         poiana: {
             title: 'Poiana Brasov Ski Resort',
+            title_ro: 'Stațiunea Poiana Brașov',
             description: 'Premier ski resort with 23km of slopes for all skill levels. In summer, offers hiking, mountain biking, and stunning alpine scenery.',
+            description_ro: 'Stațiune de schi de primă clasă cu 23 km de pârtii pentru toate nivelurile de abilitate. În vară, oferă drumeții, mountain biking și peisaje alpine impresionante.',
             hours: 'Ski Season: December-March, 8:00 AM - 4:00 PM. Summer activities: May-October',
+            hours_ro: 'Sezonul de schi: Decembrie-Martie, 8:00 AM - 4:00 PM. Activități de vară: Mai-Octombrie',
             price: 'Ski pass: 150 RON/day, Equipment rental: 80 RON/day',
-            tips: 'Book lessons in advance. Multiple difficulty levels available. Great apres-ski scene.'
+            price_ro: 'Pasul de schi: 150 RON/zi, Închiriere echipament: 80 RON/zi',
+            tips: 'Book lessons in advance. Multiple difficulty levels available. Great apres-ski scene.',
+            tips_ro: 'Rezervați lecții în avans. Niveluri de dificultate multiple disponibile. Scenă apres-ski grozavă.'
         },
         brasov: {
             title: 'Brasov Old Town',
+            title_ro: 'Centrul Istoric Brașov',
             description: 'Medieval city center featuring the impressive Black Church, colorful baroque buildings, and the famous Council Square. Charming cobblestone streets perfect for walking.',
+            description_ro: 'Centru medieval cu Biserica Neagră impresionantă, clădiri baroc colorate și Piața Sfatului faimoasă. Străzi pietruite fermecătoare, perfect pentru plimbări.',
             hours: 'Always accessible (individual attractions vary)',
+            hours_ro: 'Întotdeauna accesibil (atracciile individuale variază)',
             price: 'Free to walk around, Black Church: 10 RON',
-            tips: 'Don\'t miss Council Square and Rope Street (narrowest street). Great shopping and dining options.'
+            price_ro: 'Gratuit pentru a merge pe jos, Biserica Neagră: 10 RON',
+            tips: 'Don\'t miss Council Square and Rope Street (narrowest street). Great shopping and dining options.',
+            tips_ro: 'Nu pierdeți Piața Sfatului și Strada Șnurului (cea mai îngustă stradă). Opțiuni minunate de cumpărături și mâncare.'
         },
         peles: {
             title: 'Peles Castle',
+            title_ro: 'Castelul Peleș',
             description: 'One of Europe\'s most beautiful castles, this Neo-Renaissance masterpiece features 160 rooms with stunning art, furniture, and architecture. Former royal summer residence.',
+            description_ro: 'Unul dintre cele mai frumoase castele ale Europei, această capodoperă neo-renascentistă are 160 de camere cu artă, mobilă și arhitectură impresionante. Foste reședință de vară regală.',
             hours: 'Wednesday-Sunday: 9:15 AM - 5:00 PM (Closed Monday-Tuesday)',
+            hours_ro: 'Miercuri-Duminică: 9:15 AM - 5:00 PM (Închis luni-marți)',
             price: 'Adults: 50 RON, Students: 12.5 RON. Photo permit: 35 RON',
-            tips: 'Book online to skip lines. Guided tours mandatory. Photography not allowed inside without permit.'
+            price_ro: 'Adulți: 50 RON, Studenți: 12,5 RON. Permis foto: 35 RON',
+            tips: 'Book online to skip lines. Guided tours mandatory. Photography not allowed inside without permit.',
+            tips_ro: 'Rezervați online pentru a sări peste cozi. Ture ghidate obligatorii. Fotografia nu este permisă în interior fără permis.'
         },
         'national-park': {
             title: 'Piatra Craiului National Park',
+            title_ro: 'Parcul Național Piatra Craiului',
             description: 'Protected mountain range with dramatic limestone ridge. Home to rare wildlife including chamois, lynx, and brown bears. Pristine alpine meadows and forests.',
+            description_ro: 'Lanț montan protejat cu creastă calcaroasă dramatică. Acasă pentru faunul rar, inclusiv chamois, lincele și ursul brun. Pajiști și păduri alpine neîntinse.',
             hours: 'Always open (visitor center: 9:00 AM - 5:00 PM)',
+            hours_ro: 'Întotdeauna deschis (centrul de vizitatori: 9:00 AM - 5:00 PM)',
             price: 'Free entry, Guided tours: 100-200 RON',
-            tips: 'Stay on marked trails. Bring proper hiking gear. Best months: June-September. Bear-safe practices required.'
+            price_ro: 'Intrare gratuită, Ture ghidate: 100-200 RON',
+            tips: 'Stay on marked trails. Bring proper hiking gear. Best months: June-September. Bear-safe practices required.',
+            tips_ro: 'Rămâneți pe traseele marcate. Duceți echipamentul de drumeție adecvat. Luni optime: iunie-septembrie. Practici sigure cu ursul necesare.'
         },
         'bear-sanctuary': {
             title: 'Libearty Bear Sanctuary',
+            title_ro: 'Sanctuarul pentru Urși Libearty',
             description: 'Europe\'s largest brown bear sanctuary, home to over 100 rescued bears. Ethical tourism supporting bear conservation and welfare in natural forest habitat.',
+            description_ro: 'Cel mai mare sanctuar pentru ursul brun din Europa, gazda pentru peste 100 de urși salvați. Turism etic care să susțină conservarea și bunăstarea ursului în habitat forestier natural.',
             hours: 'Daily: 9:00 AM - 7:00 PM (April-October), 9:00 AM - 5:00 PM (November-March)',
+            hours_ro: 'Zilnic: 9:00 AM - 7:00 PM (Aprilie-Octombrie), 9:00 AM - 5:00 PM (Noiembrie-martie)',
             price: 'Adults: 25 RON, Children: 15 RON, Family: 60 RON',
-            tips: 'Allow 1.5 hours. Bears most active in morning/evening. Support conservation by not feeding wildlife.'
+            price_ro: 'Adulți: 25 RON, Copii: 15 RON, Familie: 60 RON',
+            tips: 'Allow 1.5 hours. Bears most active in morning/evening. Support conservation by not feeding wildlife.',
+            tips_ro: 'Acordați 1,5 ore. Urșii sunt cei mai activi dimineață/seară. Susțineți conservarea prin a nu hrăni fauna sălbatică.'
         }
     };
     
@@ -1035,13 +1330,16 @@ function showLocationDetails(locationId) {
     if (detail) {
         const title = (currentLang === 'ro' && detail.title_ro) ? detail.title_ro : detail.title;
         const description = (currentLang === 'ro' && detail.description_ro) ? detail.description_ro : detail.description;
+        const hours = (currentLang === 'ro' && detail.hours_ro) ? detail.hours_ro : detail.hours;
+        const price = (currentLang === 'ro' && detail.price_ro) ? detail.price_ro : detail.price;
+        const tips = (currentLang === 'ro' && detail.tips_ro) ? detail.tips_ro : detail.tips;
 
         document.getElementById('details-title').textContent = title;
         document.getElementById('details-content').innerHTML = `
             <p><strong>${currentLang === 'ro' ? 'Despre' : 'About'}:</strong> ${description}</p>
-            <p><strong>${currentLang === 'ro' ? 'Ore' : 'Hours'}:</strong> ${detail.hours}</p>
-            <p><strong>${currentLang === 'ro' ? 'Preț' : 'Price'}:</strong> ${detail.price}</p>
-            <p><strong>${currentLang === 'ro' ? 'Sfaturi' : 'Tips'}:</strong> ${detail.tips}</p>
+            <p><strong>${currentLang === 'ro' ? 'Ore' : 'Hours'}:</strong> ${hours}</p>
+            <p><strong>${currentLang === 'ro' ? 'Preț' : 'Price'}:</strong> ${price}</p>
+            <p><strong>${currentLang === 'ro' ? 'Sfaturi' : 'Tips'}:</strong> ${tips}</p>
         `;
         openModal('details-modal');
     }
@@ -1055,7 +1353,8 @@ function showRestaurantDetails(restaurantId) {
             menu: 'Sarmale (stuffed cabbage rolls), Mici (grilled meat rolls), Polenta with cheese and sour cream, Traditional soups',
             menu_ro: 'Sarmale, Mici, Mămăligă cu brânză și smântână, supe tradiționale',
             hours: '11:00 AM - 11:00 PM',
-            notes: 'Reservations recommended for groups.'
+            notes: 'Reservations recommended for groups.',
+            notes_ro: 'Rezervări recomandate pentru grupuri.'
         },
         ceaun: {
             title: 'La Ceaun',
@@ -1063,43 +1362,68 @@ function showRestaurantDetails(restaurantId) {
             menu: 'Ciorbă (sour soup), Grilled trout, Pork steak with mushrooms, Homemade desserts',
             menu_ro: 'Ciorbă, păstrăv la grătar, friptură de porc cu ciuperci, deserturi de casă',
             hours: '12:00 PM - 10:00 PM',
-            notes: 'Cozy atmosphere with fireplace.'
+            notes: 'Cozy atmosphere with fireplace.',
+            notes_ro: 'Atmosferă confortabilă cu șemineu.'
         },
         pizzeria: {
             title: 'Pizzeria Castello',
+            title_ro: 'Pizzeria Castello',
             menu: 'Wood-fired pizzas, Fresh pasta, Romanian-Italian fusion dishes, Tiramisu',
+            menu_ro: 'Pizza la cuptorul din lemn, paste proaspete, fusion romano-italian, Tiramisu',
             hours: '11:00 AM - 11:00 PM',
-            notes: 'Delivery available.'
+            hours_ro: '11:00 AM - 11:00 PM',
+            notes: 'Delivery available.',
+            notes_ro: 'Livrare disponibilă.'
         },
         cafe: {
             title: 'Cafe Central',
+            title_ro: 'Cafe Central',
             menu: 'Specialty coffee, Fresh pastries, Breakfast menu, Sandwiches and salads',
+            menu_ro: 'Cafea de specialitate, patiserie proaspătă, meniu de micul dejun, sandwich-uri și salate',
             hours: '7:00 AM - 8:00 PM',
-            notes: 'Free WiFi available.'
+            hours_ro: '7:00 AM - 8:00 PM',
+            notes: 'Free WiFi available.',
+            notes_ro: 'WiFi gratuit disponibil.'
         },
         'belvedere-terrace': {
             title: 'Belvedere Terrace',
+            title_ro: 'Terasă Belvedere',
             menu: 'International cuisine, Steaks, Seafood, Fine wines, Gourmet desserts',
+            menu_ro: 'Bucătărie internațională, Friptură, Fructe de mare, Vinuri fine, Deserturi gourmet',
             hours: '12:00 PM - 11:00 PM (Kitchen closes at 10:00 PM)',
-            notes: 'Reservations essential for sunset dining. Dress code: Smart casual.'
+            hours_ro: '12:00 PM - 11:00 PM (Bucătăria se închide la 10:00 PM)',
+            notes: 'Reservations essential for sunset dining. Dress code: Smart casual.',
+            notes_ro: 'Rezervări esențiale pentru cina la apus. Cod de îmbrăcăminte: Smart casual.'
         },
         'grill-house': {
             title: 'Grill House Rasnov',
+            title_ro: 'Grill House Rasnov',
             menu: 'Mixed grills, BBQ ribs, Chicken skewers, Fresh salads, Local wines and craft beers',
+            menu_ro: 'Grătar mixt, Coaste BBQ, Frigărui de pui, Salate proaspete, Vinuri locale și bere artizanală',
             hours: '12:00 PM - 11:00 PM',
-            notes: 'Outdoor seating available. Great for groups.'
+            hours_ro: '12:00 PM - 11:00 PM',
+            notes: 'Outdoor seating available. Great for groups.',
+            notes_ro: 'Locuri de ședere în aer liber. Perfect pentru grupuri.'
         },
         bistro: {
             title: 'Bistro Rasnoveana',
+            title_ro: 'Bistro Rasnoveana',
             menu: 'Daily specials, Soups, Burgers, Pasta, Homemade cakes and desserts',
+            menu_ro: 'Ofertele zilei, Supe, Hamburgeri, Paste, Prăjituri și deserturi de casă',
             hours: '10:00 AM - 10:00 PM',
-            notes: 'Budget-friendly. Quick service. Lunch specials 11:00 AM - 2:00 PM.'
+            hours_ro: '10:00 AM - 10:00 PM',
+            notes: 'Budget-friendly. Quick service. Lunch specials 11:00 AM - 2:00 PM.',
+            notes_ro: 'Buget-friendly. Serviciu rapid. Oferte speciale la prânz 11:00 AM - 2:00 PM.'
         },
         vegetarian: {
             title: 'Vegetarian Haven',
+            title_ro: 'Vegetarian Haven',
             menu: 'Buddha bowls, Vegan burgers, Fresh juices, Smoothies, Plant-based desserts',
+            menu_ro: 'Boluri Buddha, Hamburgeri vegani, Sucuri proaspete, Smoothies, Deserturi pe bază de plante',
             hours: '9:00 AM - 9:00 PM',
-            notes: 'All organic ingredients. Gluten-free options available.'
+            hours_ro: '9:00 AM - 9:00 PM',
+            notes: 'All organic ingredients. Gluten-free options available.',
+            notes_ro: 'Toate ingredientele sunt ecologice. Opțiuni fără gluten disponibile.'
         }
     };
     
@@ -1107,12 +1431,13 @@ function showRestaurantDetails(restaurantId) {
     if (detail) {
         const title = (currentLang === 'ro' && detail.title_ro) ? detail.title_ro : detail.title;
         const menu = (currentLang === 'ro' && detail.menu_ro) ? detail.menu_ro : detail.menu;
+        const notes = (currentLang === 'ro' && detail.notes_ro) ? detail.notes_ro : detail.notes;
 
         document.getElementById('details-title').textContent = title;
         document.getElementById('details-content').innerHTML = `
             <p><strong>${currentLang === 'ro' ? 'Meniu (repere)' : 'Menu Highlights'}:</strong> ${menu}</p>
             <p><strong>${currentLang === 'ro' ? 'Ore' : 'Hours'}:</strong> ${detail.hours}</p>
-            <p><strong>${currentLang === 'ro' ? 'Notă' : 'Note'}:</strong> ${detail.notes}</p>
+            <p><strong>${currentLang === 'ro' ? 'Notă' : 'Note'}:</strong> ${notes}</p>
         `;
         openModal('details-modal');
     }
@@ -1132,50 +1457,71 @@ function showAccommodationDetails(accommodationId) {
         },
         belvedere: {
             title: 'Pension Belvedere',
+            title_ro: 'Pensiunea Belvedere',
             description: 'Family-run guesthouse with traditional rooms and homemade breakfast.',
+            description_ro: 'Pensiune de familie cu camere tradiționale și mic dejun de casă.',
             amenities: 'Free WiFi, parking, garden',
+            amenities_ro: 'WiFi gratuit, parcare, grădină',
             price: 'From €40/night',
             contact: '+40 268 234 568'
         },
         petre: {
             title: 'Casa Petre',
+            title_ro: 'Casa Petre',
             description: 'Fully equipped apartments in old town. Perfect for families or longer stays.',
+            description_ro: 'Apartamente complet echipate în centrul vechi. Perfect pentru familii sau sejururi mai lungi.',
             amenities: 'Kitchen, WiFi, parking',
+            amenities_ro: 'Bucătărie, WiFi, parcare',
             price: 'From €50/night',
             contact: '+40 268 234 569'
         },
         hostel: {
             title: 'Mountain Hostel',
+            title_ro: 'Hostel Montan',
             description: 'Budget-friendly with dorms and private rooms.',
+            description_ro: 'Economic cu dormitoare și camere private.',
             amenities: 'Shared kitchen, common area, organized trips',
+            amenities_ro: 'Bucătărie comună, sufragerie, excursii organizate',
             price: 'From €15/night',
             contact: '+40 268 234 570'
         },
         villa: {
             title: 'Villa Carpathia',
+            title_ro: 'Villa Carpathia',
             description: 'Luxury villa with 5 bedrooms, private garden, outdoor pool, and jacuzzi.',
+            description_ro: 'Vilă de lux cu 5 dormitoare, grădină privată, piscină în aer liber și jacuzzi.',
             amenities: 'Private pool, garden, BBQ area, full kitchen, parking',
+            amenities_ro: 'Piscină privată, grădină, zonă BBQ, bucătărie complet echipată, parcare',
             price: 'From €300/night (sleeps 10)',
             contact: '+40 268 234 571'
         },
         boutique: {
             title: 'Boutique Hotel Residence',
+            title_ro: 'Boutique Hotel Residence',
             description: 'Contemporary 4-star boutique hotel with rooftop bar and fitness center.',
+            description_ro: 'Hotel boutique contemporan de 4 stele cu bar pe acoperiș și centru de fitness.',
             amenities: 'Rooftop bar, gym, restaurant, spa treatments, free WiFi',
+            amenities_ro: 'Bar pe acoperiș, sală de sport, restaurant, tratamente spa, WiFi gratuit',
             price: 'From €90/night',
             contact: '+40 268 234 572'
         },
         cabins: {
             title: 'Mountain Cabins',
+            title_ro: 'Căsuțe Montane',
             description: 'Rustic wooden cabins with modern amenities. Each with fireplace and private terrace.',
+            description_ro: 'Căsuțe din lemn rustic cu facilități moderne. Fiecare cu șemineu și terasă privată.',
             amenities: 'Fireplace, terrace, kitchenette, WiFi',
+            amenities_ro: 'Șemineu, terasă, bucătărie mică, WiFi',
             price: 'From €60/night (2 persons)',
             contact: '+40 268 234 573'
         },
         'casa-maria': {
             title: 'Casa Maria B&B',
+            title_ro: 'Casa Maria B&B',
             description: 'Traditional bed and breakfast run by local family. Authentic experience with homemade meals.',
+            description_ro: 'Pensiune tradițională de mic dejun și masă administrată de o familie locală. Experiență autentică cu mâncăruri de casă.',
             amenities: 'Breakfast included, shared lounge, garden, WiFi',
+            amenities_ro: 'Mic dejun inclus, sufragerie comună, grădină, WiFi',
             price: 'From €35/night',
             contact: '+40 268 234 574'
         }
@@ -1465,6 +1811,54 @@ const I18N = {
             about: 'Despre Râșnov',
             quickLinks: 'Linkuri rapide',
             contact: 'Contact'
+        },
+        huntItems: {
+            fortress: 'Poarta Cetății Râșnov',
+            well: 'Fântâna Antică',
+            tower: 'Turnul de Veghe',
+            church: 'Biserica Veche',
+            museum: 'Muzeul Satului',
+            peak: 'Vârful Muntelui',
+            square: 'Piața Orașului',
+            dino: 'Intrarea Dino Parc'
+        },
+        infoCards: {
+            emergency: {
+                title: 'Urgență',
+                police: 'Poliție',
+                medical: 'Medical',
+                touristInfo: 'Info Turist'
+            },
+            transportation: {
+                title: 'Transport',
+                busToBrasov: 'Autobuz la Brașov',
+                taxi: 'Taxi',
+                carRental: 'Închiriere Mașini'
+            },
+            language: {
+                title: 'Limbă',
+                main: 'Principal',
+                common: 'Obișnuit',
+                tip: 'Sfat'
+            },
+            currency: {
+                title: 'Valută',
+                currency: 'Valută',
+                atms: 'Bancomate',
+                cards: 'Cărți'
+            },
+            hours: {
+                title: 'Ore de Deschidere',
+                fortress: 'Cetate',
+                shops: 'Magazine',
+                restaurants: 'Restaurante'
+            },
+            visitTime: {
+                title: 'Cel mai Bun Timp pentru Vizită',
+                peak: 'Vârf',
+                shoulder: 'Transițional',
+                winter: 'Iarnă'
+            }
         }
     }
 };
@@ -1574,6 +1968,14 @@ function applyTranslations(lang) {
     if (testLocationBtn) testLocationBtn.innerHTML = dict.ar.testLocation;
     if (testingModeBtn) testingModeBtn.innerHTML = dict.ar.testingMode;
 
+    // Hunt items
+    if (dict.huntItems) {
+        Object.entries(dict.huntItems).forEach(([key, label]) => {
+            const huntItem = document.querySelector(`.hunt-item[data-location="${key}"] span`);
+            if (huntItem) huntItem.textContent = label;
+        });
+    }
+
     // Progress text suffix
     const progressText = document.querySelector('.progress-text');
     if (progressText) {
@@ -1607,6 +2009,26 @@ function applyTranslations(lang) {
     if (footerQuick) footerQuick.textContent = dict.footer.quickLinks;
     const footerContact = document.querySelectorAll('.footer-section h4')[2];
     if (footerContact) footerContact.textContent = dict.footer.contact;
+
+    // Translate footer about text
+    const footerAboutText = document.querySelector('.footer-section:first-child p');
+    if (footerAboutText && currentLang === 'ro') {
+        footerAboutText.textContent = 'Oraș istoric din Transilvania, România, cunoscut pentru forța medievală și peisajele muntoase impresionante.';
+    } else if (footerAboutText && currentLang === 'en') {
+        footerAboutText.textContent = 'Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.';
+    }
+
+    // Translate footer links
+    const footerLinks = document.querySelectorAll('.footer-section:nth-child(2) a');
+    const linkTranslations = {
+        en: ['Home', 'Scavenger Hunt', 'Map', 'Info'],
+        ro: ['Acasă', 'Vânătoare', 'Hartă', 'Info']
+    };
+    footerLinks.forEach((link, idx) => {
+        if (linkTranslations[currentLang] && linkTranslations[currentLang][idx]) {
+            link.textContent = linkTranslations[currentLang][idx];
+        }
+    });
 
     // Translate card titles/descriptions by scanning buttons that open details
     // Locations
@@ -1722,7 +2144,79 @@ function applyTranslations(lang) {
             if (descEl) descEl.textContent = (currentLang === 'ro') ? entry.ro.desc : entry.en.desc;
         }
     });
-}
+
+    // Translate info cards
+    if (dict.infoCards) {
+        const infoCardsMap = {
+            'Emergency': dict.infoCards.emergency.title,
+            'Transportation': dict.infoCards.transportation.title,
+            'Language': dict.infoCards.language.title,
+            'Currency': dict.infoCards.currency.title,
+            'Opening Hours': dict.infoCards.hours.title,
+            'Best Time to Visit': dict.infoCards.visitTime.title
+        };
+        
+        // Translate info card titles
+        document.querySelectorAll('.info-card h3').forEach(el => {
+            const title = el.textContent.trim();
+            if (infoCardsMap[title]) {
+                el.textContent = infoCardsMap[title];
+            }
+        });
+
+        // Translate info card content
+        document.querySelectorAll('.info-card p').forEach((p) => {
+            const text = p.innerHTML;
+            // Emergency section
+            if (text.includes('<strong>Police')) {
+                p.innerHTML = `<strong>${dict.infoCards.emergency.police}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Medical')) {
+                p.innerHTML = `<strong>${dict.infoCards.emergency.medical}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Tourist Info')) {
+                p.innerHTML = `<strong>${dict.infoCards.emergency.touristInfo}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+            // Transportation section
+            else if (text.includes('<strong>Bus to Brasov')) {
+                p.innerHTML = `<strong>${dict.infoCards.transportation.busToBrasov}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Taxi')) {
+                p.innerHTML = `<strong>${dict.infoCards.transportation.taxi}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Car Rental')) {
+                p.innerHTML = `<strong>${dict.infoCards.transportation.carRental}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+            // Language section
+            else if (text.includes('<strong>Main')) {
+                p.innerHTML = `<strong>${dict.infoCards.language.main}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Common')) {
+                p.innerHTML = `<strong>${dict.infoCards.language.common}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Tip')) {
+                p.innerHTML = `<strong>${dict.infoCards.language.tip}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+            // Currency section
+            else if (text.includes('<strong>Currency')) {
+                p.innerHTML = `<strong>${dict.infoCards.currency.currency}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>ATMs')) {
+                p.innerHTML = `<strong>${dict.infoCards.currency.atms}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Cards')) {
+                p.innerHTML = `<strong>${dict.infoCards.currency.cards}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+            // Opening Hours section
+            else if (text.includes('<strong>Fortress')) {
+                p.innerHTML = `<strong>${dict.infoCards.hours.fortress}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Shops')) {
+                p.innerHTML = `<strong>${dict.infoCards.hours.shops}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Restaurants')) {
+                p.innerHTML = `<strong>${dict.infoCards.hours.restaurants}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+            // Best Time section
+            else if (text.includes('<strong>Peak')) {
+                p.innerHTML = `<strong>${dict.infoCards.visitTime.peak}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Shoulder')) {
+                p.innerHTML = `<strong>${dict.infoCards.visitTime.shoulder}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            } else if (text.includes('<strong>Winter')) {
+                p.innerHTML = `<strong>${dict.infoCards.visitTime.winter}:</strong> ${p.innerHTML.match(/<\/strong>(.+)$/)[1]}`;
+            }
+        });
+    }
 
 if (langToggle) {
     langToggle.addEventListener('click', () => {
@@ -1742,6 +2236,11 @@ if (langToggle) {
     });
 }
 
+// ==================== Initialization ====================
+
+// Initialize user account system
+initializeUser();
+
 // Initialize progress display
 updateProgress();
 
@@ -1754,3 +2253,4 @@ document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
 console.log('Testing mode available for AR scavenger hunt');
+console.log('User Points System Active - Points saved to account');
