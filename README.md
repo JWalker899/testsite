@@ -85,6 +85,18 @@ For real-time data from Google Places API:
    ```bash
    npm start
    ```
+   
+   **Or use the combined command**:
+   ```bash
+   npm run fetch-and-start
+   ```
+   This will check if data is fresh (< 30 days old) and only fetch if needed, then start the server. This saves API tokens for build commands!
+   
+   **Force fetch fresh data**:
+   ```bash
+   npm run force-fetch-and-start
+   ```
+   This will always fetch fresh data regardless of cache age, then start the server.
 
 📖 **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed instructions with screenshots
 
@@ -204,6 +216,27 @@ Every Page Load → Google Places API → Response → Render
 
 ## API Usage & Free Tier
 
+### Data Caching Strategy
+
+To conserve API tokens, the `fetch-and-start` command uses smart caching:
+
+- **Automatic Caching**: Data is cached for 30 days after fetching
+- **Smart Fetching**: Only fetches if data is older than 30 days or missing
+- **Force Override**: Use `force-fetch-and-start` to force fetch regardless of cache age
+- **Build-Friendly**: Safe to use `fetch-and-start` as a build command without worrying about API limits
+
+**Example Usage**:
+```bash
+# Check cache age and fetch only if needed (recommended for builds)
+npm run fetch-and-start
+
+# Always fetch fresh data (when you need latest information)
+npm run force-fetch-and-start
+
+# Just fetch data without starting server
+npm run fetch-data
+```
+
 ### Google Places API
 
 **Free Tier**: $200/month credit (every month!)
@@ -305,7 +338,9 @@ The site is 100% static - just copy all files to any web server!
 
 **Cause**: `places-data.json` doesn't exist yet
 
-**Solution**: Run `npm run fetch-data` to generate real data
+**Solution**: Run `npm run fetch-data` to generate real data. The data will be saved to `data/places-data.json` (which is gitignored).
+
+**Note**: After running `npm run fetch-data`, the data file persists on your local machine and the server will use it instead of sample data. You don't need to fetch data every time you restart the server - only when you want fresh data from Google Places API.
 
 ### Cards not loading / Empty tabs
 
