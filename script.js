@@ -580,7 +580,7 @@ function scanQRCode() {
     // Use jsQR library to decode QR code (if available)
     if (typeof jsQR !== 'undefined') {
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
+            inversionAttempts: "attemptBoth",
         });
         
         if (code && code.data) {
@@ -806,6 +806,28 @@ async function launchARExperience(locationKey, isTestMode = false) {
         
     } catch (error) {
         console.error('AR Camera Error:', error);
+        
+        // In test mode, show demo view even without camera
+        if (isTestMode) {
+            arLoading.classList.add('hidden');
+            
+            // Setup AR scene without camera (will show placeholder)
+            setupARScene(locationKey);
+            
+            // Update text overlay
+            arLocationName.textContent = `You found ${location.name}!`;
+            arLocationHint.textContent = location.hint || 'Great job exploring Rasnov!';
+            
+            // Mark location as discovered after a delay
+            setTimeout(() => {
+                if (!foundLocations.has(locationKey)) {
+                    discoverLocationQuietly(locationKey);
+                }
+            }, 2000);
+            
+            return;
+        }
+        
         arLoading.classList.add('hidden');
         
         // Show user-friendly error message
@@ -855,112 +877,152 @@ function setupARScene(locationKey) {
     // Clear previous scene
     arSceneContainer.innerHTML = '';
     
-    // Create A-Frame scene for marker-less AR
-    const scene = document.createElement('a-scene');
-    scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
-    scene.setAttribute('vr-mode-ui', 'enabled: false');
-    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true; precision: medium;');
+    // Create video element for camera feed
+    const video = document.createElement('video');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('muted', '');
+    video.id = 'ar-camera-feed';
+    video.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+    `;
     
-    // Add camera entity
-    const camera = document.createElement('a-entity');
-    camera.setAttribute('camera', '');
-    
-    // Create 3D mascot - place directly in scene for marker-less AR
-    const mascot = createMascotForLocation(locationKey);
-    mascot.setAttribute('position', '0 0 -3'); // Place 3 units in front of camera
-    
-    // Add entities to scene
-    scene.appendChild(mascot);
-    scene.appendChild(camera);
-    
-    // Append scene to container
-    arSceneContainer.appendChild(scene);
-    
-    // Attach camera stream to AR.js video element with polling
+    // Attach camera stream to video or show placeholder
     if (arStream) {
-        let attempts = 0;
-        const maxAttempts = 20; // Try for 2 seconds (20 * 100ms)
+        video.srcObject = arStream;
+        video.play().catch(err => console.warn('Video autoplay failed:', err));
+    } else {
+        // Show placeholder when camera is not available (for demo/testing)
+        video.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        const placeholder = document.createElement('div');
+        placeholder.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 2;
+        `;
+        placeholder.textContent = '📷';
+        const lineBreak1 = document.createElement('br');
+        const cameraText = document.createTextNode('Camera View');
+        const lineBreak2 = document.createElement('br');
+        const smallText = document.createElement('small');
+        smallText.style.fontSize = '14px';
+        smallText.textContent = '(Placeholder)';
         
-        const attachStream = () => {
-            const arVideo = scene.querySelector('video');
-            if (arVideo && arStream) {
-                arVideo.srcObject = arStream;
-                arVideo.play().catch(err => console.warn('Video autoplay failed:', err));
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                setTimeout(attachStream, 100);
-            } else {
-                console.warn('Failed to find AR video element after', maxAttempts * 100, 'ms');
-            }
-        };
-        
-        // Start polling after a short delay to let A-Frame initialize
-        setTimeout(attachStream, 100);
+        placeholder.appendChild(lineBreak1);
+        placeholder.appendChild(cameraText);
+        placeholder.appendChild(lineBreak2);
+        placeholder.appendChild(smallText);
+        arSceneContainer.appendChild(placeholder);
     }
+    
+    // Create mascot overlay
+    const mascot = createMascotOverlay(locationKey);
+    
+    // Add elements to container
+    arSceneContainer.appendChild(video);
+    arSceneContainer.appendChild(mascot);
 }
 
-function createMascotForLocation(locationKey) {
+function createMascotOverlay(locationKey) {
     // Create a container for the mascot
-    const container = document.createElement('a-entity');
-    container.setAttribute('position', '0 0 0');
+    const container = document.createElement('div');
+    container.className = 'ar-mascot-container';
+    container.style.cssText = `
+        position: absolute;
+        bottom: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: bounceIn 0.6s ease-out;
+    `;
     
-    // Create different mascots for different locations using A-Frame primitives
-    const mascotColors = {
-        fortress: '#8B4513',  // Brown for fortress
-        well: '#4169E1',      // Blue for well
-        tower: '#DC143C',     // Red for tower
-        church: '#FFD700',    // Gold for church
-        museum: '#9370DB',    // Purple for museum
-        peak: '#00CED1',      // Cyan for peak
-        square: '#FF6347',    // Tomato for square
-        dino: '#32CD32'       // Green for dino park
+    // Create mascot character (friendly bear)
+    const mascot = document.createElement('div');
+    mascot.className = 'ar-mascot';
+    mascot.style.cssText = `
+        font-size: 120px;
+        line-height: 1;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        animation: float 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+    `;
+    
+    // Use bear emoji or location-specific character
+    const mascotCharacters = {
+        fortress: '🏰',   // Castle for fortress
+        well: '💧',       // Water drop for well
+        tower: '🗼',      // Tower
+        church: '⛪',     // Church
+        museum: '🎨',     // Art palette for museum
+        peak: '⛰️',       // Mountain for peak
+        square: '🏛️',     // Building for square
+        dino: '🦕'        // Dinosaur for dino park
     };
     
-    const color = mascotColors[locationKey] || '#FF6347';
+    mascot.textContent = mascotCharacters[locationKey] || '🐻';
     
-    // Main body (sphere) - use scale animation for better performance
-    const body = document.createElement('a-sphere');
-    body.setAttribute('position', '0 0.6 0');
-    body.setAttribute('radius', '0.3');
-    body.setAttribute('color', color);
-    body.setAttribute('animation', 'property: scale; to: 1.1 1.1 1.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate');
+    // Create speech bubble
+    const speechBubble = document.createElement('div');
+    speechBubble.className = 'ar-speech-bubble';
+    speechBubble.style.cssText = `
+        background: white;
+        color: #333;
+        padding: 12px 20px;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        position: relative;
+        animation: fadeInUp 0.6s ease-out 0.3s both;
+        max-width: 250px;
+        text-align: center;
+    `;
     
-    // Eyes (small spheres)
-    const leftEye = document.createElement('a-sphere');
-    leftEye.setAttribute('position', '-0.1 0.6 0.25');
-    leftEye.setAttribute('radius', '0.05');
-    leftEye.setAttribute('color', '#000000');
+    const messages = {
+        fortress: "You found the fortress! 🎉",
+        well: "The ancient well! 🎉",
+        tower: "The watch tower! 🎉",
+        church: "The old church! 🎉",
+        museum: "The village museum! 🎉",
+        peak: "Mountain peak! 🎉",
+        square: "Town square! 🎉",
+        dino: "Dino Park! 🎉"
+    };
     
-    const rightEye = document.createElement('a-sphere');
-    rightEye.setAttribute('position', '0.1 0.6 0.25');
-    rightEye.setAttribute('radius', '0.05');
-    rightEye.setAttribute('color', '#000000');
+    speechBubble.textContent = messages[locationKey] || "You found me! 🎉";
     
-    // Smile (cylinder rotated)
-    const smile = document.createElement('a-torus');
-    smile.setAttribute('position', '0 0.45 0.25');
-    smile.setAttribute('rotation', '0 0 0');
-    smile.setAttribute('radius', '0.1');
-    smile.setAttribute('radius-tubular', '0.02');
-    smile.setAttribute('arc', '180');
-    smile.setAttribute('color', '#000000');
+    // Add triangle pointer to speech bubble
+    const pointer = document.createElement('div');
+    pointer.style.cssText = `
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid white;
+    `;
+    speechBubble.appendChild(pointer);
     
-    // Hat/crown on top
-    const hat = document.createElement('a-cone');
-    hat.setAttribute('position', '0 0.85 0');
-    hat.setAttribute('radius-bottom', '0.2');
-    hat.setAttribute('radius-top', '0.05');
-    hat.setAttribute('height', '0.3');
-    hat.setAttribute('color', '#FFD700');
-    hat.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3000; easing: linear; loop: true');
-    
-    // Add all parts to container
-    container.appendChild(body);
-    container.appendChild(leftEye);
-    container.appendChild(rightEye);
-    container.appendChild(smile);
-    container.appendChild(hat);
+    container.appendChild(mascot);
+    container.appendChild(speechBubble);
     
     return container;
 }
@@ -995,18 +1057,31 @@ function closeARView() {
     // Hide AR modal
     arModal.classList.remove('active');
     
-    // Stop camera stream
+    // Stop all video tracks from the camera stream
     if (arStream) {
-        arStream.getTracks().forEach(track => track.stop());
+        arStream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Stopped camera track:', track.label);
+        });
         arStream = null;
     }
     
-    // Clear AR scene
+    // Find and stop any video elements in the AR scene
+    const videoElements = arSceneContainer.querySelectorAll('video');
+    videoElements.forEach(video => {
+        video.pause();
+        video.srcObject = null;
+        video.load(); // Reset video element
+    });
+    
+    // Clear AR scene completely
     arSceneContainer.innerHTML = '';
     
     // Reset state
     currentARLocation = null;
     arTestModeIndicator.style.display = 'none';
+    
+    console.log('AR view closed, camera stopped');
 }
 
 // Modal Functions
