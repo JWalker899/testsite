@@ -34,6 +34,237 @@ let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
 
+// ==================== User Account & Points System ====================
+let currentUser = null;
+const POINTS_PER_LOCATION = 10;
+const COMPLETION_BONUS = 50;
+
+// Initialize user from localStorage or create anonymous session
+function initializeUser() {
+    const savedUser = localStorage.getItem('rasnov_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+        } catch (e) {
+            console.error('Failed to load user from localStorage:', e);
+            createAnonymousUser();
+        }
+    } else {
+        createAnonymousUser();
+    }
+    updateUserDisplayUI();
+}
+
+// Create an anonymous user account
+function createAnonymousUser() {
+    const timestamp = Date.now();
+    currentUser = {
+        username: `guest_${timestamp}`,
+        totalPoints: 0,
+        locationsFound: [],
+        completedAt: null,
+        createdAt: new Date().toISOString(),
+        isAnonymous: true
+    };
+    saveUserToLocalStorage();
+}
+
+// Save user to localStorage
+function saveUserToLocalStorage() {
+    localStorage.setItem('rasnov_user', JSON.stringify(currentUser));
+}
+
+// Set a custom username for the user
+function setUsername(username) {
+    if (!username || username.trim() === '') {
+        showNotification('Please enter a valid username', 'warning');
+        return false;
+    }
+    
+    currentUser.username = username.trim();
+    currentUser.isAnonymous = false;
+    saveUserToLocalStorage();
+    updateUserDisplayUI();
+    showNotification(`Welcome, ${username}!`, 'success');
+    return true;
+}
+
+// Award points for finding a location
+async function awardPoints(locationKey, locationName) {
+    if (!currentUser) return;
+    
+    const isAlreadyFound = currentUser.locationsFound.includes(locationKey);
+    if (isAlreadyFound) {
+        console.log(`Location ${locationKey} already found by user`);
+        return;
+    }
+    
+    const isCompletion = foundLocations.size === Object.keys(huntLocations).length;
+    
+    // Add to user's found locations
+    currentUser.locationsFound.push(locationKey);
+    
+    // Calculate points
+    const pointsAwarded = POINTS_PER_LOCATION;
+    let bonusPoints = 0;
+    
+    if (isCompletion) {
+        bonusPoints = COMPLETION_BONUS;
+        currentUser.completedAt = new Date().toISOString();
+    }
+    
+    currentUser.totalPoints += pointsAwarded + bonusPoints;
+    
+    // Save to localStorage
+    saveUserToLocalStorage();
+    
+    // Try to sync with server if endpoint is available (optional)
+    try {
+        const response = await fetch(`/api/user/${encodeURIComponent(currentUser.username)}/location-found`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                locationKey,
+                locationName,
+                isCompletion
+            })
+        });
+        
+        if (!response.ok && response.status !== 400) {
+            console.warn('Failed to sync points with server:', response.statusText);
+        }
+    } catch (e) {
+        console.log('Server sync unavailable (offline mode):', e.message);
+    }
+    
+    // Update UI
+    updateUserDisplayUI();
+    
+    // Show points notification
+    showPointsNotification(pointsAwarded, bonusPoints, locationName);
+    
+    return {
+        pointsAwarded,
+        bonusPoints,
+        totalPoints: currentUser.totalPoints
+    };
+}
+
+// Update user display in header
+function updateUserDisplayUI() {
+    const userElement = document.getElementById('user-points-display');
+    if (userElement && currentUser) {
+        userElement.innerHTML = `
+            <span class="user-name">${currentUser.username}</span>
+            <span class="user-points">⭐ ${currentUser.totalPoints} pts</span>
+        `;
+    }
+}
+
+// Show a celebration notification when points are earned
+function showPointsNotification(points, bonusPoints = 0, locationName = '') {
+    let message = `<strong>+${points} points</strong>`;
+    if (locationName) {
+        message = `<strong>${locationName}</strong><br>+${points} points`;
+    }
+    if (bonusPoints > 0) {
+        message += `<br><strong>🎉 +${bonusPoints} completion bonus!</strong>`;
+    }
+    
+    const notificationEl = document.createElement('div');
+    notificationEl.className = 'points-notification';
+    notificationEl.innerHTML = message;
+    document.body.appendChild(notificationEl);
+    
+    // Animate in
+    setTimeout(() => notificationEl.classList.add('show'), 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notificationEl.classList.remove('show');
+        setTimeout(() => notificationEl.remove(), 300);
+    }, 3000);
+}
+
+// Show user profile modal
+function showUserProfile() {
+    if (!currentUser) return;
+    
+    const profileHTML = `
+        <div class="user-profile-modal">
+            <div class="profile-header">
+                <h2>Your Profile</h2>
+                <button class="modal-close" onclick="closeModal('user-profile-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="profile-content">
+                <div class="profile-stat">
+                    <span class="stat-label">Username</span>
+                    <span class="stat-value">${currentUser.username}</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Total Points</span>
+                    <span class="stat-value" style="color: #f39c12; font-weight: bold;">⭐ ${currentUser.totalPoints}</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Locations Found</span>
+                    <span class="stat-value">${currentUser.locationsFound.length} / 8</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-label">Hunt Status</span>
+                    <span class="stat-value">${currentUser.completedAt ? '✅ Completed' : '🔄 In Progress'}</span>
+                </div>
+                ${currentUser.completedAt ? `
+                    <div class="profile-stat">
+                        <span class="stat-label">Completed Date</span>
+                        <span class="stat-value">${new Date(currentUser.completedAt).toLocaleDateString()}</span>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="profile-actions">
+                ${currentUser.isAnonymous ? `
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" id="new-username" placeholder="Enter username" maxlength="20" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                        <button class="card-button" style="width: 100%; margin-top: 0.5rem;" onclick="updateUsernameInModal()">Set Username</button>
+                    </div>
+                ` : ''}
+                <button class="card-button" onclick="resetProgress()">Reset Progress</button>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.getElementById('user-profile-modal');
+    if (modal) {
+        modal.querySelector('.modal-content').innerHTML = profileHTML;
+    }
+}
+
+// Update username from profile modal
+function updateUsernameInModal() {
+    const input = document.getElementById('new-username');
+    if (input && setUsername(input.value)) {
+        showUserProfile();
+    }
+}
+
+// Reset all hunt progress
+function resetProgress() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+        currentUser.locationsFound = [];
+        currentUser.totalPoints = 0;
+        currentUser.completedAt = null;
+        foundLocations.clear();
+        saveUserToLocalStorage();
+        updateUserDisplayUI();
+        updateProgress();
+        closeModal('user-profile-modal');
+        showNotification('Progress reset successfully', 'info');
+    }
+}
+
+// ==================== Scavenger Hunt Locations ====================
+
 // Scavenger Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
     fortress: { 
@@ -467,24 +698,42 @@ function discoverLocation(locationKey) {
         huntItem.querySelector('i').className = 'fas fa-check-circle';
     }
     
+    // Award points to user
+    const location = huntLocations[locationKey];
+    const localizedName = localizedField(location, 'name') || location.name;
+    const isCompletion = foundLocations.size === Object.keys(huntLocations).length;
+    const pointsResult = awardPoints(locationKey, localizedName);
+    
     // Update progress
     updateProgress();
     
-    // Show discovery modal
-    const location = huntLocations[locationKey];
-    const localizedName = localizedField(location, 'name') || location.name;
+    // Show discovery modal with points
     const localizedFact = localizedField(location, 'fact') || location.fact || '';
     const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
 
     document.getElementById('discovery-title').textContent = (currentLang === 'ro') ? `Ai găsit ${localizedName}!` : `You found ${localizedName}!`;
     document.getElementById('discovery-message').textContent = discoveryMsg;
-    document.getElementById('discovery-fact').innerHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
+    
+    let factHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
+    if (pointsResult) {
+        let pointsText = `<br><br><strong>Points Earned: +${pointsResult.pointsAwarded}</strong>`;
+        if (pointsResult.bonusPoints > 0) {
+            pointsText += `<br><strong>🎉 Completion Bonus: +${pointsResult.bonusPoints}</strong>`;
+            pointsText += `<br><strong>Total Points: ${pointsResult.totalPoints}</strong>`;
+        }
+        factHTML += pointsText;
+    }
+    
+    document.getElementById('discovery-fact').innerHTML = factHTML;
     openModal('discovery-modal');
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
+            const celebrationMsg = (currentLang === 'ro') 
+                ? `🎉 Felicitări! Ai completat vânătoarea! Total puncte: ${currentUser.totalPoints}` 
+                : `🎉 Congratulations! You completed the scavenger hunt! Total points: ${currentUser.totalPoints}`;
+            showNotification(celebrationMsg, 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
@@ -1912,6 +2161,11 @@ if (langToggle) {
     });
 }
 
+// ==================== Initialization ====================
+
+// Initialize user account system
+initializeUser();
+
 // Initialize progress display
 updateProgress();
 
@@ -1924,3 +2178,4 @@ document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
 console.log('Testing mode available for AR scavenger hunt');
+console.log('User Points System Active - Points saved to account');

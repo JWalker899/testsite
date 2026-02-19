@@ -34,6 +34,13 @@
                     </ul>
                 </nav>
                 <div class="header-actions">
+                    <button class="user-profile-btn" id="user-profile-btn" onclick="showUserProfile()" title="View profile and points">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="user-points-display" class="user-points-badge">
+                            <span class="user-name">Guest</span>
+                            <span class="user-points">⭐ 0 pts</span>
+                        </span>
+                    </button>
                     <button class="lang-toggle" aria-label="Change language">
                         <i class="fas fa-globe"></i> EN
                     </button>
@@ -539,6 +546,13 @@
                         </button>
                         <h3 id="details-title"></h3>
                         <div id="details-content"></div>
+                    </div>
+                </div>
+
+                <!-- User Profile Modal -->
+                <div class="modal" id="user-profile-modal">
+                    <div class="modal-content">
+                        <!-- Content filled dynamically by JavaScript -->
                     </div>
                 </div>
             </section>
