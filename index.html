@@ -592,7 +592,25 @@
                         <h3 id="discovery-title">Location Found!</h3>
                         <p id="discovery-message"></p>
                         <div id="discovery-fact" class="fact-box"></div>
-                        <button class="cta-button" onclick="closeModal('discovery-modal')">Continue Hunt</button>
+                        <button class="cta-button" onclick="onDiscoveryModalContinue()">Continue Hunt</button>
+                    </div>
+                </div>
+
+                <!-- First Discovery Name Modal -->
+                <div class="modal" id="first-discovery-modal">
+                    <div class="modal-content first-discovery-content">
+                        <div class="discovery-icon">
+                            <i class="fas fa-trophy" style="color: #f39c12;"></i>
+                        </div>
+                        <h3>🎉 Congratulations!</h3>
+                        <p>You found your first location! Add your name to appear on the leaderboard.</p>
+                        <div class="name-entry-group">
+                            <input type="text" id="first-discovery-name" placeholder="Your name" maxlength="30" autocomplete="name">
+                            <button class="cta-button" onclick="submitFirstDiscoveryName()">
+                                <i class="fas fa-check"></i> Save Name
+                            </button>
+                        </div>
+                        <button class="skip-btn" onclick="skipFirstDiscoveryName()">Skip for now</button>
                     </div>
                 </div>
 
