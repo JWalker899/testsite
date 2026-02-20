@@ -1181,6 +1181,26 @@ body {
     z-index: 5;
     filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5));
     transform: translateX(110vw) scaleX(-1);
+    animation: none;
+}
+
+/* Fake-out peek: bear peeks in, bobs, retreats */
+.ar-bear-placeholder.ar-bear-fakeout {
+    animation: bearFakeOut 2s ease-in-out forwards;
+}
+
+@keyframes bearFakeOut {
+    0%   { transform: translateX(110vw) scaleX(-1) translateY(0); }
+    20%  { transform: translateX(70vw)  scaleX(-1) translateY(-12px); }
+    30%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
+    40%  { transform: translateX(70vw)  scaleX(-1) translateY(-8px); }
+    50%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
+    65%  { transform: translateX(110vw) scaleX(-1) translateY(0); }
+    100% { transform: translateX(110vw) scaleX(-1) translateY(0); }
+}
+
+/* Main walk-in: applied after fake-out */
+.ar-bear-placeholder.ar-bear-walkin {
     animation: bearWalkIn 2s ease-out 1.2s forwards;
 }
 
@@ -1829,4 +1849,62 @@ body {
     .profile-content {
         grid-template-columns: 1fr;
     }
+}
+
+/* ==================== Theme Unlocks Tab ==================== */
+.theme-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.theme-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-card.unlocked {
+    border-color: var(--primary-color);
+}
+
+.theme-card.active-theme {
+    border-color: var(--success-color);
+    background: #f1f8f1;
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.2), var(--shadow);
+}
+
+.theme-card.locked {
+    opacity: 0.65;
+    filter: grayscale(0.4);
+}
+
+.theme-emoji {
+    font-size: 2.5rem;
+}
+
+.theme-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.theme-desc {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.theme-pts {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 600;
 }
