@@ -25,6 +25,10 @@ const arOverlayText = document.getElementById('ar-overlay-text');
 const arLocationName = document.getElementById('ar-location-name');
 const arLocationHint = document.getElementById('ar-location-hint');
 const arTestModeIndicator = document.getElementById('ar-test-mode-indicator');
+const arCaptureBtn = document.getElementById('ar-capture-btn');
+const arHuntBanner = document.getElementById('ar-hunt-banner');
+const arHuntText = document.getElementById('ar-hunt-text');
+const arFlash = document.getElementById('ar-flash');
 
 // State Management
 let huntActive = false;
@@ -33,6 +37,13 @@ let foundLocations = new Set();
 let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
+
+// Three.js / AR 3D state
+let arThreeRenderer = null;
+let arThreeMixer = null;
+let arThreeClock = null;
+let arAnimationId = null;
+let arBearReady = false;
 
 // ==================== User Account & Points System ====================
 let currentUser = null;
@@ -504,6 +515,11 @@ arCloseBtn.addEventListener('click', () => {
     closeARView();
 });
 
+// AR Capture Button – take photo of the bear
+arCaptureBtn.addEventListener('click', () => {
+    captureARPhoto();
+});
+
 function handleTestingModeClick(e) {
     if (testingMode && huntActive) {
         const locationKey = this.dataset.location;
@@ -724,6 +740,12 @@ function discoverLocation(locationKey) {
         factHTML += pointsText;
     }
     
+    // Show saved AR photo if available (validate it's a safe JPEG data URL)
+    const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
+    if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+        factHTML += `<br><p class="ar-photo-label">📸 Your Grizzly photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your AR bear photo at ${localizedName}">`;
+    }
+    
     document.getElementById('discovery-fact').innerHTML = factHTML;
     openModal('discovery-modal');
     
@@ -773,6 +795,15 @@ async function launchARExperience(locationKey, isTestMode = false) {
     // Show AR modal
     arModal.classList.add('active');
     arLoading.classList.remove('hidden');
+    arOverlayText.classList.add('hidden');
+    arBearReady = false;
+    
+    // Update hunt instruction banner
+    const locName = localizedField(location, 'name') || location.name;
+    arHuntText.textContent = (currentLang === 'ro')
+        ? `Găsește Grizzly la ${locName} și fă o poză!`
+        : `Find Grizzly at the ${locName} and take a picture!`;
+    arHuntBanner.style.display = 'flex';
     
     // Show test mode indicator if applicable
     if (isTestMode) {
@@ -785,24 +816,11 @@ async function launchARExperience(locationKey, isTestMode = false) {
         // Request camera permission and initialize
         await initializeARCamera();
         
-        // Setup AR scene
+        // Setup AR scene with 3D bear
         setupARScene(locationKey);
-        
-        // Update text overlay
-        const locName = localizedField(location, 'name') || location.name;
-        arLocationName.textContent = (currentLang === 'ro') ? `Ai găsit ${locName}!` : `You found ${locName}!`;
-        arLocationHint.textContent = localizedField(location, 'hint') || (currentLang === 'ro' ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!');
         
         // Hide loading indicator
         arLoading.classList.add('hidden');
-        
-        // Mark location as discovered after a delay (allowing user to view AR mascot)
-        // This gives users time to appreciate the AR experience before updating progress
-        setTimeout(() => {
-            if (!foundLocations.has(locationKey)) {
-                discoverLocationQuietly(locationKey);
-            }
-        }, 2000);
         
     } catch (error) {
         console.error('AR Camera Error:', error);
@@ -813,17 +831,6 @@ async function launchARExperience(locationKey, isTestMode = false) {
             
             // Setup AR scene without camera (will show placeholder)
             setupARScene(locationKey);
-            
-            // Update text overlay
-            arLocationName.textContent = `You found ${location.name}!`;
-            arLocationHint.textContent = location.hint || 'Great job exploring Rasnov!';
-            
-            // Mark location as discovered after a delay
-            setTimeout(() => {
-                if (!foundLocations.has(locationKey)) {
-                    discoverLocationQuietly(locationKey);
-                }
-            }, 2000);
             
             return;
         }
@@ -926,105 +933,208 @@ function setupARScene(locationKey) {
         arSceneContainer.appendChild(placeholder);
     }
     
-    // Create mascot overlay
-    const mascot = createMascotOverlay(locationKey);
-    
-    // Add elements to container
     arSceneContainer.appendChild(video);
-    arSceneContainer.appendChild(mascot);
+    
+    // Setup 3D bear (Three.js) or walking bear fallback
+    setupBearAR(locationKey);
 }
 
-function createMascotOverlay(locationKey) {
-    // Create a container for the mascot
-    const container = document.createElement('div');
-    container.className = 'ar-mascot-container';
-    container.style.cssText = `
-        position: absolute;
-        bottom: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 5;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        animation: bounceIn 0.6s ease-out;
-    `;
-    
-    // Create mascot character (friendly bear)
-    const mascot = document.createElement('div');
-    mascot.className = 'ar-mascot';
-    mascot.style.cssText = `
-        font-size: 120px;
-        line-height: 1;
-        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        animation: float 2s ease-in-out infinite;
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-    `;
-    
-    // Use bear emoji or location-specific character
-    const mascotCharacters = {
-        fortress: '🏰',   // Castle for fortress
-        well: '💧',       // Water drop for well
-        tower: '🗼',      // Tower
-        church: '⛪',     // Church
-        museum: '🎨',     // Art palette for museum
-        peak: '⛰️',       // Mountain for peak
-        square: '🏛️',     // Building for square
-        dino: '🦕'        // Dinosaur for dino park
-    };
-    
-    mascot.textContent = mascotCharacters[locationKey] || '🐻';
-    
-    // Create speech bubble
-    const speechBubble = document.createElement('div');
-    speechBubble.className = 'ar-speech-bubble';
-    speechBubble.style.cssText = `
-        background: white;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 20px;
-        font-size: 16px;
-        font-weight: bold;
-        margin-top: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        position: relative;
-        animation: fadeInUp 0.6s ease-out 0.3s both;
-        max-width: 250px;
-        text-align: center;
-    `;
-    
-    const messages = {
-        fortress: "You found the fortress! 🎉",
-        well: "The ancient well! 🎉",
-        tower: "The watch tower! 🎉",
-        church: "The old church! 🎉",
-        museum: "The village museum! 🎉",
-        peak: "Mountain peak! 🎉",
-        square: "Town square! 🎉",
-        dino: "Dino Park! 🎉"
-    };
-    
-    speechBubble.textContent = messages[locationKey] || "You found me! 🎉";
-    
-    // Add triangle pointer to speech bubble
-    const pointer = document.createElement('div');
-    pointer.style.cssText = `
-        position: absolute;
-        top: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid white;
-    `;
-    speechBubble.appendChild(pointer);
-    
-    container.appendChild(mascot);
-    container.appendChild(speechBubble);
-    
-    return container;
+// ── Public bear GLTF model (Quaternius free CC0 bear via public CDN) ──────────
+// If the 3D model fails to load, we fall back to an animated bear emoji overlay.
+// To use a local model instead: download the bear.glb from
+//   https://quaternius.com/packs/ultimateanimals.html (free CC0)
+// place it at /assets/bear.glb and change the URL below.
+const BEAR_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bear/model.gltf';
+
+function setupBearAR(locationKey) {
+    // Try Three.js 3D bear first.
+    // The legacy examples/js GLTFLoader registers itself as THREE.GLTFLoader.
+    // Also check the global GLTFLoader as a fallback for environments where
+    // it doesn't attach to the THREE namespace.
+    const hasThree = typeof THREE !== 'undefined';
+    const hasGLTFLoader = hasThree && (typeof THREE.GLTFLoader !== 'undefined' || typeof GLTFLoader !== 'undefined');
+    if (hasThree && hasGLTFLoader) {
+        _setup3DBear(locationKey);
+    } else {
+        _setupBearFallback();
+    }
+}
+
+function _setup3DBear(locationKey) {
+    const container = arSceneContainer;
+    const w = container.offsetWidth || window.innerWidth;
+    const h = container.offsetHeight || window.innerHeight;
+
+    // Three.js renderer (transparent background so camera shows through)
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(w, h);
+    renderer.domElement.className = 'ar-three-canvas';
+    container.appendChild(renderer.domElement);
+    arThreeRenderer = renderer;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+    camera.position.set(0, 1.5, 6);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(5, 10, 5);
+    scene.add(sun);
+
+    const clock = new THREE.Clock();
+    arThreeClock = clock;
+
+    // Load GLTF bear
+    const LoaderClass = (typeof THREE.GLTFLoader !== 'undefined') ? THREE.GLTFLoader : GLTFLoader;
+    const loader = new LoaderClass();
+    let bearGroup = null;
+    let walkX = 6; // start off-screen right
+
+    loader.load(
+        BEAR_MODEL_URL,
+        (gltf) => {
+            bearGroup = gltf.scene;
+            bearGroup.scale.set(1.2, 1.2, 1.2);
+            bearGroup.position.set(walkX, -1, 0);
+            // Face left (toward center)
+            bearGroup.rotation.y = -Math.PI / 2;
+            scene.add(bearGroup);
+
+            // Play animation if available
+            if (gltf.animations && gltf.animations.length) {
+                arThreeMixer = new THREE.AnimationMixer(bearGroup);
+                const clip = gltf.animations[0];
+                arThreeMixer.clipAction(clip).play();
+            }
+
+            arBearReady = true;
+            // Notify once bear is loaded and walks into view
+            // (notification shown when walking completes in animate loop)
+        },
+        undefined,
+        (err) => {
+            console.warn('3D bear model failed to load, using fallback.', err);
+            // Cleanup Three.js canvas and use emoji fallback
+            if (renderer.domElement.parentNode) {
+                renderer.domElement.parentNode.removeChild(renderer.domElement);
+            }
+            renderer.dispose();
+            arThreeRenderer = null;
+            _setupBearFallback();
+        }
+    );
+
+    // Animation loop
+    function animate() {
+        arAnimationId = requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+
+        if (arThreeMixer) arThreeMixer.update(delta);
+
+        if (bearGroup) {
+            // Walk bear in from right to center over ~2.5s
+            if (walkX > 0) {
+                walkX -= delta * 2.4;
+                bearGroup.position.x = Math.max(walkX, 0);
+                if (walkX <= 0) {
+                    arBearReady = true;
+                    showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+                }
+            }
+        }
+
+        renderer.render(scene, camera);
+    }
+    animate();
+}
+
+function _setupBearFallback() {
+    // Animated emoji bear that walks in from the right
+    const bear = document.createElement('div');
+    bear.className = 'ar-bear-placeholder';
+    bear.id = 'ar-bear-placeholder';
+    bear.textContent = '🐻';
+    bear.setAttribute('role', 'img');
+    bear.setAttribute('aria-label', 'Grizzly Bear');
+    arSceneContainer.appendChild(bear);
+
+    // After walk-in animation completes, switch to idle
+    setTimeout(() => {
+        bear.classList.add('idle');
+        arBearReady = true;
+        showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+    }, 3300); // walk-in animation: 1.2s delay + 2s duration
+}
+
+function captureARPhoto() {
+    if (!currentARLocation) return;
+
+    // Use a canvas to composite camera feed + bear overlay
+    const video = document.getElementById('ar-camera-feed');
+    const captureCanvas = document.createElement('canvas');
+    const cw = video ? video.videoWidth || 640 : 640;
+    const ch = video ? video.videoHeight || 480 : 480;
+    captureCanvas.width = cw;
+    captureCanvas.height = ch;
+    const ctx = captureCanvas.getContext('2d');
+
+    // Draw camera frame (or solid bg if no camera)
+    if (video && video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, cw, ch);
+    } else {
+        ctx.fillStyle = '#334';
+        ctx.fillRect(0, 0, cw, ch);
+    }
+
+    // Overlay bear emoji as watermark if Three.js not active
+    if (!arThreeRenderer) {
+        ctx.font = `${Math.round(ch * 0.2)}px 'Apple Color Emoji', 'Noto Color Emoji', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 16;
+        ctx.fillText('🐻', cw * 0.65, ch * 0.85);
+    }
+
+    // Timestamp watermark
+    ctx.shadowBlur = 0;
+    ctx.font = `bold ${Math.round(cw * 0.03)}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('📍 Rasnov Scavenger Hunt', 10, ch - 8);
+
+    const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.82);
+
+    // Save photo to localStorage under location key
+    try {
+        localStorage.setItem(`ar_photo_${currentARLocation}`, dataUrl);
+    } catch (e) {
+        // localStorage quota exceeded or unavailable
+        console.warn('Could not save photo to localStorage (storage full?)', e);
+        showNotification('📸 Photo taken! (Could not save – storage full)', 'warning');
+    }
+
+    // Flash effect
+    arFlash.classList.add('flashing');
+    arFlash.addEventListener('animationend', () => arFlash.classList.remove('flashing'), { once: true });
+
+    // Capture button feedback
+    arCaptureBtn.classList.add('captured');
+    arCaptureBtn.innerHTML = '<i class="fas fa-check"></i>';
+
+    // Award points and show discovery after a short delay
+    setTimeout(() => {
+        const locKey = currentARLocation;
+        closeARView();
+        if (!foundLocations.has(locKey)) {
+            discoverLocation(locKey);
+        } else {
+            showNotification('📸 Photo saved! You already found this location.', 'info');
+        }
+    }, 600);
 }
 
 function discoverLocationQuietly(locationKey) {
@@ -1057,6 +1167,21 @@ function closeARView() {
     // Hide AR modal
     arModal.classList.remove('active');
     
+    // Cancel Three.js animation loop
+    if (arAnimationId !== null) {
+        cancelAnimationFrame(arAnimationId);
+        arAnimationId = null;
+    }
+    
+    // Dispose Three.js renderer
+    if (arThreeRenderer) {
+        arThreeRenderer.dispose();
+        arThreeRenderer = null;
+    }
+    arThreeMixer = null;
+    arThreeClock = null;
+    arBearReady = false;
+    
     // Stop all video tracks from the camera stream
     if (arStream) {
         arStream.getTracks().forEach(track => {
@@ -1076,6 +1201,13 @@ function closeARView() {
     
     // Clear AR scene completely
     arSceneContainer.innerHTML = '';
+    
+    // Reset capture button
+    arCaptureBtn.classList.remove('captured');
+    arCaptureBtn.innerHTML = '<i class="fas fa-camera"></i>';
+    
+    // Reset overlay
+    arOverlayText.classList.add('hidden');
     
     // Reset state
     currentARLocation = null;

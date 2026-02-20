@@ -662,14 +662,26 @@
             <i class="fas fa-times"></i>
         </button>
         <div class="ar-scene-container" id="ar-scene-container">
-            <!-- Camera feed and AR mascot will be dynamically inserted here -->
+            <!-- Camera feed and 3D bear will be dynamically inserted here -->
         </div>
-        <div class="ar-overlay-text" id="ar-overlay-text">
+        <!-- Hunt instruction banner -->
+        <div class="ar-hunt-banner" id="ar-hunt-banner">
+            <span class="ar-hunt-icon">🐻</span>
+            <span id="ar-hunt-text">Find Grizzly and take a picture!</span>
+        </div>
+        <!-- Overlay text shown after photo taken -->
+        <div class="ar-overlay-text hidden" id="ar-overlay-text">
             <div class="ar-success-message">
                 <h2 id="ar-location-name">You found me!</h2>
                 <p id="ar-location-hint" class="ar-hint-text"></p>
             </div>
         </div>
+        <!-- Photo capture button -->
+        <button class="ar-capture-btn" id="ar-capture-btn" aria-label="Take Photo">
+            <i class="fas fa-camera"></i>
+        </button>
+        <!-- Photo flash overlay -->
+        <div class="ar-flash" id="ar-flash"></div>
         <div class="ar-test-mode-indicator" id="ar-test-mode-indicator" style="display: none;">
             <i class="fas fa-flask"></i> Test Mode Active
         </div>
@@ -678,6 +690,10 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Three.js for 3D bear rendering (r134 UMD build) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <!-- GLTFLoader for loading .glb/.gltf bear model -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="script.js"></script>
 </body>
