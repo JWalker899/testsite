@@ -1330,6 +1330,11 @@ function _setup3DBear(locationKey) {
 
 function _setupBearFallback() {
     // Animated emoji bear: fake-out peek then full walk-in from the right
+    const FAKEOUT_DURATION_MS = 2000;   // duration of bearFakeOut CSS animation
+    const WALKIN_DELAY_MS = 1200;       // CSS animation delay before walk-in starts
+    const WALKIN_DURATION_MS = 2000;    // CSS animation duration for walk-in
+    const BEAR_VISIBLE_DELAY_MS = 1500; // ms into walk-in when bear enters the visible area
+
     const bear = document.createElement('div');
     bear.className = 'ar-bear-placeholder ar-bear-fakeout';
     bear.id = 'ar-bear-placeholder';
@@ -1338,14 +1343,14 @@ function _setupBearFallback() {
     bear.setAttribute('aria-label', 'Grizzly Bear');
     arSceneContainer.appendChild(bear);
 
-    // After fake-out animation ends (~2s), start main walk-in
+    // After fake-out animation ends, start main walk-in
     setTimeout(() => {
         bear.classList.remove('ar-bear-fakeout');
         bear.classList.add('ar-bear-walkin');
-        // Bear enters visible area ~1.5s into the walk-in animation
+        // Bear enters visible area partway through the walk-in animation
         setTimeout(() => {
             arBearOnScreen = true;
-        }, 1500);
+        }, BEAR_VISIBLE_DELAY_MS);
         // After walk-in animation completes, switch to idle
         setTimeout(() => {
             bear.classList.remove('ar-bear-walkin');
@@ -1353,8 +1358,8 @@ function _setupBearFallback() {
             arBearReady = true;
             arBearOnScreen = true;
             showNotification('🐻 Grizzly is here! Take a photo!', 'info');
-        }, 3200); // walk-in animation: 1.2s delay + 2s duration
-    }, 2000); // fake-out animation duration
+        }, WALKIN_DELAY_MS + WALKIN_DURATION_MS);
+    }, FAKEOUT_DURATION_MS);
 }
 
 function captureARPhoto() {
@@ -2769,7 +2774,6 @@ function renderUnlocksTab() {
         </div>`;
 }
 
-// Load saved theme on page load
 // Initialize user account system
 initializeUser();
 
