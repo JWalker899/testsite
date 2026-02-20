@@ -37,6 +37,7 @@ let foundLocations = new Set();
 let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
+let firstDiscoveryPending = false; // true when name prompt should follow discovery modal
 
 // Three.js / AR 3D state
 let arThreeRenderer = null;
@@ -66,6 +67,18 @@ function getCookie(name) {
     return null;
 }
 
+// ==================== UUID Helper ====================
+function generateUUID() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback UUID v4
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
 // ==================== User Account & Points System ====================
 let currentUser = null;
 const POINTS_PER_LOCATION = 10;
@@ -77,6 +90,19 @@ async function initializeUser() {
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
+            // Migrate legacy user format (pre-UUID) to UUID-based format
+            if (!currentUser.uuid) {
+                currentUser.uuid = generateUUID();
+                if (currentUser.username && !currentUser.username.startsWith('guest_')) {
+                    currentUser.displayName = currentUser.username.substring(0, 30);
+                    currentUser.hasSetName = true;
+                } else {
+                    currentUser.displayName = null;
+                    currentUser.hasSetName = false;
+                }
+                delete currentUser.isAnonymous;
+                saveUserToLocalStorage();
+            }
         } catch (e) {
             console.error('Failed to load user from storage:', e);
             createAnonymousUser();
@@ -85,25 +111,26 @@ async function initializeUser() {
         createAnonymousUser();
     }
     updateUserDisplayUI();
-    // Try to create the user on the server (non-blocking if server unavailable)
+    // Ensure server has the user record, then background-sync state
     await createOrEnsureServerUser();
+    syncWithServer();
 }
 
-// Create an anonymous user account
+// Create an anonymous user account with a unique UUID
 function createAnonymousUser() {
-    const timestamp = Date.now();
     currentUser = {
-        username: `guest_${timestamp}`,
+        uuid: generateUUID(),
+        displayName: null,
+        hasSetName: false,
         totalPoints: 0,
         locationsFound: [],
         completedAt: null,
-        createdAt: new Date().toISOString(),
-        isAnonymous: true
+        createdAt: new Date().toISOString()
     };
     saveUserToLocalStorage();
 }
 
-// Save user to localStorage and cookie for persistence
+// Save user to localStorage and cookie for device-side persistence
 function saveUserToLocalStorage() {
     const data = JSON.stringify(currentUser);
     localStorage.setItem('rasnov_user', data);
@@ -116,32 +143,82 @@ function saveUserToLocalStorage() {
 
 // Ensure server has a corresponding user record (best-effort)
 async function createOrEnsureServerUser() {
-    if (!currentUser || !currentUser.username) return;
+    if (!currentUser || !currentUser.uuid) return;
     try {
         await fetch('/api/user/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: currentUser.username })
+            body: JSON.stringify({ uuid: currentUser.uuid, displayName: currentUser.displayName })
         });
     } catch (e) {
         console.log('Could not create/ensure server user (offline or server unreachable)', e.message || e);
     }
 }
 
-// Set a custom username for the user
+// Background-sync local state with server to handle desyncs (e.g. server restart)
+async function syncWithServer() {
+    if (!currentUser || !currentUser.uuid) return;
+    try {
+        const response = await fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}`);
+        if (response.status === 404) {
+            // Server lost our data - re-create user and re-upload all found locations
+            await createOrEnsureServerUser();
+            for (const locationKey of currentUser.locationsFound) {
+                const location = huntLocations[locationKey];
+                if (!location) continue;
+                fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/location-found`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ locationKey, locationName: location.name, isCompletion: false })
+                }).catch(() => {});
+            }
+        } else if (response.ok) {
+            const serverUser = await response.json();
+            // Merge any locations the server has that local doesn't (edge case)
+            let changed = false;
+            for (const loc of (serverUser.locationsFound || [])) {
+                if (!currentUser.locationsFound.includes(loc)) {
+                    currentUser.locationsFound.push(loc);
+                    changed = true;
+                }
+            }
+            // Adopt server points if higher (server is authoritative after confirmed awards)
+            if (serverUser.totalPoints > currentUser.totalPoints) {
+                currentUser.totalPoints = serverUser.totalPoints;
+                changed = true;
+            }
+            if (changed) {
+                saveUserToLocalStorage();
+                updateUserDisplayUI();
+            }
+        }
+    } catch (e) {
+        console.log('Background sync skipped (offline):', e.message);
+    }
+}
+
+// Set a display name for the user and sync to server
 function setUsername(username) {
     if (!username || username.trim() === '') {
-        showNotification('Please enter a valid username', 'warning');
+        showNotification('Please enter a valid name', 'warning');
         return false;
     }
-    
-    currentUser.username = username.trim();
-    currentUser.isAnonymous = false;
+
+    const trimmed = username.trim().substring(0, 30);
+    currentUser.displayName = trimmed;
+    currentUser.hasSetName = true;
     saveUserToLocalStorage();
     updateUserDisplayUI();
-    showNotification(`Welcome, ${username}!`, 'success');
-    // Ensure server user exists for this username (fire-and-forget)
-    createOrEnsureServerUser();
+    showNotification(`Welcome, ${trimmed}!`, 'success');
+
+    // Sync name to server (fire-and-forget)
+    if (currentUser.uuid) {
+        fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/set-name`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayName: trimmed })
+        }).catch(e => console.log('Could not sync name to server:', e.message));
+    }
     return true;
 }
 
@@ -171,12 +248,12 @@ async function awardPoints(locationKey, locationName) {
     
     currentUser.totalPoints += pointsAwarded + bonusPoints;
     
-    // Save to localStorage
+    // Save to localStorage and cookie
     saveUserToLocalStorage();
     
-    // Try to sync with server if endpoint is available (optional)
+    // Try to sync with server (optional, non-blocking)
     try {
-        const response = await fetch(`/api/user/${encodeURIComponent(currentUser.username)}/location-found`, {
+        const response = await fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/location-found`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -210,8 +287,9 @@ async function awardPoints(locationKey, locationName) {
 function updateUserDisplayUI() {
     const userElement = document.getElementById('user-points-display');
     if (userElement && currentUser) {
+        const name = escapeHtml(currentUser.displayName || 'Explorer');
         userElement.innerHTML = `
-            <span class="user-name">${currentUser.username}</span>
+            <span class="user-name">${name}</span>
             <span class="user-points">⭐ ${currentUser.totalPoints} pts</span>
         `;
     }
@@ -246,6 +324,7 @@ function showPointsNotification(points, bonusPoints = 0, locationName = '') {
 function showUserProfile() {
     if (!currentUser) return;
     
+    const displayName = escapeHtml(currentUser.displayName || 'Anonymous');
     const profileHTML = `
         <div class="user-profile-modal">
             <div class="profile-header">
@@ -256,8 +335,8 @@ function showUserProfile() {
             </div>
             <div class="profile-content">
                 <div class="profile-stat">
-                    <span class="stat-label">Username</span>
-                    <span class="stat-value">${currentUser.username}</span>
+                    <span class="stat-label">Name</span>
+                    <span class="stat-value">${displayName}</span>
                 </div>
                 <div class="profile-stat">
                     <span class="stat-label">Total Points</span>
@@ -279,12 +358,10 @@ function showUserProfile() {
                 ` : ''}
             </div>
             <div class="profile-actions">
-                ${currentUser.isAnonymous ? `
-                    <div style="margin-bottom: 1rem;">
-                        <input type="text" id="new-username" placeholder="Enter username" maxlength="20" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
-                        <button class="card-button" style="width: 100%; margin-top: 0.5rem;" onclick="updateUsernameInModal()">Set Username</button>
-                    </div>
-                ` : ''}
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" id="new-username" placeholder="${currentUser.hasSetName ? 'Change name' : 'Enter your name'}" maxlength="30" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                    <button class="card-button" style="width: 100%; margin-top: 0.5rem;" onclick="updateUsernameInModal()">${currentUser.hasSetName ? 'Update Name' : 'Set Name'}</button>
+                </div>
                 <button class="card-button" onclick="resetProgress()">Reset Progress</button>
             </div>
         </div>
@@ -304,7 +381,7 @@ function updateUsernameInModal() {
     }
 }
 
-// Reset all hunt progress
+// Reset all hunt progress (preserves identity)
 function resetProgress() {
     if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
         currentUser.locationsFound = [];
@@ -432,7 +509,7 @@ function displayLeaderboard(leaderboard) {
     // Generate table rows
     const rows = leaderboard.map((player, index) => {
         const rank = player.rank;
-        const isCurrentUser = currentUser && player.username === currentUser.username;
+        const isCurrentUser = currentUser && player.uuid && player.uuid === currentUser.uuid;
         const topClass = rank <= 3 ? `top-3 rank-${rank}` : '';
         const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
         
@@ -471,7 +548,7 @@ function displayLeaderboard(leaderboard) {
     leaderboardBody.innerHTML = rows;
     
     // Update user stats
-    const userRank = currentUser ? leaderboard.findIndex(p => p.username === currentUser.username) + 1 : '-';
+    const userRank = currentUser ? leaderboard.findIndex(p => p.uuid && p.uuid === currentUser.uuid) + 1 : '-';
     document.getElementById('user-rank').textContent = userRank > 0 ? `#${userRank}` : '-';
     document.getElementById('user-leaderboard-points').textContent = currentUser ? `⭐ ${currentUser.totalPoints}` : '-';
     document.getElementById('total-players').textContent = leaderboard.length;
@@ -933,7 +1010,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-function discoverLocation(locationKey) {
+async function discoverLocation(locationKey) {
     foundLocations.add(locationKey);
     
     // Update UI
@@ -945,11 +1022,11 @@ function discoverLocation(locationKey) {
         addPhotoToHuntItem(locationKey, huntItem);
     }
     
-    // Award points to user
+    // Award points to user (await so pointsResult is available for modal display)
     const location = huntLocations[locationKey];
     const localizedName = localizedField(location, 'name') || location.name;
     const isCompletion = foundLocations.size === Object.keys(huntLocations).length;
-    const pointsResult = awardPoints(locationKey, localizedName);
+    const pointsResult = await awardPoints(locationKey, localizedName);
     
     // Update progress
     updateProgress();
@@ -979,6 +1056,11 @@ function discoverLocation(locationKey) {
     
     document.getElementById('discovery-fact').innerHTML = factHTML;
     openModal('discovery-modal');
+
+    // After the first location found, queue a name prompt if user hasn't set one yet
+    if (foundLocations.size === 1 && currentUser && !currentUser.hasSetName) {
+        firstDiscoveryPending = true;
+    }
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
@@ -1003,6 +1085,35 @@ function updateProgress() {
     progressFill.style.width = `${percentage}%`;
     progressCount.textContent = found;
     progressTotal.textContent = total;
+}
+
+// Delay (ms) between closing discovery modal and opening name prompt
+const MODAL_TRANSITION_DELAY = 200;
+
+// Called when the user clicks "Continue Hunt" in the discovery modal
+function onDiscoveryModalContinue() {
+    closeModal('discovery-modal');
+    if (firstDiscoveryPending) {
+        firstDiscoveryPending = false;
+        setTimeout(() => openModal('first-discovery-modal'), MODAL_TRANSITION_DELAY);
+    }
+}
+
+// Submit name entered in the first-discovery modal
+function submitFirstDiscoveryName() {
+    const input = document.getElementById('first-discovery-name');
+    const name = input ? input.value.trim() : '';
+    if (!name) {
+        showNotification('Please enter a name', 'warning');
+        return;
+    }
+    setUsername(name);
+    closeModal('first-discovery-modal');
+}
+
+// Skip setting a name for now
+function skipFirstDiscoveryName() {
+    closeModal('first-discovery-modal');
 }
 
 // AR Camera Functions

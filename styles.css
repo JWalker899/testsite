@@ -773,6 +773,61 @@ body {
     border-left: 4px solid var(--primary-color);
 }
 
+/* First-discovery name prompt modal */
+.first-discovery-content {
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+
+.first-discovery-content h3 {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+}
+
+.first-discovery-content p {
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.name-entry-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.name-entry-group input {
+    padding: 0.75rem 1rem;
+    border: 2px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.name-entry-group input:focus {
+    border-color: var(--primary-color);
+}
+
+.skip-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0.5rem;
+    display: block;
+    margin: 0 auto;
+}
+
+.skip-btn:hover {
+    color: #666;
+}
+
 /* Map Section */
 .map-section {
     background: white;
