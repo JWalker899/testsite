@@ -664,6 +664,7 @@ body {
 .hunt-item.found {
     background: #e8f5e9;
     border: 2px solid var(--success-color);
+    flex-wrap: wrap;
 }
 
 .hunt-item.found i {
@@ -1184,9 +1185,15 @@ body {
 }
 
 @keyframes bearWalkIn {
-    0%   { transform: translateX(110vw) scaleX(-1); }
-    80%  { transform: translateX(10vw) scaleX(-1); }
-    100% { transform: translateX(30vw) scaleX(-1); }
+    0%   { transform: translateX(110vw) scaleX(-1) translateY(0); }
+    12%  { transform: translateX(88vw)  scaleX(-1) translateY(-28px); }
+    25%  { transform: translateX(68vw)  scaleX(-1) translateY(0); }
+    37%  { transform: translateX(52vw)  scaleX(-1) translateY(-22px); }
+    50%  { transform: translateX(40vw)  scaleX(-1) translateY(0); }
+    62%  { transform: translateX(33vw)  scaleX(-1) translateY(-14px); }
+    75%  { transform: translateX(28vw)  scaleX(-1) translateY(0); }
+    87%  { transform: translateX(30vw)  scaleX(-1) translateY(-6px); }
+    100% { transform: translateX(30vw)  scaleX(-1) translateY(0); }
 }
 
 .ar-bear-placeholder.idle {
@@ -1219,6 +1226,17 @@ body {
     display: block;
     box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     border: 3px solid var(--success-color);
+}
+
+/* Thumbnail photo shown below each found hunt item */
+.hunt-item-photo {
+    width: 100%;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    max-height: 90px;
+    object-fit: cover;
+    border: 2px solid var(--success-color);
+    flex-shrink: 0;
 }
 
 .ar-photo-label {
