@@ -45,19 +45,39 @@ let arThreeClock = null;
 let arAnimationId = null;
 let arBearReady = false;
 
+// ==================== Cookie Helpers ====================
+function setCookie(name, value, days = 365) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    const secure = window.location.protocol === 'https:' ? ';Secure' : '';
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Strict${secure}`;
+}
+
+function getCookie(name) {
+    const nameEQ = name + '=';
+    const ca = document.cookie.split(';');
+    for (let c of ca) {
+        c = c.trim();
+        if (c.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(c.substring(nameEQ.length));
+        }
+    }
+    return null;
+}
+
 // ==================== User Account & Points System ====================
 let currentUser = null;
 const POINTS_PER_LOCATION = 10;
 const COMPLETION_BONUS = 50;
 
-// Initialize user from localStorage or create anonymous session
+// Initialize user from localStorage or cookie or create anonymous session
 function initializeUser() {
-    const savedUser = localStorage.getItem('rasnov_user');
+    const savedUser = localStorage.getItem('rasnov_user') || getCookie('rasnov_user');
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
         } catch (e) {
-            console.error('Failed to load user from localStorage:', e);
+            console.error('Failed to load user from storage:', e);
             createAnonymousUser();
         }
     } else {
@@ -80,9 +100,15 @@ function createAnonymousUser() {
     saveUserToLocalStorage();
 }
 
-// Save user to localStorage
+// Save user to localStorage and cookie for persistence
 function saveUserToLocalStorage() {
-    localStorage.setItem('rasnov_user', JSON.stringify(currentUser));
+    const data = JSON.stringify(currentUser);
+    localStorage.setItem('rasnov_user', data);
+    try {
+        setCookie('rasnov_user', data);
+    } catch (e) {
+        console.warn('Could not save progress to cookie:', e);
+    }
 }
 
 // Set a custom username for the user
@@ -269,8 +295,79 @@ function resetProgress() {
         saveUserToLocalStorage();
         updateUserDisplayUI();
         updateProgress();
+
+        // Reset hunt item UI
+        huntItems.forEach(item => {
+            item.classList.remove('found');
+            const icon = item.querySelector('i');
+            if (icon) icon.className = 'fas fa-lock';
+            const photo = item.querySelector('.hunt-item-photo');
+            if (photo) photo.remove();
+        });
+
+        // Clear saved photos
+        Object.keys(huntLocations).forEach(key => {
+            localStorage.removeItem(`ar_photo_${key}`);
+        });
+
+        // Reset hunt buttons
+        huntActive = false;
+        startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
+        startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
+        scanQrBtn.disabled = true;
+        useLocationBtn.disabled = true;
+
         closeModal('user-profile-modal');
         showNotification('Progress reset successfully', 'info');
+    }
+}
+
+// Add a saved photo thumbnail to a hunt item element
+function addPhotoToHuntItem(locationKey, huntItem) {
+    if (!huntItem) return;
+    const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
+    if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+        const existing = huntItem.querySelector('.hunt-item-photo');
+        if (existing) {
+            existing.src = savedPhoto;
+        } else {
+            const photoEl = document.createElement('img');
+            photoEl.src = savedPhoto;
+            photoEl.className = 'hunt-item-photo';
+            photoEl.alt = 'Grizzly bear photo';
+            huntItem.appendChild(photoEl);
+        }
+    }
+}
+
+// Restore hunt UI state from saved user data on page load
+function restoreHuntState() {
+    if (!currentUser || !currentUser.locationsFound) return;
+
+    currentUser.locationsFound.forEach(locationKey => {
+        foundLocations.add(locationKey);
+
+        const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
+        if (huntItem) {
+            huntItem.classList.add('found');
+            const icon = huntItem.querySelector('i');
+            if (icon) icon.className = 'fas fa-check-circle';
+            addPhotoToHuntItem(locationKey, huntItem);
+        }
+    });
+
+    updateProgress();
+
+    if (foundLocations.size > 0 && foundLocations.size < Object.keys(huntLocations).length) {
+        huntActive = true;
+        startHuntBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Hunt';
+        startHuntBtn.classList.add('active-hunt');
+        scanQrBtn.disabled = false;
+        useLocationBtn.disabled = false;
+    } else if (foundLocations.size === Object.keys(huntLocations).length) {
+        startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
+        startHuntBtn.classList.remove('active-hunt');
+        startHuntBtn.classList.add('hunt-complete');
     }
 }
 
@@ -820,6 +917,8 @@ function discoverLocation(locationKey) {
     if (huntItem) {
         huntItem.classList.add('found');
         huntItem.querySelector('i').className = 'fas fa-check-circle';
+        // Add photo thumbnail below the hunt item
+        addPhotoToHuntItem(locationKey, huntItem);
     }
     
     // Award points to user
@@ -1094,18 +1193,24 @@ function _setup3DBear(locationKey) {
     const clock = new THREE.Clock();
     arThreeClock = clock;
 
+    // Bear walk-in constants
+    const BEAR_WALK_START_X = 6;  // start off-screen right
+    const BEAR_BASE_Y = -1;        // resting vertical position
+    const HOP_COUNT = 4;           // number of hops during walk-in
+    const HOP_HEIGHT = 0.6;        // peak hop height in world units
+
     // Load GLTF bear
     const LoaderClass = (typeof THREE.GLTFLoader !== 'undefined') ? THREE.GLTFLoader : GLTFLoader;
     const loader = new LoaderClass();
     let bearGroup = null;
-    let walkX = 6; // start off-screen right
+    let walkX = BEAR_WALK_START_X;
 
     loader.load(
         BEAR_MODEL_URL,
         (gltf) => {
             bearGroup = gltf.scene;
             bearGroup.scale.set(1.2, 1.2, 1.2);
-            bearGroup.position.set(walkX, -1, 0);
+            bearGroup.position.set(walkX, BEAR_BASE_Y, 0);
             // Face left (toward center)
             bearGroup.rotation.y = -Math.PI / 2;
             scene.add(bearGroup);
@@ -1142,11 +1247,16 @@ function _setup3DBear(locationKey) {
         if (arThreeMixer) arThreeMixer.update(delta);
 
         if (bearGroup) {
-            // Walk bear in from right to center over ~2.5s
+            // Walk bear in from right to center over ~2.5s with hopping
             if (walkX > 0) {
                 walkX -= delta * 2.4;
-                bearGroup.position.x = Math.max(walkX, 0);
+                const clampedX = Math.max(walkX, 0);
+                bearGroup.position.x = clampedX;
+                // Hop: sine wave tied to horizontal progress
+                const progress = (BEAR_WALK_START_X - clampedX) / BEAR_WALK_START_X;
+                bearGroup.position.y = BEAR_BASE_Y + Math.max(0, Math.sin(progress * Math.PI * HOP_COUNT)) * HOP_HEIGHT;
                 if (walkX <= 0) {
+                    bearGroup.position.y = BEAR_BASE_Y;
                     arBearReady = true;
                     showNotification('🐻 Grizzly is here! Take a photo!', 'info');
                 }
@@ -1179,6 +1289,12 @@ function _setupBearFallback() {
 function captureARPhoto() {
     if (!currentARLocation) return;
 
+    // Require bear to be on screen before taking a photo
+    if (!arBearReady) {
+        showNotification('🐻 Wait for Grizzly to hop onto the screen first!', 'warning');
+        return;
+    }
+
     // Use a canvas to composite camera feed + bear overlay
     const video = document.getElementById('ar-camera-feed');
     const captureCanvas = document.createElement('canvas');
@@ -1196,14 +1312,36 @@ function captureARPhoto() {
         ctx.fillRect(0, 0, cw, ch);
     }
 
-    // Overlay bear emoji as watermark if Three.js not active
-    if (!arThreeRenderer) {
-        ctx.font = `${Math.round(ch * 0.2)}px 'Apple Color Emoji', 'Noto Color Emoji', sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 16;
-        ctx.fillText('🐻', cw * 0.65, ch * 0.85);
+    // Overlay bear at its actual on-screen position
+    if (arThreeRenderer) {
+        // Composite the Three.js WebGL canvas on top of the camera frame
+        ctx.drawImage(arThreeRenderer.domElement, 0, 0, cw, ch);
+    } else {
+        // Emoji fallback – calculate real rendered position of bear element
+        const bearEl = document.getElementById('ar-bear-placeholder');
+        if (bearEl) {
+            const containerRect = arSceneContainer.getBoundingClientRect();
+            const bearRect = bearEl.getBoundingClientRect();
+            const scaleX = cw / containerRect.width;
+            const scaleY = ch / containerRect.height;
+            const bearCenterX = (bearRect.left + bearRect.width / 2 - containerRect.left) * scaleX;
+            const bearCenterY = (bearRect.top + bearRect.height / 2 - containerRect.top) * scaleY;
+            const bearFontSize = Math.round(bearRect.height * scaleY);
+            ctx.font = `${bearFontSize}px 'Apple Color Emoji', 'Noto Color Emoji', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 16;
+            ctx.fillText('🐻', bearCenterX, bearCenterY);
+        } else {
+            // Final fallback to fixed position
+            ctx.font = `${Math.round(ch * 0.2)}px 'Apple Color Emoji', 'Noto Color Emoji', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 16;
+            ctx.fillText('🐻', cw * 0.65, ch * 0.85);
+        }
     }
 
     // Timestamp watermark
@@ -2482,12 +2620,15 @@ if (langToggle) {
 // Initialize user account system
 initializeUser();
 
-// Initialize progress display
-updateProgress();
-
-// Initialize button states
+// Initialize button states (before restoreHuntState which may re-enable them)
 scanQrBtn.disabled = true;
 useLocationBtn.disabled = true;
+
+// Restore hunt state (found locations, photos, button states) from saved data
+restoreHuntState();
+
+// Initialize progress display
+updateProgress();
 
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
