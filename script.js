@@ -71,15 +71,9 @@ let currentUser = null;
 const POINTS_PER_LOCATION = 10;
 const COMPLETION_BONUS = 50;
 
-<<<<<<< main
-// Initialize user from localStorage or create anonymous session
-async function initializeUser() {
-    const savedUser = localStorage.getItem('rasnov_user');
-=======
 // Initialize user from localStorage or cookie or create anonymous session
-function initializeUser() {
+async function initializeUser() {
     const savedUser = localStorage.getItem('rasnov_user') || getCookie('rasnov_user');
->>>>>>> main
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
