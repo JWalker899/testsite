@@ -44,6 +44,7 @@ let arThreeMixer = null;
 let arThreeClock = null;
 let arAnimationId = null;
 let arBearReady = false;
+let arBearOnScreen = false; // true once bear is visible in the viewport (during or after walk-in)
 
 // ==================== Cookie Helpers ====================
 function setCookie(name, value, days = 365) {
@@ -590,6 +591,10 @@ tabButtons.forEach(button => {
         if (targetTab === 'leaderboard') {
             loadLeaderboard();
         }
+        // Render unlocks tab when opened
+        if (targetTab === 'unlocks') {
+            renderUnlocksTab();
+        }
     });
 });
 
@@ -1029,6 +1034,7 @@ async function launchARExperience(locationKey, isTestMode = false) {
     arLoading.classList.remove('hidden');
     arOverlayText.classList.add('hidden');
     arBearReady = false;
+    arBearOnScreen = false;
     
     // Update hunt instruction banner
     const locName = localizedField(location, 'name') || location.name;
@@ -1223,12 +1229,20 @@ function _setup3DBear(locationKey) {
     const BEAR_BASE_Y = -1;        // resting vertical position
     const HOP_COUNT = 4;           // number of hops during walk-in
     const HOP_HEIGHT = 0.6;        // peak hop height in world units
+    const FAKEOUT_STOP_X = 3.2;    // how far in the bear peeks during fake-out
+    const FAKEOUT_SPEED = 5.0;     // fast walk-in for fake-out
+    const WALKIN_SPEED = 2.4;      // normal walk-in speed
 
     // Load GLTF bear
     const LoaderClass = (typeof THREE.GLTFLoader !== 'undefined') ? THREE.GLTFLoader : GLTFLoader;
     const loader = new LoaderClass();
     let bearGroup = null;
     let walkX = BEAR_WALK_START_X;
+
+    // Fake-out + walk-in phase state
+    // Phases: 'fakeout_in' -> 'fakeout_bob' -> 'fakeout_out' -> 'pause' -> 'walkin'
+    let bearPhase = 'fakeout_in';
+    let phaseTimer = 0;
 
     loader.load(
         BEAR_MODEL_URL,
@@ -1246,10 +1260,7 @@ function _setup3DBear(locationKey) {
                 const clip = gltf.animations[0];
                 arThreeMixer.clipAction(clip).play();
             }
-
-            arBearReady = true;
-            // Notify once bear is loaded and walks into view
-            // (notification shown when walking completes in animate loop)
+            // arBearReady / arBearOnScreen are set by the animate loop phases
         },
         undefined,
         (err) => {
@@ -1272,18 +1283,67 @@ function _setup3DBear(locationKey) {
         if (arThreeMixer) arThreeMixer.update(delta);
 
         if (bearGroup) {
-            // Walk bear in from right to center over ~2.5s with hopping
-            if (walkX > 0) {
-                walkX -= delta * 2.4;
-                const clampedX = Math.max(walkX, 0);
-                bearGroup.position.x = clampedX;
-                // Hop: sine wave tied to horizontal progress
-                const progress = (BEAR_WALK_START_X - clampedX) / BEAR_WALK_START_X;
-                bearGroup.position.y = BEAR_BASE_Y + Math.max(0, Math.sin(progress * Math.PI * HOP_COUNT)) * HOP_HEIGHT;
-                if (walkX <= 0) {
-                    bearGroup.position.y = BEAR_BASE_Y;
-                    arBearReady = true;
-                    showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+            phaseTimer += delta;
+
+            if (bearPhase === 'fakeout_in') {
+                // Bear walks in quickly to the fake-out stop point
+                walkX -= delta * FAKEOUT_SPEED;
+                if (walkX <= FAKEOUT_STOP_X) {
+                    walkX = FAKEOUT_STOP_X;
+                    bearPhase = 'fakeout_bob';
+                    phaseTimer = 0;
+                }
+                bearGroup.position.x = walkX;
+                bearGroup.position.y = BEAR_BASE_Y;
+
+            } else if (bearPhase === 'fakeout_bob') {
+                // Bear bobs briefly at the peek position
+                bearGroup.position.x = FAKEOUT_STOP_X;
+                bearGroup.position.y = BEAR_BASE_Y + Math.sin(phaseTimer * Math.PI * 3) * 0.25;
+                if (phaseTimer > 0.7) {
+                    bearPhase = 'fakeout_out';
+                    phaseTimer = 0;
+                }
+
+            } else if (bearPhase === 'fakeout_out') {
+                // Bear retreats quickly back off-screen
+                walkX += delta * (FAKEOUT_SPEED * 1.5);
+                if (walkX >= BEAR_WALK_START_X) {
+                    walkX = BEAR_WALK_START_X;
+                    bearPhase = 'pause';
+                    phaseTimer = 0;
+                }
+                bearGroup.position.x = walkX;
+                bearGroup.position.y = BEAR_BASE_Y;
+
+            } else if (bearPhase === 'pause') {
+                // Bear stays off-screen briefly before the real walk-in
+                bearGroup.position.x = BEAR_WALK_START_X;
+                bearGroup.position.y = BEAR_BASE_Y;
+                if (phaseTimer > 1.2) {
+                    bearPhase = 'walkin';
+                    phaseTimer = 0;
+                    walkX = BEAR_WALK_START_X;
+                }
+
+            } else if (bearPhase === 'walkin') {
+                // Main walk-in from right to center with hopping
+                if (walkX > 0) {
+                    walkX -= delta * WALKIN_SPEED;
+                    const clampedX = Math.max(walkX, 0);
+                    bearGroup.position.x = clampedX;
+                    const progress = (BEAR_WALK_START_X - clampedX) / BEAR_WALK_START_X;
+                    bearGroup.position.y = BEAR_BASE_Y + Math.max(0, Math.sin(progress * Math.PI * HOP_COUNT)) * HOP_HEIGHT;
+                    // Bear is "on screen" once it enters the visible viewport area
+                    if (!arBearOnScreen && clampedX < 3) {
+                        arBearOnScreen = true;
+                    }
+                    if (walkX <= 0) {
+                        bearGroup.position.y = BEAR_BASE_Y;
+                        arBearReady = true;
+                        arBearOnScreen = true;
+                        showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+                    }
                 }
             }
         }
@@ -1294,28 +1354,44 @@ function _setup3DBear(locationKey) {
 }
 
 function _setupBearFallback() {
-    // Animated emoji bear that walks in from the right
+    // Animated emoji bear: fake-out peek then full walk-in from the right
+    const FAKEOUT_DURATION_MS = 2000;   // duration of bearFakeOut CSS animation
+    const WALKIN_DELAY_MS = 1200;       // CSS animation delay before walk-in starts
+    const WALKIN_DURATION_MS = 2000;    // CSS animation duration for walk-in
+    const BEAR_VISIBLE_DELAY_MS = 1500; // ms into walk-in when bear enters the visible area
+
     const bear = document.createElement('div');
-    bear.className = 'ar-bear-placeholder';
+    bear.className = 'ar-bear-placeholder ar-bear-fakeout';
     bear.id = 'ar-bear-placeholder';
     bear.textContent = '🐻';
     bear.setAttribute('role', 'img');
     bear.setAttribute('aria-label', 'Grizzly Bear');
     arSceneContainer.appendChild(bear);
 
-    // After walk-in animation completes, switch to idle
+    // After fake-out animation ends, start main walk-in
     setTimeout(() => {
-        bear.classList.add('idle');
-        arBearReady = true;
-        showNotification('🐻 Grizzly is here! Take a photo!', 'info');
-    }, 3300); // walk-in animation: 1.2s delay + 2s duration
+        bear.classList.remove('ar-bear-fakeout');
+        bear.classList.add('ar-bear-walkin');
+        // Bear enters visible area partway through the walk-in animation
+        setTimeout(() => {
+            arBearOnScreen = true;
+        }, BEAR_VISIBLE_DELAY_MS);
+        // After walk-in animation completes, switch to idle
+        setTimeout(() => {
+            bear.classList.remove('ar-bear-walkin');
+            bear.classList.add('idle');
+            arBearReady = true;
+            arBearOnScreen = true;
+            showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+        }, WALKIN_DELAY_MS + WALKIN_DURATION_MS);
+    }, FAKEOUT_DURATION_MS);
 }
 
 function captureARPhoto() {
     if (!currentARLocation) return;
 
     // Require bear to be on screen before taking a photo
-    if (!arBearReady) {
+    if (!arBearOnScreen) {
         showNotification('🐻 Wait for Grizzly to hop onto the screen first!', 'warning');
         return;
     }
@@ -1452,6 +1528,7 @@ function closeARView() {
     arThreeMixer = null;
     arThreeClock = null;
     arBearReady = false;
+    arBearOnScreen = false;
     
     // Stop all video tracks from the camera stream
     if (arStream) {
@@ -2194,7 +2271,9 @@ const I18N = {
         tabs: {
             locations: 'Locații',
             restaurants: 'Restaurante',
-            accommodations: 'Cazare'
+            accommodations: 'Cazare',
+            leaderboard: 'Clasament',
+            unlocks: 'Recompense'
         },
         ar: {
             title: 'Vânătoare AR',
@@ -2642,8 +2721,92 @@ if (langToggle) {
 
 // ==================== Initialization ====================
 
+// ==================== Theme Unlocks System ====================
+const THEMES = [
+    {
+        id: 'default',
+        name: 'Mountain Blue',
+        emoji: '🏔️',
+        description: 'The classic Rasnov look.',
+        pointsRequired: 0,
+        vars: {
+            '--primary-color': '#2c5f8d',
+            '--secondary-color': '#e8734e',
+            '--accent-color': '#f4a460'
+        }
+    },
+    {
+        id: 'forest',
+        name: 'Forest Green',
+        emoji: '🌲',
+        description: 'Deep Carpathian forest vibes.',
+        pointsRequired: 30,
+        vars: {
+            '--primary-color': '#2e7d32',
+            '--secondary-color': '#ff8f00',
+            '--accent-color': '#66bb6a'
+        }
+    },
+    {
+        id: 'sunset',
+        name: 'Sunset Glow',
+        emoji: '🌅',
+        description: 'Warm glow of a Rasnov sunset.',
+        pointsRequired: 80,
+        vars: {
+            '--primary-color': '#bf360c',
+            '--secondary-color': '#fdd835',
+            '--accent-color': '#ff7043'
+        }
+    }
+];
+
+function applyTheme(themeId) {
+    const theme = THEMES.find(t => t.id === themeId);
+    if (!theme) return;
+    const root = document.documentElement;
+    Object.entries(theme.vars).forEach(([prop, val]) => {
+        root.style.setProperty(prop, val);
+    });
+    localStorage.setItem('rasnov_theme', themeId);
+    renderUnlocksTab();
+}
+
+function renderUnlocksTab() {
+    const container = document.getElementById('unlocks');
+    if (!container) return;
+    const userPoints = (currentUser && currentUser.totalPoints) || 0;
+    const savedTheme = localStorage.getItem('rasnov_theme') || 'default';
+    container.innerHTML = `
+        <h2 class="section-title">🎨 Theme Unlocks</h2>
+        <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the scavenger hunt to unlock new site themes.</p>
+        <div class="theme-cards">
+            ${THEMES.map(theme => {
+                const unlocked = userPoints >= theme.pointsRequired;
+                const active = savedTheme === theme.id;
+                return `<div class="theme-card ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
+                    <div class="theme-emoji">${theme.emoji}</div>
+                    <h3 class="theme-name">${theme.name}</h3>
+                    <p class="theme-desc">${theme.description}</p>
+                    <p class="theme-pts">${theme.pointsRequired === 0 ? 'Always unlocked' : `Requires ${theme.pointsRequired} pts`}</p>
+                    ${unlocked
+                        ? (active
+                            ? `<button class="ar-button primary" disabled>✓ Active</button>`
+                            : `<button class="ar-button primary" onclick="applyTheme('${theme.id}')">Apply</button>`)
+                        : `<button class="ar-button" disabled>🔒 ${userPoints}/${theme.pointsRequired} pts</button>`}
+                </div>`;
+            }).join('')}
+        </div>`;
+}
+
 // Initialize user account system
 initializeUser();
+
+// Load saved theme (after user is initialized so points are available)
+(function loadSavedTheme() {
+    const saved = localStorage.getItem('rasnov_theme');
+    if (saved && saved !== 'default') applyTheme(saved);
+})();
 
 // Initialize button states (before restoreHuntState which may re-enable them)
 scanQrBtn.disabled = true;
