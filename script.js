@@ -274,6 +274,109 @@ function resetProgress() {
     }
 }
 
+// ==================== Leaderboard System ====================
+
+// Load and display leaderboard
+async function loadLeaderboard() {
+    try {
+        const response = await fetch('/api/leaderboard');
+        if (!response.ok) throw new Error('Failed to fetch leaderboard');
+        
+        const leaderboard = await response.json();
+        displayLeaderboard(leaderboard);
+    } catch (error) {
+        console.error('Error loading leaderboard:', error);
+        showNotification('Failed to load leaderboard', 'warning');
+        document.getElementById('leaderboard-body').innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: #999;">
+                    <i class="fas fa-exclamation-circle"></i> Failed to load leaderboard
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Display leaderboard data in table
+function displayLeaderboard(leaderboard) {
+    const leaderboardBody = document.getElementById('leaderboard-body');
+    
+    if (!leaderboard || leaderboard.length === 0) {
+        leaderboardBody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: #999;">
+                    <i class="fas fa-chart-line"></i> No players on leaderboard yet. Start the hunt to join!
+                </td>
+            </tr>
+        `;
+        document.getElementById('total-players').textContent = '0';
+        return;
+    }
+    
+    // Generate table rows
+    const rows = leaderboard.map((player, index) => {
+        const rank = player.rank;
+        const isCurrentUser = currentUser && player.username === currentUser.username;
+        const topClass = rank <= 3 ? `top-3 rank-${rank}` : '';
+        const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+        
+        const statusClass = player.completedAt ? 'completed' : 'in-progress';
+        const statusIcon = player.completedAt ? '✅' : '🔄';
+        const statusText = player.completedAt ? 'Completed' : 'In Progress';
+        
+        const highlightClass = isCurrentUser ? ' style="background: #e3f2fd; font-weight: 600;"' : '';
+        
+        return `
+            <tr class="${topClass}"${highlightClass}>
+                <td class="rank-col">
+                    <div class="rank-badge">${medalEmoji || rank}</div>
+                </td>
+                <td class="name-col">
+                    <div class="player-name">
+                        <span>${player.username}</span>
+                        ${isCurrentUser ? '<span class="player-badge">YOU</span>' : ''}
+                    </div>
+                </td>
+                <td class="points-col">
+                    <span class="points-value">⭐ ${player.totalPoints}</span>
+                </td>
+                <td class="locations-col">
+                    ${player.locationsFound} / 8
+                </td>
+                <td class="status-col">
+                    <span class="completion-status ${statusClass}">
+                        ${statusIcon} ${statusText}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    leaderboardBody.innerHTML = rows;
+    
+    // Update user stats
+    const userRank = currentUser ? leaderboard.findIndex(p => p.username === currentUser.username) + 1 : '-';
+    document.getElementById('user-rank').textContent = userRank > 0 ? `#${userRank}` : '-';
+    document.getElementById('user-leaderboard-points').textContent = currentUser ? `⭐ ${currentUser.totalPoints}` : '-';
+    document.getElementById('total-players').textContent = leaderboard.length;
+    
+    // Add row click event for details (optional)
+    document.querySelectorAll('.leaderboard-table tbody tr').forEach((row, index) => {
+        row.style.cursor = 'pointer';
+        row.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.boxShadow = 'none';
+        });
+    });
+}
+
+// Auto-load leaderboard when leaderboard tab is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    // Additional initialization can go here if needed
+});
+
 // ==================== Scavenger Hunt Locations ====================
 
 // Scavenger Hunt Locations (for testing and location-based discovery)
@@ -360,6 +463,11 @@ tabButtons.forEach(button => {
         // Add active class to clicked button and corresponding content
         button.classList.add('active');
         document.getElementById(targetTab).classList.add('active');
+        
+        // Load leaderboard if leaderboard tab is clicked
+        if (targetTab === 'leaderboard') {
+            loadLeaderboard();
+        }
     });
 });
 
@@ -2387,3 +2495,4 @@ document.documentElement.style.scrollBehavior = 'smooth';
 console.log('Discover Rasnov - Tourist Website Initialized');
 console.log('Testing mode available for AR scavenger hunt');
 console.log('User Points System Active - Points saved to account');
+}

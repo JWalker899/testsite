@@ -79,6 +79,10 @@
                         <i class="fas fa-bed"></i>
                         <span>Places to Stay</span>
                     </button>
+                    <button class="tab-button" data-tab="leaderboard">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard</span>
+                    </button>
                 </div>
 
                 <!-- Locations Tab -->
@@ -429,7 +433,56 @@
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Leaderboard Tab -->
+                <div class="tab-content" id="leaderboard">
+                    <h2 class="section-title">🏆 Leaderboard</h2>
+                    <p class="leaderboard-subtitle">Top Rasnov Explorers - Ranked by Points</p>
+                    
+                    <div class="leaderboard-container">
+                        <div class="leaderboard-info">
+                            <div class="info-item">
+                                <span class="info-label">Your Rank:</span>
+                                <span class="info-value" id="user-rank">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Your Points:</span>
+                                <span class="info-value" id="user-leaderboard-points">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Total Players:</span>
+                                <span class="info-value" id="total-players">-</span>
+                            </div>
+                        </div>
+
+                        <div class="leaderboard-table-wrapper">
+                            <table class="leaderboard-table">
+                                <thead>
+                                    <tr>
+                                        <th class="rank-col">#</th>
+                                        <th class="name-col">Player</th>
+                                        <th class="points-col">Points</th>
+                                        <th class="locations-col">Locations</th>
+                                        <th class="status-col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body">
+                                    <tr class="loading-row">
+                                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="leaderboard-actions">
+                            <button class="card-button" onclick="loadLeaderboard()" title="Refresh the leaderboard">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             <!-- AR Scavenger Hunt Section -->
             <section class="ar-section" id="ar-mode">

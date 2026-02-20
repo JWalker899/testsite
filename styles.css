@@ -307,6 +307,219 @@ body {
     background: #1e4a6f;
 }
 
+/* Leaderboard Styles */
+.leaderboard-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.leaderboard-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), #1e4a6f);
+    border-radius: var(--border-radius);
+    color: white;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.leaderboard-table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.leaderboard-table thead {
+    background: linear-gradient(135deg, var(--primary-color), #1e4a6f);
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.leaderboard-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.rank-col {
+    width: 70px;
+    text-align: center;
+}
+
+.name-col {
+    flex: 1;
+    min-width: 150px;
+}
+
+.points-col {
+    width: 120px;
+    text-align: right;
+}
+
+.locations-col {
+    width: 120px;
+    text-align: center;
+}
+
+.status-col {
+    width: 120px;
+    text-align: center;
+}
+
+.leaderboard-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.leaderboard-table tbody tr {
+    transition: var(--transition);
+}
+
+.leaderboard-table tbody tr:hover {
+    background-color: #f0f4f8;
+    transform: translateX(5px);
+}
+
+.leaderboard-table tbody tr.top-3 {
+    background-color: #fffacd;
+}
+
+.leaderboard-table tbody tr.top-3.rank-1 {
+    background: linear-gradient(90deg, #ffd700, #fffacd);
+    font-weight: 600;
+}
+
+.leaderboard-table tbody tr.top-3.rank-2 {
+    background: linear-gradient(90deg, #c0c0c0, #fffacd);
+    font-weight: 600;
+}
+
+.leaderboard-table tbody tr.top-3.rank-3 {
+    background: linear-gradient(90deg, #cd7f32, #fffacd);
+    color: white;
+    font-weight: 600;
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.1rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.rank-1 .rank-badge {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+}
+
+.rank-2 .rank-badge {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    color: #333;
+}
+
+.rank-3 .rank-badge {
+    background: linear-gradient(135deg, #cd7f32, #d4a574);
+    color: white;
+}
+
+.player-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.player-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.points-value {
+    font-weight: bold;
+    color: #f39c12;
+    font-size: 1.1rem;
+}
+
+.completion-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.completion-status.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.completion-status.in-progress {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.loading-row {
+    text-align: center;
+    color: #999;
+}
+
+.leaderboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.leaderboard-actions .card-button {
+    max-width: 200px;
+}
+
 /* AR Section */
 .ar-section {
     background: white;
@@ -1597,3 +1810,5 @@ body {
 
     .profile-content {
         grid-template-columns: 1fr;
+    }
+}
