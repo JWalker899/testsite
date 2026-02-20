@@ -2362,3 +2362,4 @@ document.documentElement.style.scrollBehavior = 'smooth';
 console.log('Discover Rasnov - Tourist Website Initialized');
 console.log('Testing mode available for AR scavenger hunt');
 console.log('User Points System Active - Points saved to account');
+}
