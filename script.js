@@ -51,7 +51,7 @@ const POINTS_PER_LOCATION = 10;
 const COMPLETION_BONUS = 50;
 
 // Initialize user from localStorage or create anonymous session
-function initializeUser() {
+async function initializeUser() {
     const savedUser = localStorage.getItem('rasnov_user');
     if (savedUser) {
         try {
@@ -64,6 +64,8 @@ function initializeUser() {
         createAnonymousUser();
     }
     updateUserDisplayUI();
+    // Try to create the user on the server (non-blocking if server unavailable)
+    await createOrEnsureServerUser();
 }
 
 // Create an anonymous user account
@@ -85,6 +87,20 @@ function saveUserToLocalStorage() {
     localStorage.setItem('rasnov_user', JSON.stringify(currentUser));
 }
 
+// Ensure server has a corresponding user record (best-effort)
+async function createOrEnsureServerUser() {
+    if (!currentUser || !currentUser.username) return;
+    try {
+        await fetch('/api/user/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: currentUser.username })
+        });
+    } catch (e) {
+        console.log('Could not create/ensure server user (offline or server unreachable)', e.message || e);
+    }
+}
+
 // Set a custom username for the user
 function setUsername(username) {
     if (!username || username.trim() === '') {
@@ -97,6 +113,8 @@ function setUsername(username) {
     saveUserToLocalStorage();
     updateUserDisplayUI();
     showNotification(`Welcome, ${username}!`, 'success');
+    // Ensure server user exists for this username (fire-and-forget)
+    createOrEnsureServerUser();
     return true;
 }
 
@@ -374,7 +392,8 @@ function displayLeaderboard(leaderboard) {
 
 // Auto-load leaderboard when leaderboard tab is clicked
 document.addEventListener('DOMContentLoaded', function() {
-    // Additional initialization can go here if needed
+    // Initialize user session and other startup tasks
+    initializeUser();
 });
 
 // ==================== Scavenger Hunt Locations ====================
