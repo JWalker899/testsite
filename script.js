@@ -34,6 +34,13 @@ const arFlash = document.getElementById('ar-flash');
 let huntActive = false;
 let testingMode = false;
 let foundLocations = new Set();
+
+// Rasnov geographic coordinates (used for weather API)
+const RASNOV_LATITUDE = 45.59;
+const RASNOV_LONGITUDE = 25.46;
+
+// Timer handle for the reset-progress confirmation button auto-revert
+let resetConfirmTimeout = null;
 let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
@@ -362,7 +369,7 @@ function showUserProfile() {
                     <input type="text" id="new-username" placeholder="${currentUser.hasSetName ? 'Change name' : 'Enter your name'}" maxlength="30" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
                     <button class="card-button" style="width: 100%; margin-top: 0.5rem;" onclick="updateUsernameInModal()">${currentUser.hasSetName ? 'Update Name' : 'Set Name'}</button>
                 </div>
-                <button class="card-button" onclick="resetProgress()">Reset Progress</button>
+                <button class="card-button reset-progress-btn" id="reset-progress-btn" onclick="resetProgress()">Reset Progress</button>
             </div>
         </div>
     `;
@@ -383,39 +390,58 @@ function updateUsernameInModal() {
 
 // Reset all hunt progress (preserves identity)
 function resetProgress() {
-    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
-        currentUser.locationsFound = [];
-        currentUser.totalPoints = 0;
-        currentUser.completedAt = null;
-        foundLocations.clear();
-        saveUserToLocalStorage();
-        updateUserDisplayUI();
-        updateProgress();
-
-        // Reset hunt item UI
-        huntItems.forEach(item => {
-            item.classList.remove('found');
-            const icon = item.querySelector('i');
-            if (icon) icon.className = 'fas fa-lock';
-            const photo = item.querySelector('.hunt-item-photo');
-            if (photo) photo.remove();
-        });
-
-        // Clear saved photos
-        Object.keys(huntLocations).forEach(key => {
-            localStorage.removeItem(`ar_photo_${key}`);
-        });
-
-        // Reset hunt buttons
-        huntActive = false;
-        startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
-        startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
-        scanQrBtn.disabled = true;
-        useLocationBtn.disabled = true;
-
-        closeModal('user-profile-modal');
-        showNotification('Progress reset successfully', 'info');
+    const btn = document.getElementById('reset-progress-btn');
+    if (btn && btn.dataset.confirming !== 'true') {
+        // First click: switch button to "Are you sure?" state
+        btn.dataset.confirming = 'true';
+        btn.textContent = 'Are you sure?';
+        btn.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+        btn.style.boxShadow = '0 4px 12px rgba(231, 76, 60, 0.4)';
+        // Auto-revert after 4 seconds if not confirmed
+        clearTimeout(resetConfirmTimeout);
+        resetConfirmTimeout = setTimeout(() => {
+            if (btn && btn.dataset.confirming === 'true') {
+                btn.dataset.confirming = 'false';
+                btn.textContent = 'Reset Progress';
+                btn.style.background = '';
+                btn.style.boxShadow = '';
+            }
+        }, 4000);
+        return;
     }
+
+    // Second click: execute reset
+    currentUser.locationsFound = [];
+    currentUser.totalPoints = 0;
+    currentUser.completedAt = null;
+    foundLocations.clear();
+    saveUserToLocalStorage();
+    updateUserDisplayUI();
+    updateProgress();
+
+    // Reset hunt item UI
+    huntItems.forEach(item => {
+        item.classList.remove('found');
+        const icon = item.querySelector('i');
+        if (icon) icon.className = 'fas fa-lock';
+        const photo = item.querySelector('.hunt-item-photo');
+        if (photo) photo.remove();
+    });
+
+    // Clear saved photos
+    Object.keys(huntLocations).forEach(key => {
+        localStorage.removeItem(`ar_photo_${key}`);
+    });
+
+    // Reset hunt buttons
+    huntActive = false;
+    startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
+    startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
+    scanQrBtn.disabled = true;
+    useLocationBtn.disabled = true;
+
+    closeModal('user-profile-modal');
+    showNotification('Progress reset successfully', 'info');
 }
 
 // Add a saved photo thumbnail to a hunt item element
@@ -708,10 +734,18 @@ function scrollToSection(sectionId) {
 // Weather Widget
 async function updateWeather() {
     const tempElement = document.getElementById('temp');
-    // Simulated weather data (in production, use real weather API)
-    const temperatures = [15, 18, 22, 25, 20, 16];
-    const randomTemp = temperatures[Math.floor(Math.random() * temperatures.length)];
-    tempElement.textContent = `${randomTemp}°C`;
+    try {
+        // Open-Meteo: free, no API key required. Rasnov coords: 45.59°N, 25.46°E
+        const response = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${RASNOV_LATITUDE}&longitude=${RASNOV_LONGITUDE}&current=temperature_2m`
+        );
+        if (!response.ok) throw new Error('Weather fetch failed');
+        const data = await response.json();
+        const temp = Math.round(data.current.temperature_2m);
+        tempElement.textContent = `${temp}°C`;
+    } catch {
+        // Fallback: keep existing display unchanged
+    }
 }
 
 updateWeather();
@@ -1690,6 +1724,11 @@ function closeModal(modalId) {
                 video.srcObject.getTracks().forEach(track => track.stop());
                 video.srcObject = null;
             }
+        }
+
+        // Clear reset-progress confirmation timer if profile modal is closed
+        if (modalId === 'user-profile-modal') {
+            clearTimeout(resetConfirmTimeout);
         }
     }
 }

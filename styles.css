@@ -1889,6 +1889,10 @@ body {
     }
 
     .user-points-badge {
+        gap: 0;
+    }
+
+    .user-name {
         display: none;
     }
 
