@@ -2217,6 +2217,7 @@ function applyTranslations(lang) {
             }
         });
     }
+}
 
 if (langToggle) {
     langToggle.addEventListener('click', () => {
