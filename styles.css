@@ -600,6 +600,62 @@ body {
     color: white;
 }
 
+/* Hunt Tabs (inside the AR section) */
+.hunt-tabs {
+    margin-top: 2rem;
+}
+
+.hunt-tab-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--light-color);
+    flex-wrap: wrap;
+}
+
+.hunt-tab-btn {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dark-color);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.hunt-tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.hunt-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.hunt-tab-pane {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.hunt-tab-pane.active {
+    display: block;
+}
+
+.ar-button.reset-hunt-btn {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.ar-button.reset-hunt-btn:hover {
+    background: #e74c3c;
+    color: white;
+}
+
 .hunt-status {
     margin-top: 2rem;
 }
