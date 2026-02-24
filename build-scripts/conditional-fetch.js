@@ -18,6 +18,7 @@ const { main: fetchData } = require('./fetch-places-data.js');
 
 // Configuration
 const DATA_FILE = path.join(__dirname, '../data/places-data.json');
+const SAMPLE_FILE = path.join(__dirname, '../data/sample-places-data.json');
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
 /**
@@ -30,15 +31,23 @@ function shouldFetchData(forceFlag) {
     return true;
   }
 
-  // Check if data file exists
-  if (!fs.existsSync(DATA_FILE)) {
+  // Determine which file to check for the timestamp
+  let fileToCheck = null;
+  if (fs.existsSync(DATA_FILE)) {
+    fileToCheck = DATA_FILE;
+  } else if (fs.existsSync(SAMPLE_FILE)) {
+    // places-data.json may have been lost after a rebuild; check sample data
+    // (sample data is overwritten with real data on each successful fetch)
+    fileToCheck = SAMPLE_FILE;
+    console.log('📋 places-data.json not found - checking sample data for a recent fetch timestamp...\n');
+  } else {
     console.log('📭 No existing data found - fetching fresh data...\n');
     return true;
   }
 
   try {
     // Read existing data
-    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    const data = JSON.parse(fs.readFileSync(fileToCheck, 'utf8'));
     
     // Check if lastUpdated field exists
     if (!data.lastUpdated) {
