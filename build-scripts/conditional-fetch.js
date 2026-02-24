@@ -83,6 +83,34 @@ function shouldFetchData(forceFlag) {
 }
 
 /**
+ * Sync places-data.json to sample-places-data.json if they are out of sync.
+ * This ensures the sample file always holds the latest real data so it can
+ * serve as a persistent fallback when places-data.json is missing.
+ */
+function syncSampleData() {
+  if (!fs.existsSync(DATA_FILE)) return;
+
+  try {
+    const placesContent = fs.readFileSync(DATA_FILE, 'utf8');
+    const placesData = JSON.parse(placesContent);
+
+    // Only overwrite when the timestamps differ (sample is stale or missing)
+    let sampleData = null;
+    if (fs.existsSync(SAMPLE_FILE)) {
+      sampleData = JSON.parse(fs.readFileSync(SAMPLE_FILE, 'utf8'));
+    }
+
+    if (!sampleData || sampleData.lastUpdated !== placesData.lastUpdated) {
+      console.log('🔄 Syncing real data to sample file for persistence...\n');
+      fs.writeFileSync(SAMPLE_FILE, placesContent, 'utf8');
+      console.log('✅ Sample file updated.\n');
+    }
+  } catch (error) {
+    console.warn('⚠️  Could not sync sample data:', error.message);
+  }
+}
+
+/**
  * Main function
  */
 async function main() {
@@ -93,11 +121,12 @@ async function main() {
 
   // Determine if we should fetch
   if (shouldFetchData(forceFlag)) {
-    // Fetch new data
+    // Fetch new data (fetch-places-data.js writes both places-data.json and sample)
     await fetchData();
   } else {
-    // Skip fetch
+    // Skip fetch, but ensure sample-places-data.json is in sync with places-data.json
     console.log('💡 Tip: Use --force flag to fetch regardless of cache age.\n');
+    syncSampleData();
   }
 }
 
