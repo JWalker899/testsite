@@ -115,9 +115,77 @@
   function renderAllCards() {
     if (!placesData) return;
 
-    renderCards('locations', placesData.locations);
+    // Sort locations by review count descending
+    const sortedLocations = [...(placesData.locations || [])].sort(
+      (a, b) => (b.userRatingsTotal || 0) - (a.userRatingsTotal || 0)
+    );
+
+    renderLocationsCards(sortedLocations);
     renderCards('restaurants', placesData.restaurants);
     renderCards('accommodations', placesData.accommodations);
+  }
+
+  /**
+   * Pick the featured place of the day for locations.
+   * Excludes the top and bottom places by review count so the
+   * featured pick comes from the middle of the ranked list.
+   * The selection rotates daily based on the current date.
+   */
+  function getFeaturedPlace(sortedPlaces) {
+    const n = sortedPlaces.length;
+    if (n === 0) return null;
+    // Scale the exclusion window so the pool is never empty
+    const cutoff = Math.min(5, Math.max(1, Math.floor((n - 1) / 2)));
+    const pool = sortedPlaces.slice(cutoff, n - cutoff);
+    if (pool.length === 0) return null;
+    const d = new Date();
+    const dayNumber = Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    return pool[dayNumber % pool.length];
+  }
+
+  /**
+   * Render location cards sorted by reviews, with a featured place at the top
+   */
+  function renderLocationsCards(sortedPlaces) {
+    const container = document.getElementById('locations');
+    if (!container) {
+      console.error('Container for locations not found');
+      return;
+    }
+
+    const grid = container.querySelector('.card-grid');
+    if (!grid) {
+      console.error('Card grid in locations not found');
+      return;
+    }
+
+    grid.innerHTML = '';
+
+    const featured = getFeaturedPlace(sortedPlaces);
+    const featuredId = featured ? featured.id : null;
+
+    // Render featured card first
+    if (featured) {
+      const card = createCard(featured, 'locations');
+      card.classList.add('card-featured');
+      const cardImage = card.querySelector('.card-image');
+      if (cardImage) {
+        const banner = document.createElement('div');
+        banner.className = 'featured-banner';
+        banner.innerHTML = '<i class="fas fa-star"></i> Featured Place of the Day';
+        cardImage.prepend(banner);
+      }
+      grid.appendChild(card);
+    }
+
+    // Render remaining cards (excluding featured)
+    sortedPlaces.forEach(place => {
+      if (place.id !== featuredId) {
+        grid.appendChild(createCard(place, 'locations'));
+      }
+    });
+
+    console.log(`✅ Rendered ${sortedPlaces.length} cards in locations`);
   }
 
   /**
@@ -140,7 +208,7 @@
     grid.innerHTML = '';
 
     // Generate cards
-    places.forEach((place, index) => {
+    places.forEach((place) => {
       const card = createCard(place, category);
       grid.appendChild(card);
     });
