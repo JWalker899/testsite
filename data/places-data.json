@@ -1,0 +1,1729 @@
+{
+  "lastUpdated": "2026-02-24T05:49:57.739Z",
+  "center": {
+    "lat": 45.5889,
+    "lng": 25.4631
+  },
+  "locations": [
+    {
+      "id": "ChIJTTT7-05Es0ARRM9ow7gv13I",
+      "name": "Valea Cetatii Cave",
+      "coordinates": {
+        "lat": 45.5824394,
+        "lng": 25.4962876
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 4085,
+      "priceLevel": null,
+      "address": "Valea Cetatii, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXaNjHNBFyz9-g00nL2dePuCdmI90KNybHnj02m6z7Pu0_FlajIlfbXApD0Xx5WPDY5oHah5berssjPKJw_eePsEguH-Bg0mz-npDZ270FmigVQOrLfPS1YBPdOJ-GOHY4oBf2_MgdJKWL-QYDa8RGoaQ_sFUVagNhTdRJGU5_MCN5encL2CgruuK7-hj6qZal6wkEBKBWCs7wBSmvK1ZHQKeb8jY9nJAyQNCkvar1dmhDmxEWskpCYZ2rDSOEEOpy7RIAjaet7xo2eRqsS-ByapYNnLEs5CAyY5YWjgyEH9SNRgGYP2CLowLvaBM1235p018fRJ6Q&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/105478227894792388839\">Peștera Valea Cetății</a>"
+        }
+      ],
+      "phone": "0724 345 898",
+      "website": "http://pestera-valeacetatii.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 10:00 AM – 6:00 PM",
+          "Tuesday: 10:00 AM – 6:00 PM",
+          "Wednesday: 10:00 AM – 6:00 PM",
+          "Thursday: 10:00 AM – 6:00 PM",
+          "Friday: 10:00 AM – 6:00 PM",
+          "Saturday: 10:00 AM – 6:00 PM",
+          "Sunday: 10:00 AM – 6:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJLxCHffZDs0ARXeGcUu4OzOw",
+      "name": "Gold Pit",
+      "coordinates": {
+        "lat": 45.55937660000001,
+        "lng": 25.5267119
+      },
+      "rating": 3.8,
+      "userRatingsTotal": 19,
+      "priceLevel": null,
+      "address": null,
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUJz9Coybi3xVKkM4idkCiDtQY1KYpgwru2wKpuHN0EFId3Vw4qVl4S0OgRY7py1i3CqnH-YRQCO8lMSb259cW42rXV6oHtSWhJ1qrC6S_ABH5r_M6IfJfQBPYqz0wRz-YPC_Qkrfz9lHf0JEN7cITIdd5nx_1F6rIhRuf2taZsyRV7t2p3OyOMy3M6wcbrLYUzcURY8UVrLoiTSJE-SYX63ka4nd_OqGlCDY3-J9SvJkdubct4CRJ_ym2rbsDWtafHvQXR_mOt_n72n1zHe4MgIxzDwoTlVVQbbMFhMaiowyNg-7bj5llLtf_UYHxMChxbWb0AZ73EuXnvrLlHguzvEmaigX7JwxONCepEISVmtzjkEaDVNCTD62jnAGzeTzgrGmdmkZhEBu_Fi4OVEj7rQlgi4mgkpjDUSu_btjvyH1wMK7LV5dCpwtxMotubQ2t7rVBkuRhrAWb_meb1NPz5ROCi97LLnDhuz-dc77CuGttAURGOvXHhMMID3eEkZOBqUjKcswLkxZJocPiDH_bqssGdMiCvHapTGKS_-p1NuSH6rAoSxQOb7aPwyhpArOblm1LELsuLugbjLJypoe5OvcQUaIR8i0UpDY_jtGbeX24RxOjNH8hapq9GwQYC5696pQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/111447833910276930146\">Gergely Kósa</a>"
+        }
+      ],
+      "phone": null,
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ2-Spxj5Ps0ARJoGtF3BfdpU",
+      "name": "Libearty Bear Sanctuary Zarnesti",
+      "coordinates": {
+        "lat": 45.59318750000001,
+        "lng": 25.3853125
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 4061,
+      "priceLevel": null,
+      "address": "H9VP+74, Zărnești",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWDkbmn583nGEr5VAiywIrEf4omxHy0UTt_Uoiksbnmc6xVYBJ5hLgw5NwyMKDWeRlU69pW_qz0Jxx6t6HVyekYfFpcRNCvXWF72nAfgQTWkfF_agM6EwsCEoU_A8msSy8i3XpWF6vOMoHts3qWRPg_qkKSxdqUpZ8QhGlL5Z32qtf5AdlCRKgqTFyr071xo3jajbY8jVOLL0-aK28z5S-aZigR3HXLauFo1Jc9P1PqOyJ0-BfbKQQbLY0ieW6j2Kki_x5ZhivrFgQFb7vYubmXVT4pr27MGU_Y9gsEBI1DhGG9ED9lZIC7OIXK7CP6WYtX8mT0LulzAV5Ww4yFlzDcLTxeGwA-bfpFlQwq3gCHlMdQmeuJsnJBSPYZXTf84Ui-6BxmDub_x5K-7iCAnn8a_nPq_fQIS4pyN5U40FAgOV6PckeoxfxJA157wx6rER5ZRZrJXOABiWVsM5PRGVNRs-ves9RlfcCA9yWBJSxx3c3F8YVEYVcT_tMzDQN5Thz7QOxFDrxcXM8mVWIDjbrvB1Vb3H1K1THABuwgFV-SQxWd_xDV9CbKp-2D_zRlBjZhOrgj1RX2i36JDUPt9fcOsji7NE23n0bcfEfMUMfr221Gdtq3VfpH0rPeSqf0hQsMMkYMlWPIGp4EXBJheTSvodk&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/101742492351377933822\">Stephan Grafe</a>"
+        }
+      ],
+      "phone": "0731 334 791",
+      "website": "https://millionsoffriends.org/en/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: Closed",
+          "Tuesday: 9:30 – 11:15 AM",
+          "Wednesday: 9:30 – 11:15 AM",
+          "Thursday: 9:30 – 11:15 AM",
+          "Friday: 9:30 – 11:15 AM",
+          "Saturday: 9:30 – 11:15 AM",
+          "Sunday: 9:30 – 11:15 AM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJgYQhwp1Es0ARi1ROEu5CIao",
+      "name": "Season Hill",
+      "coordinates": {
+        "lat": 45.5934167,
+        "lng": 25.5532842
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 1903,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfW2bi1_Lf-hBeX_KTTl2f2x1Xiz3R3uscjOMx0O0idM6Fdu-1PuKZEDWNulxP3O153ux8DkVvz2Z0L-2W8zPT1i7jTUc7uA24ej7owiZ3etFnPrXj0PgmfP9Si6ZCnAFLxPnHJmAWW_bsi9zVB84J-tiSXes4JZh6ixIq-qZQJ_YkeYXauwiQAfuYlR5ZRcOD645MjrS3gHQlOuxXr6CKyH3J87AgYc5pqijFygRv9FtZuK-CQ035g5ku3AYvDnPORusvemR6oybljJ2eLl6IJJ9ecOoGqsuWDWnw109GorEsQG8GGXp5CAUo7Mrda5biExd4Eu8cY&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106030787041619473723\">Season Hill</a>"
+        }
+      ],
+      "phone": "0752 036 117",
+      "website": "https://www.seasonhill.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 10:00 AM – 6:00 PM",
+          "Tuesday: 10:00 AM – 6:00 PM",
+          "Wednesday: 10:00 AM – 6:00 PM",
+          "Thursday: 10:00 AM – 6:00 PM",
+          "Friday: 10:00 AM – 6:00 PM",
+          "Saturday: 10:00 AM – 6:00 PM",
+          "Sunday: 10:00 AM – 6:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ4WWXU6JDs0ARuefGGi4Jf5E",
+      "name": "\"Postăvaru\" Peak",
+      "coordinates": {
+        "lat": 45.5688764,
+        "lng": 25.5677001
+      },
+      "rating": 4.8,
+      "userRatingsTotal": 1300,
+      "priceLevel": null,
+      "address": "Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWk936xDral2eO-idZkbpfrJc7eRIlQ3TPcrNi-WI63hKdxfhd1SXrtuv6xuzPP2-R2k-VNoghMDIVzciju8amVkj6qNHxk3FOI5mrhV8Hj8oPwMrN32Vrxhcp6IP5JxRCEEPRMnqEJ0yX-_Dv_S1hSbELTZoQngSgCIsQei8vmNQTUH62LGLaFkswkf7dVeAkun6xOnVj2paBxiZGevF7bXk14ogjuZIrNoEeZRBPYgqjpMX8dtKmV_-WoJ9FJGeVOIOFubh_G1ZkMbIuKgOGq2n-Hll-ZIgg81-3MF98xH051FuPyEdllFa3X63P8lv8sdwV6zwkIBIlCbqR_2jic9zAi8lVb8y10ccBFonHWq_9r94Ln-2zXmFdCfuVBi-gplzKSVSiHylabrHesj_4_yteYDwNXuo95pAdOEm3usx4qDU1gNUE2AvZjPxIKe-BYpFxdSVKstluWuk5BD_A5IX-pgkUSkgu2m7MaN5_0t2DvPW4duCZo3BaBA-rvwLLZ_Lj0FWyxqW7UlkFWlUDXfqggebKWQW52pF--VFmIbyu7t7G5ldcDczkiczf9RfnXutPBCe5MG0KJ9hmX8t6DasyMp01gf7AWPXtpyopuU-gmXkjqQsVMWOaRNe64tu2_AbYXxaNebpG_j_b3RBbi6mM&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/110145411792266127486\">Nicușor Chiru</a>"
+        }
+      ],
+      "phone": null,
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJrVilMHNBs0ARdP2524s6hD4",
+      "name": "Fun Park Trei Brazi",
+      "coordinates": {
+        "lat": 45.522007,
+        "lng": 25.5400157
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 2043,
+      "priceLevel": null,
+      "address": "Predeal",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWzzt7DWujmvNPVLmktXPoz1vStFwEfMVa9t8EXw7PX_3-FEaPksogyACMhV_7V9sucQhZEQo7egt3gUGmoOZlvrk-iWicmdXlhvrMrorNF88HMw0IWJLlCm_UOKGgf0rrC4PKUz0cc5RF1Lz8Nr-5db3ACH3_ggMmhX6oXeZMqURLRaXcmrsNFHEZhW0j41kRqGGziMGuc6vZSnBVoa2ldPi_WZ-WbohZq_wKtQrI1KndNlQMp0UN_CojEU9mZChswkxRd-6rJ4z4z6TdAgQac3ozVxesjG0sltbWIzDNpi1j7qKcRXZlLSZK_WT0bl1yOO9B3dK46e1sSNU0qGkUftMm4hv4rPb_9JyuyXPbfwbzs1qfnVdpWZZpCiKy_jXZ5_0q49YY3mwQptFpb64ARrnAdcUs1AJ7okXO1WDFQldhRTb_Ykc2-xH-4aUfDQOG-rjN9LeyyDol0rClAqSmTwQUzPCSCwqiy7dvXmc8FI-ITtTGaULDeSeofnzF8bxW5qaktvztcnVYIcoVocZl2xbEHMG2KGhbJwl6tQaGPqqTlr4n8wMLGQvDN2QUGRw5wvKPe6Q-vnwiuPen8h3vKs1IcKZmXe4udPUFHKS3XCHQB8FR48JRerEASU6JukEDOOjKY&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/104199231276501073414\">Ovidiu Dumitru</a>"
+        }
+      ],
+      "phone": "0722 940 105",
+      "website": "http://www.funparkpredeal.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 10:00 AM – 6:30 PM",
+          "Tuesday: 10:00 AM – 6:30 PM",
+          "Wednesday: 10:00 AM – 6:30 PM",
+          "Thursday: 10:00 AM – 6:30 PM",
+          "Friday: 10:00 AM – 6:30 PM",
+          "Saturday: 10:00 AM – 6:30 PM",
+          "Sunday: 10:00 AM – 6:30 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJeeYq6aRFs0ARs3DarFbK28o",
+      "name": "Turnul gărzii",
+      "coordinates": {
+        "lat": 45.589637,
+        "lng": 25.4651484
+      },
+      "rating": 4,
+      "userRatingsTotal": 28,
+      "priceLevel": null,
+      "address": "Strada Cetății 1, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXGe23zSyHzSOLWDgIn1IXaXb7gtNMxJLps0H2PFhbxQnL14DkSOwz3IqLki28ehaQiH4Pktg302PDbSRQsAysA6QjeLJo6QlsBrgM5srNdV1cpE36D6hgxJpSaceKPMLqVB9fXcarMgg7AwKgBGs6x-7X9BGMOzzw2exo_S9bK9gMXB2LtQZ_2eP-c01dBH-HkY7YXTXnw450Tq6lnhkxtuf6QOrjum0TWBnoLi3FaI5u3FmC-5RoZIy4oD3Nw8OCMGCznbFWG5cq9V6gXG7jH7_adioyKZgOqhcMoLCEDdNzNZp6dd-E76L22pPSjkXKKf1lH6rz4_1Hstih0EzgsLAFuFp3J-ytOCedzEOcnqCC-oDJcrerHnDHnUsNW7r9fiEcW0_FDspFg11dnaWnvfGJ4oLCUd8YNUST4-N96gt0sZlXz5qNOTEnGPdXzYcWyropKcYqCXTXzVuiq-8NvG2iUuZa7qsVH0DNqU1fRDXpDS5IBN-X8yTPlgh52tXo_AoceRGK1qc38KfMdbURD422fs-Ip7S7AnQ1pXaJhlP658Prnaig111Yctu7jo3hfoxDSCw2Cvei1FGfKuJKlzXzVBs4yt0nJZsFsSKFkvUSC4VXlMWxSFDGA5zWE&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/111613532005799372484\">Cristian Ponce</a>"
+        }
+      ],
+      "phone": "0268 230 002",
+      "website": null,
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 9:00 AM – 5:00 PM",
+          "Tuesday: 9:00 AM – 5:00 PM",
+          "Wednesday: 9:00 AM – 5:00 PM",
+          "Thursday: 9:00 AM – 5:00 PM",
+          "Friday: 9:00 AM – 5:00 PM",
+          "Saturday: 9:00 AM – 5:00 PM",
+          "Sunday: 9:00 AM – 5:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJWw3Lo6RFs0ARTdktG5CoLR8",
+      "name": "Elevator Fortress mills",
+      "coordinates": {
+        "lat": 45.59042549999999,
+        "lng": 25.4661473
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 270,
+      "priceLevel": null,
+      "address": "Piața Unirii 9, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVkEKSq1ngiKflUqy8g5_pQ3RFkHS6UcMfbMTq7RTQphuQBaIvbSoZFH9cECGUo6udhtYc22Ngplewi4loOnKhAlo1hzAjTkod8vS1eoIOBwSxS7erekSvM3WzNZFynGUVgy8EmR7qG3yhdl-kSzaD-mHbgod56LJunkxbwBbPOpaUQ1vZ0X2h5a38KJ8qXK85lX96jDJi631QZWfOmMupgRcIxqBix4fVNmlKqNbUF4R7v4KHYiLZFLxEoaeRNzktl48cEmPFVs8GJif-kO_sduJCGrt7oODahmocjVwM-qKu9cgyaHyvJ9mwRgwNknK9NWuskp9MplL1SAldGbZJKJXCQEig0pLu7rCY3XDCjWtmXE5O6kUIGy4aNPkXOek3FnkgwiI87fK5GtsQXqMAHyy5DY5Et60AwJUsS3waVNlDV7SqLEGk3SXSfdcAYW3wu-69LURBrg19bA3cZLDLxoXLf3VuRRdolmIx6vrqeEW7aj-bHThntmaLDymS9O1xbBsHeHcSszM0AfFcY9TTts70BkbQEw08OdE-LyIfsdi7ZYnH2VHUpaoNcBSYw9Ohw4ZPPuNlchSQTT-Ub_HgBfcIzUNutj08x-9MbQ8NN5Ig6gGhMLsu2I7GWwRtA6pNK818q&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/107514414248501704774\">TALENT TV</a>"
+        }
+      ],
+      "phone": null,
+      "website": "http://www.asaltulcetatii.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 9:00 AM – 5:00 PM",
+          "Tuesday: 9:00 AM – 5:00 PM",
+          "Wednesday: 9:00 AM – 5:00 PM",
+          "Thursday: 9:00 AM – 5:00 PM",
+          "Friday: 9:00 AM – 5:00 PM",
+          "Saturday: 9:00 AM – 5:00 PM",
+          "Sunday: 9:00 AM – 5:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJJQw-YTNFs0AR_2IRkw2qYEw",
+      "name": "The Old Town",
+      "coordinates": {
+        "lat": 45.59098739999999,
+        "lng": 25.4654302
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 117,
+      "priceLevel": null,
+      "address": "Strada Centru Nord, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVfIVOWERnwpba3Cb4IXX7YKWsbJGyYWoUT0ctqQmS9pxtMbOl6TInFKvFlmJWq2rGx3UwsjTSwX7R8b8zesy0GrejH0-QSbQIpOHYyKSu_qNyLaeW5YGnnRrFMUkPzNQWsKcMKOP4DBy2-i9YYwdOztMASnebFa4OEhp1i8CYYt-9TmjxRyo2M83DCFDaQwDcEX0-Y62NhTpOXYwjYmhkTRFZ2F9nbeRbBK6T9ZMdKlMM0beaX0cW3EC_LTrlz3K4wHejQv43IJDrcmF1DPu7U_QwflfW7mYunkCpy4BprqXRsi_NJJGBs2auMO4Hc2AThse7mTGCjYq8I8DPGzKgmwgkCGDh0n0DN748mHJYwx9QYs_PnJ_XYw6zkuiDNEKuuntV1F9ZL2fFWVZDvnOGA416GUrLprHCWEDaZYFTY1MiwnZ34OZqu_LCmkpeT0WRoqmm0r9z0aQsqvLiLfl24in6g7pTdBdkaXIzXXha7XoCA5B_kKstwB2VvBkGW7i7dwFjZZMwwxws0x5XeyiOAuJEgQyg6yOlbt-uUpP7MxdD2h90uUv67z9mh-SuQDpSfCZlOtg7xz7YJUUfFLk0bwKZMUGaFDxBqdFfpIp9p-03EnxJSA6Vl0CF_aYL7&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103298963832394978969\">Andy G.</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJVW0NUABFs0AR7l5kvzip5vI",
+      "name": "Nimfa râului",
+      "coordinates": {
+        "lat": 45.5894096,
+        "lng": 25.4593945
+      },
+      "rating": 5,
+      "userRatingsTotal": 2,
+      "priceLevel": null,
+      "address": "Piața Industriei 505400, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXj-IxsO2J0ZYF3sibWWJnGp5XOYO8P8-oNhHgzaW7Gx4runVT8CEIShhAv-zqNSoicEu7yRfWf-njybfZ_J6vg4odHA6P6WFdqVcqv3PGxWR-P7XvSRAeqdRmHl0PqguZmyR4orifbSCX7ZJCiQ_0zqTDNq78pAYzLEev91XOd-pvOfAfQ_EWoN86rTR2GUdnwz73HKz3KhKNv1uN6ZXFtEB4wOTrfYLIE4w3JSRevk5UUwR9xrCAwE3GADHrSLWXrQ_D8g_vAmDyRxvqAYzPQic5MG9bB740H4melUBKDwZClADzC3n-3g8wCa3loL9wudZEao9E1I3V-IgE_eQPf5fovtv4fGxSKwi6UhgjLZlJYvuRtTprkpFjJdDtDu0kJBG2mafOdA_M1mG0ZRAMadeRcQSgXL1FAh4qCrNsXDPCyHJdHRoGWdhCLQ5g43ukNONDxDOzlHH3rYAEQS_dCItrCkA2VXA8mCCY3iNJ9swZWu7Hhcd-R39uESo9W83TNLONglL9LN6UpCNtJCpx3Wyd5V3OfAMrIhetZyP__Mm_zIAY8P0sZjfDnZo1uAiMjbJj3lsF_hFkDMS_mokraRhHC3SGN7FWTxPgv1_d2TzrVyFBOzhkOhTjNzUuDvF9OBw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/111664053422858448191\">Victor Rotariu</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJO1yfnqRFs0AR2SRw3ZQ-4dM",
+      "name": "Piața Unirii",
+      "coordinates": {
+        "lat": 45.5910063,
+        "lng": 25.4656416
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 65,
+      "priceLevel": null,
+      "address": "Piața Unirii 3, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVYg2yyOwtq4xUdB0RQkS-AVPHqWPch7TmnzRRM6VCwu1Wb_jk8Uwb_C_Vxyqp-oV8rlIvhy7n5ACPXdbK1Zs0oX08-DWffiRVDuyvg0DUdNvpQX5bOeDITKeyPmx1J-PJELP86wJlAScCsAAJ0VuC7axR_a8zrkF9BFzxOZa3Zlpxfdi3WADnGWNpDLD4PjCjFSwt4TvTHxUj78wrh4gQeZUXxTXAEnwu_V-OVUg1tWZ6PZDjr_NsDFBjHNdg2eBF5uLKDrJ3MwEqiVuFC6GnEO4orTEvm1bBIW-Q85S3-EPW-jzWJ2N7qhIlxrfH5jMqEoDg9OfcFtHZ2TdA0DTlNkVCFZD1Pvly0PRPzMZ9Q5aB-iWl99g_7D6GzUNxWrI1kJRNitDKDBr_bW1K_RdrtfQwhKJWLmjEmF2vUuZhY2uyemDPl1jP2A4gcCwOFTb6XVzECc8lRwEdhmaTVvsUOkXtMU_EaP7KVW_k1EXpQT_alfrXjQrSjZpziWKou8MG5rVV9loR8A2j2JU9WeA5Q9MFGeLFtWIIE3iWc55oscEo3NVcTW-QTl8C6VI5gpXrlY3pZwpVZ_5QHmJx-RhRIj4_p6U-ba0vUDlCDxby6iVYQFh_HoEVaLPMxJsf8N_-7gypq&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/111257633466405729611\">photocetera</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJxZ7EKklFs0ARWfJM9TCiShA",
+      "name": "Rockstad Extrem Fest",
+      "coordinates": {
+        "lat": 45.5905835,
+        "lng": 25.4677439
+      },
+      "rating": 4.8,
+      "userRatingsTotal": 24,
+      "priceLevel": null,
+      "address": "Cetatea Râșnov, Strada Cetății 17, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUWR5-S-UP26D5V3KDqk51zeo-JK7Ao_j8mByv7YK038iEelf8INxkgsdABzB4InaMctq55vvFfYwM1VnYSEHoz4DaSO8CDDC50GO2V8PdVAYtFBYRPeE5fg0gSB-ehmLRiU6xNz9ss37ecKMeTVMwxxS3jzvGN37DTIc-Uy_d7m7-Ivyjd3WxUJ25Urkis7z4FTBSrPbI5Ux5GOa__p6iS9ip3W68UX9KmWu82g4xbr_Qlm6Sx0b3kLNHwSdY3Gpf-UUdpDzQbfU3dRwHHl0nhCLGzmaHzrqt6ZQJrqAxsuwBtMLJqvEuW2TIr87u07Xx0IWMkmp2cmX1EVjSquSwY09XZfASACMh-7MHa6hYM1bE0LDTBgrJvZwsCoH3KxqkshMx2RcW6kjWx2E6cdbPHVNoiAS17fe9CDGZ5fhiwhzJxStGSGCzf_hDi1IGEn-hvI6BeDcrjES7FiBbNFXJP_WnTGayjIXDpOeyZCul2IAB0GqWnxpfXegq0qHMjj5s0hDC_m3lW9IMYOQW-cAxTgQpaLMRtZSBusog7UWAeRUmpjcT-9QhwcfYR6pYA97TY-60K9MllFO-8IhaOWYLW0o6AyY0-yhJw5SBCDWhwIWz9UK1MpJUpQcurYX7sn2Tp-aIQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100173191003202101991\">Facim Tamir</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJOZrRdy1Fs0AROHd07aVNniU",
+      "name": "Râșnov sign",
+      "coordinates": {
+        "lat": 45.5906875,
+        "lng": 25.4678125
+      },
+      "rating": 3.5,
+      "userRatingsTotal": 8,
+      "priceLevel": null,
+      "address": "Cetatea Râșnov, Strada Cetății 17, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXcHzhAiXEiakv2S3XtAoxJDY5hmcVyUdiZpCFt2FIdYhCbmWmCHRkZDxu7mJ5SuzVQ63tEpVgf5KtMckMQ8KiO7fiiZsfmnksQE1HKXKWKBXOKHMaJvEJ4tbem4NsQMHU5qKoERDhDsjQTUDtCu6dIuUZJJyvGWBj04QuHxsmSsd3tDqPKFSrfjfv8pgoI67qkLW6amg9_hRVxOjclgPUOAwsb9Akw4KIfifggAF6ItadDajo_tkstlHKNiVauBUtbDDthAUpJAgoVWovZHwOnVBtfYTcL0ggzHbeXermtbGqGCXMzxP0g422XwFWaQ0DKDqiJ05xFqQY9qFybzxsyT0FWMd5TsRMIQ5wBO71Q-9HpywlYXxeMVMv7RuQuGd5fM4coE-B_e_mF1Wxk3QrKm-9neMSDZDunM1jIYmLIljRDuy_dKYaOVleqrQWKKeELoXuZAjWoJ6drvVCHE2y--Mmv2cscdikM0v1Oxk7Aax8qzFRO0_Pf4nmtrXixGPlSfnAI2O_AXLLTQbQCM4oyLPUsPcUHiOeeycedxQljMqdqQSAH8IxaNJJj9mwOSIsFBq8kaM-OhhXtbZYnYAwgM2saS4YE3P1ZaoT15tyPDNv9B9GUCJzypGty6qCW-RNHRjTJXjaJB5i_jk2zCA&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/104744409359531438423\">Milorad Zecevic</a>"
+        }
+      ],
+      "phone": null,
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJBQlGVndFs0ARMrghOkxfhxI",
+      "name": "Râșnov Citadel",
+      "coordinates": {
+        "lat": 45.5905985,
+        "lng": 25.4687524
+      },
+      "rating": 3.9,
+      "userRatingsTotal": 189,
+      "priceLevel": null,
+      "address": "Cetatea Râșnov, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWVmAy3Q2OxCLz4X-_uXaA3xnAODzAKvTe1U6uYNaRI12YkJrz-bjj-vkXfi3f8XoUhbLq4qaVOPt6u_XG4oXH5Wtp5ksn5MluLgwGQm1RFQsu49-lND4cPK2E4c_VDhl9l2IcFGPqGTnzSw79vnBCe0zHrVfVP7CY0euR--523UMCqCDBdxo0vEVMzyiz6oY-9jPu9iWykx7f6Isysi-ZTzpwr0XvdEQG3eVhkTmJOYMIson1CpwVHPe5gu3p9c-7tOp0eTOXlJVWEpTMLawue3H4X5hhWKHRKVx3utqMfoBls2uq2Y4l-Fi0yu_0sbfJQMtQTzLNyU_9wdBL3lS2BPZMgVNnEnfLMfbaRCWSed9XIYmaiBdsgBsf3rK1AJDBh5slSB2W6AuuDjNMzlz4OwgupKmM4TyRyEi7Z1mK4kqt9h3pF3-RL03IQfzE88HhvEtDaHUYQEGURv4PKHmtNvvcYiT6yAZPWQnZ2H8npwAIYDpyHTGF0R8ezur8N1mDxA75c1HwHhCcjTnmKOZt4F41XUClmOd7kQMx13Z9nY4ARH-LBPt9PmZyE-otzu1XcC5KIdP7mdyRBCGo_4YhWIA2VPxPCAcnG06AR_rdRkk1NifIKqXEf6-CddyEZ2SF4ubjZWj3jfJ0nCNOe5xdwSig&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/118176999897135936678\">S Gibbons</a>"
+        }
+      ],
+      "phone": null,
+      "website": "https://primariarasnov.ro/"
+    },
+    {
+      "id": "ChIJUc2UHKVFs0ARzYHPn4ys4Ic",
+      "name": "Turnul armelor",
+      "coordinates": {
+        "lat": 45.5903899,
+        "lng": 25.4694136
+      },
+      "rating": 4.1,
+      "userRatingsTotal": 32,
+      "priceLevel": null,
+      "address": "Strada Cetății 17, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXAKq7U_LhyzvVp-qLDXpogsM2puOprysGSE-2q4NE1PVAeMH56ISfdSCrUdW5yi1pPyaSJUA_o5RFwtbKSTAJ6-igXEJbLiNIpvdvLSqspoOSQmEMPZJ3-rQAx7QzCcrQTj6CTvE62Kq5JlGfvHOoQixZJUwZWcW5DysVk_FnvbBkuvsJvZVZszAFkzQ3y2_fN4HnYsTV0fuPzfQoXBGfAUXUjbPe8DjRSn__ZMV2N7-ZF4E8FyYFc3sJaZjxcj_qtlkdJ6vA8Y0aQrDrkMbQY0fY7A4JBnE61OqoECoWupOEi1LqrwGWPeq84td4q5Rk2HyKpla0AJ8bZyqKC8v0IIY9mb0UKrQIocQGVNwqnU2OxA7wjXQXJQmFHYDzKZEIyUQCLf_ocqw_DWRyM3FjaxWw1JtyLSOX7j4ioi9OJRMciOCLfd-wb2ih-5FNICgTttbKqOr5lrrK4oM3eXkUDjWhzelFZF67TvisO1Gq_r_ElsDr2-eGG31wOjCu3LbRDEeBZDOP_aiXDkTyXyep3t7P--DHnmdzB3hWnCQKnlk1AAxZYZqYECIXwwCuDb-mx-OAYq--a7WuTmEM4t_lGc7AplGayLmtPjqk_Sk7pHq2MEGlPYPSy4NOVFor-_jF8aAEA&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/117039336005134663072\">Andrei Dan Suciu</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJo_Kij0BFs0ARK8yd0tyxxUE",
+      "name": "Monument de rascruce - Rasnov",
+      "coordinates": {
+        "lat": 45.5765341,
+        "lng": 25.4563523
+      },
+      "rating": 4.9,
+      "userRatingsTotal": 7,
+      "priceLevel": null,
+      "address": "Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVUN4GuSuHeHCKmQ9bBGHrc6EzA2NITJdp_EIEZlCRtI-UO9aZImPEvf--caZC8kiNbgv-tstaYwz2fvtn3xzGEYUKRuc6cSBKF1CSUBYq5MOT2VxBIG9147vXa7zASS58DuR_v6_Db7mhRhkDl--8pYm6H_UYC3SPxlO2eyZvZvwBl0vKAW7x4SQECj6TWnI9OUe59WLQyXHZOy1ZKHeAYIl6Md7V3gZa8LGjiw7e_1CQqLigQBtzN8m4A5dpHWRBo3CrdMUFdMNyuZ9dJOeD2Dsd7jApHRhWQJqxh_0B16wv6ebqbXNeQWgBKxPbWa8PIOLv7kGH8KbkevcmEvPbDo3GvD-sCwEU6SLE_aal1iihY57ULVvynNAWQx-vrBcPNPNBovjr52p85C7KrBcjexn0rdt62WrRh0CKXtAoVz-C3o1Sd3bv7P1yY4pRTHgnHjC8Qqrlab7ad_-YSZOFA0qk7gjmTEHHntrwYsREFlWPlFo-NyVM_2cmjPwfYvBQcRs9xithI01QcsDRivlErV_F5hMXWneKOMB5dVOr5B5BHDcojM9_V8lu6xqFQBh3CiZWGAskRB8c3csErZv-PFz7oCoSp6qRRjKYAZcEy2brE7PgWR8gof1Vbx8VjvFIk1tLd&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/112607867907033159787\">Andrei Gamulea</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJ1wx4RsdFs0ARHHe25LT_lSQ",
+      "name": "Izvorul Râșnovia",
+      "coordinates": {
+        "lat": 45.59992090000001,
+        "lng": 25.4751951
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 28,
+      "priceLevel": null,
+      "address": "Promenada Sisi, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWOkJVK1RlkWpxpzUzmIkW21R41LXBcUZDaaAaOQJWgFEruarKRjsDGs3ieFiRXr_aweBQbm-Iouhnzg1lMVKORn8g21XzPVLWZOg7zejHmD7FxXNTwJEv_49DCOMcJu5SIgfpSDEV_vwAKxhQZQT8eQhFrToxjN6zCs9U7NwaHqe2FgQw-CLTLQTEuIeEHT7OqzlAAeZ8yHv2wzMVDyRpjFhrYLS2Z9elZKkcNFP7f2lUQBRuOd_HJs4xKgH47skO_AFysN-U8hlqeFEHLZTxpFodr5cF8qQ9bKMCwnjSf_6IJ7KpVWyY-94b-7pHMeW-705OnkQsKiAitHRkV9Mk72DJ4CcG7ifLfu5jFLE_tIZnQFJSIkQke5oGwl4RNnfq00mN2Z3m-3kfZAj3USKOGTAyDmhykYPaIf5ju4daQyp0V4G8gxW-4nCgq3rDDAZ74kRGymFdj-O82WqN9m-RMCeMb-ysY1PNrmzAMgYgcknVoQhIfO300de6XM16N5F3buNqlzA1FzgoVQszLVzCr_0zqr82rCQ7yGuv8-nYAGadMwVCLGNMFLR6J8csFP1eShhLWnzo6gwRehyBHlkcUj8UvIfYJaWjGqj9gn_p-w7D_WWQr61UqPFITuQCWs-yoCnVtxtl9PFzjPapy3yN9C0s&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/116462617389624307024\">Cla Ro</a>"
+        }
+      ],
+      "phone": null,
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJdVNKqBtFs0ARceJJOZ9HjDg",
+      "name": "Sprungschanze",
+      "coordinates": {
+        "lat": 45.5706794,
+        "lng": 25.47089219999999
+      },
+      "rating": 5,
+      "userRatingsTotal": 2,
+      "priceLevel": null,
+      "address": "Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWSNjVe_ULWwxCsTCL-0HEjdJqIgixn6OihSbVInU98t7L5PsxtbXYO-a5fklg_jsqx4OQjXACqaRlopzurPGFUrhnOXQK_eqMLnTXY89XRZUhjIxHFnV7Lt5Qwsm3d3mHki2go-gevOSW0U5SdFCIuqwHNGICm6rQmU2Yl5KSBH7N-6L3kZuX8waVE3c5tkeRwgbSW24ovzB8MBo3SpxmNfi95bEDHg7yXvqfyUipgjfeXmdmPqAPBFuM7T7jQYlt6T8fyHrAT9KxUMP8GYLkenpXXG8udH-mH5m1DNLCyfUKGYKRhqZVK8tfItRJcD_iaZHGKhoMZAm4agqGcUZalE7eiw9BdXkZ5Bzhp6lkUhFa7SY9wnoVVqjZTU4H5qBboKbL0WhGlciW2BQYchEkjHUk13T1HDMtsyW9-F9KhUe0G0QzC9PNfx8mE6lRO1WdsdZZdCKchmmc8q0hrg8_XDsfBQKr9U7YhIMN91izvmUvwGyyUzv7EKFtxWFIdL0non2deHcDzvWtq-5o6wjPTHKE4-k7AqzA_JhJHh2LdTBlyDoPomoG3acgmCsLtHYNSrytqQkms21G-AkseiSg72CqjXRkhy3I12U_HQ66qmhxdDHGGdCLBk3kkyuzjPBDSOTBKKMFoEKxPvbxBYYXd9SQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/110284262793168998946\">Balázs Acsai (Cseles)</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJrzuxh6JFs0AREWJ7V2QdAzE",
+      "name": "Dealul Pleasa",
+      "coordinates": {
+        "lat": 45.56712749999999,
+        "lng": 25.46754139999999
+      },
+      "rating": 5,
+      "userRatingsTotal": 2,
+      "priceLevel": null,
+      "address": "HF89+V2, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWY2JjmtWjTfzqbPyPL40Jei8Rfh5nkkzS1kgIv5zZqg6Z3ng7CjwI-dgRa7sTwDzGw7zeCRuROkcQqciAPGib1A_ZJbap87mRBdZWV-BcZAGgF5PlJ8hZWPpItmnQy804k8rSltNYUUbV2faWeCGuBLleWUh-4GGyN8fxOxY4QLQyGm2kt7eU02OehAbc-JqDfHzw8NRW-8sY2IeR9Ziy2mehnsx3lREocuGcJ1q4f71b_EkjsPTzSO0HuudyW40BtB6FUHuI8CWCmyzOwAGyM15HlQjeL_yRBFRdMCn8tf9k69oRI8EudZ7QKHQyqSmJ8wdxO0Iw6ujhTvqdaWYKQ4iYPMlLIp1oKSnmDxYN12sgTWlt5OaW0PYcf-GMTuDFjyVdiFiQ8RiUqkUwg0AqEb7B1Cg-EkCStmLfMzlaZKF9SddFmJlxV0CSzeikCEmae5IEmBD7H4zZJY3RLp_tHGIQzJqGJ7kTW2ZjYYEg-0a4s3R5TT8DWwdBpsv62l7QN_3-4m0d0Ubf7DN9Qp1FP5J22FoAIOH2E2lqixaoQ0dwFSoUil_H13iLH7ZtMnqjeZAoc0kyqoB_VSFo0yq075Exhn4M_KUHvKeRWTPODqJi1zaUHZ8GOhn39d-CMYAv-Mw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/117669722600554246529\">Marius Tudosie</a>"
+        }
+      ],
+      "phone": null,
+      "website": null
+    },
+    {
+      "id": "ChIJe0H4bEhEs0AR4mOvo9geSY0",
+      "name": "Peștera Râșnoavei",
+      "coordinates": {
+        "lat": 45.5752585,
+        "lng": 25.4890215
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 118,
+      "priceLevel": null,
+      "address": null,
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfX7Mvk_n6vClH2riltBT8sQ2f4-8kO3bLO8lUmfVl2wLiR54TGudQC3RtMNsgJq5t6w_gFh1F5XKgEOA_aGlOQXH9bVGahyW2QUqFvw8vbs8o559UyQ2kNIzPhMry3ode5uDX5u1nOhqD27oEC7pouL6pMy-Q58NfVjyD9sVMVvtfGerPmvKj1PygUfPiTYS4glSZsUXXVWkSzeklHguOAJC9bTg1id2RqzMmaZ-cFoGNYRVpeXO8nKV_bLUUHsXBduWyyVk5j5nZ8vx80ydAAMe_XzBA8djz-gCi3DVavOYE_MojJsnpE8ulXwsHOhmGjW8ATaX4nxnxBineFU_9E3XE-dbCJMmaWRPPyCENhHzEFi02z7HgWd1G66HQVIwbum8FB6XwnKbwR8CA8eTZUi5VWIDDQ8hCDANbcla4YUFdre7aSv_cfRGjW3RvjwzA9L4QmT0dVcNWU_pROOy-Ym10fiUMx-VMmduI2BEUZEoHrCvKUwnlSbA0NbE7gW3FJNY7_I3reFlcvd-N2nSRzgspIo0eAEgXwXDUyK4wo58O0eZkD2Wt7yF7IKKhiAfVo9CBrxJdGpD_AK50esu2x6ZVDw97GY0c3pA4LWHUz0PNZo6x2FNZhn3-Xa6-hkf6e-2Q&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103568125992045958458\">Florin Nica</a>"
+        }
+      ],
+      "phone": null,
+      "website": "https://www.calebatuta.ro/pestera-rasnoavei/p721",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 10:00 AM – 8:00 PM",
+          "Tuesday: 10:00 AM – 8:00 PM",
+          "Wednesday: 10:00 AM – 8:00 PM",
+          "Thursday: 10:00 AM – 8:00 PM",
+          "Friday: 10:00 AM – 8:00 PM",
+          "Saturday: 10:00 AM – 8:00 PM",
+          "Sunday: 10:00 AM – 8:00 PM"
+        ]
+      }
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "ChIJm5tSgWWhTEcRIE-Fp-H2iQg",
+      "name": "Ana Hotels Bradul Poiana Brașov",
+      "coordinates": {
+        "lat": 45.5916398,
+        "lng": 25.557349
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 433,
+      "priceLevel": null,
+      "address": "Strada Valea Dragă 5, Poiana",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXzBeWImzNrhTwAAHRWh3xc49fmhKba2QEA1CXo6PFqb72tMWB-M7bv7Wk3ueJtZZo249IJJnkRf8f8MPWBM6GAUS_GLiyUwgilkO0fhWyA6uVHY6uGvaeMYkPu4Nb7HlHYF6dqEPL8RRL-K2HuxGGm50wpTURumO8gp3hdhyi52Kyf141Trb9L1HqfR0KsU0CbcvDIAZOk4kpjbuXTgeJ8gVqN2KI6NN8UbrhmlOAXajUTE1MIZpxRWY66Q7sXnvj_H1IdJ8Gu6NM7rGa9I1x_wG1xqiUvslO-sTz9BskRfTKjIvkON5FtBkliiSjecqzJdhWU4TM&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/101261275381141382732\">Ana Hotels Bradul</a>"
+        }
+      ],
+      "phone": "0268 407 330",
+      "website": "https://www.anahotels.ro/bradul",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJj0VrSn1Ds0ARTNa7FAuhtR4",
+      "name": "Valentin",
+      "coordinates": {
+        "lat": 45.587995,
+        "lng": 25.5503794
+      },
+      "rating": 3.7,
+      "userRatingsTotal": 31,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui 168, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfV9pimeubgFoBWCBJbLElDsV-TIpuxo_rTK8wHJzk_FqfnuMPJg2i3aDoYZ9j0LdVhc8ewCxi1Fg54Ylg_aniv7nI7BwYmxI9VqWkCUYDJVBHQ-2x1LeIRWuX-Z1ODP-nHh-6Pa8RbLESlfVmdcASTbOgV_8jNRawVdXiFd-vORw9LkvPk2dTSZ1-5gOobr3Cq3IsEJ99UGDLy4V86RKt3DpAO7eUuqWCgzikAWML-06hY0g80ZWBXPVA_3IVRcrTwUm6rJwpXEWVrBBETZoqyGOjgE-fyheGd93b8hwTEbPKH6-zK3g8mTjwX7f57Br9mSDPIW3ls&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/118167968913061109619\">Valentin</a>"
+        }
+      ],
+      "phone": "0268 262 436",
+      "website": "http://www.pensiuneavalentin.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJEaTlEqBGs0ARqFANuQaM7d4",
+      "name": "Poiana Râșnoavei Doripesco",
+      "coordinates": {
+        "lat": 45.55360719999999,
+        "lng": 25.4870867
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 1469,
+      "priceLevel": null,
+      "address": "KM 14, Orașul, DN73A, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVC0Q2WmQ8IiUpJZ1njhAMGYfPHJZjOYQw2nESVPR9yinaDULxGOZXGX9tmfb7m5skygxcw6jyw3TcEKHcoflb45ZjXiGF4wib2h-Vz0dRYQ4cnKHYjiHtlpu9b6nWUb258YzR2J9XvVY5m7jdHvuFWov_L9Qk18gPlQWYgv5otls10HL6Ih-ccS_kDvLMap7GCjmxUcZzxSEcS0EymqjqcV0sP_h27wEjAvSavJL1qZ9yfDshrMVPg3krTsCraEoWPTGGi5dD9XP9jgLcmlVU0YB_ptyYyoymVeBNGgosuA7edJpwTIOBRNpNTaX8BtoxUSWYuRgzZZEDrdMtQr3X3sYXlLi1T4t_PXXCaKHQWTJNkoqTOuuC_XxoNfZmGs-OzzhLVxIVvA4NA-nMJ2qObTAL01VGNTJKQWu1H0N2OEoyjbSnGrIhywVhklmOa-iuDwLLtdCLyDdGz8anUQ0plIm5s-8l23svC33xYm1vnmbdz0muMIxx8T-_4bGT4ej2fbIiCpKC-_kFTNN-meN_ZlMtOI5tW3AgLuyGOH15uFo6_ZlojUnokZvxWbgv8x_DnRMsXAaItTBAzGiTNwz6cXZDkh-JXBc2w9KRen5mc0qnG9XYzP07o6JZGqWw9i8xxQw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100956538163578586165\">Robert Epure</a>"
+        }
+      ],
+      "phone": "0720 900 778",
+      "website": "http://www.poiana-rasnoavei.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 9:00 PM",
+          "Tuesday: 8:00 AM – 9:00 PM",
+          "Wednesday: 8:00 AM – 9:00 PM",
+          "Thursday: 8:00 AM – 9:00 PM",
+          "Friday: 8:00 AM – 9:00 PM",
+          "Saturday: 8:00 AM – 9:00 PM",
+          "Sunday: 8:00 AM – 9:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJLSRtPDdAs0ARGOmQ5rYPp7E",
+      "name": "Hotel Bucegi Porțile Regatului",
+      "coordinates": {
+        "lat": 45.511684,
+        "lng": 25.508917
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 1144,
+      "priceLevel": 2,
+      "address": "Strada Valea Râșnoavei, nr 10, Pârâul Rece",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfW8binC7Jy7aqUVMF5umfYFadbFBuKVlP7OP0je-jcLpRHpjUByOtQ0MRVefVojtyM0MJhMN0b8cDn1e7szLMT969piJb2XiNDtldNzfjVB4fRTih2Z8zaIyS_0_TT-1OBrNXuIIV3aadtfHN0TpluANb0-z3lSPvsR8MlBDkaDCUIz_JCMN5nR9eBAXMglCnorll4f1AIgCuTJzFpi5VpRlAyQ3bdlJsB5_rZtEGez2_r5uywPG0YXeWHP40tdnL-INdwip-BELI6-xQw_COiFXnQaeUZx1s10ui8g8Jb07qfrT3OORPG-cNPLSy2o3hXU6xkNzPI&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/107310222074663391496\">Bucegi Porțile Regatului</a>"
+        }
+      ],
+      "phone": "0724 370 658",
+      "website": "http://www.portileregatului.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 10:00 PM",
+          "Tuesday: 8:00 AM – 10:00 PM",
+          "Wednesday: 8:00 AM – 10:00 PM",
+          "Thursday: 8:00 AM – 10:00 PM",
+          "Friday: 8:00 AM – 10:00 PM",
+          "Saturday: 8:00 AM – 10:00 PM",
+          "Sunday: 8:00 AM – 10:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJn1t339VHs0ARPCitDjxOohk",
+      "name": "Nostalgia house",
+      "coordinates": {
+        "lat": 45.535443,
+        "lng": 25.3754826
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 389,
+      "priceLevel": null,
+      "address": "Strada Branului 80",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXk0iLJY2UqpegY3KPbTYYWYf6RwDCVj3LPHIVAbv40e7C9tavGVPHmPc3P-vCvAudQSC-2mbGXudc6D49G_XIx63OCIuHcS16hWpJHSsfkk4CbTO90Fn-1GM-N_nxeXWmcM3WC7uUU2oANWNyPRYbSIlKLUMxOp-CKhH5XuQs3VSq_bK6PT3NBzS7J6iernFwzMsVlQSe_a-anIHM57wv9qdEFYvTqjBSdpYGOxYu8WOAylheEmguvT93hhaWiAwNJkbiZ7QoTvQLckO7Mg6a3HFpvdqYCFnXIRebo8Fb-gydwZF0Fh6KHXn2ddKty-k_3OyTjGGw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/118392551794490743878\">Casa Nostalgia</a>"
+        }
+      ],
+      "phone": "0368 409 074",
+      "website": "https://www.casanostalgia.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 12:00 – 9:00 PM",
+          "Tuesday: 12:00 – 9:00 PM",
+          "Wednesday: 12:00 – 9:00 PM",
+          "Thursday: 12:00 – 9:00 PM",
+          "Friday: 12:00 – 9:00 PM",
+          "Saturday: 12:00 – 9:00 PM",
+          "Sunday: 12:00 – 9:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJh3h6rthIs0ARtqqpqkbg9Zk",
+      "name": "Restaurant Transilvania",
+      "coordinates": {
+        "lat": 45.57255749999999,
+        "lng": 25.3460088
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 937,
+      "priceLevel": 2,
+      "address": "Strada Ciucaș 9, Zărnești",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWeenNOEY_gsksxgYq4nwzfSOG1aRZ6pDQsSv1oRnfK-XGi_G-kBb1U3J2QNMZTSGtUxo91UjmaTKcC_VN1jZBZc9CjzVMy9YhCm_ZCvYTSlNNSlvj0hxlxjea7xOCl1rsfRwVJKC8ru3BPUmKy1AuM3ZYTGbjyT45Xb8mwlVX7rEJOCreX2XehEDuPzBKFgl-4DT6_4mfYfWyb_LAu8I0K7N4oN3IU_k3MFDTdUEIVJJupy0BfsaFY_Sd7Ll6_TZLw6J8lVh05RzkgbLFrLiDSI9wz6zHvwUEcgqBYCsgcvwSIcDehaoxuHrpmfYv1kYkhkT2DK5I&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103949287287757263740\">Restaurant Transilvania</a>"
+        }
+      ],
+      "phone": "0749 395 532",
+      "website": "http://www.restaurant-transilvania.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 9:00 AM – 9:00 PM",
+          "Tuesday: 9:00 AM – 9:00 PM",
+          "Wednesday: 9:00 AM – 9:00 PM",
+          "Thursday: 9:00 AM – 9:00 PM",
+          "Friday: 9:00 AM – 9:00 PM",
+          "Saturday: 9:00 AM – 9:00 PM",
+          "Sunday: 9:00 AM – 9:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ51C296JFs0ARooalwTgvsuY",
+      "name": "Rosenau",
+      "coordinates": {
+        "lat": 45.5927157,
+        "lng": 25.4622726
+      },
+      "rating": 4,
+      "userRatingsTotal": 1867,
+      "priceLevel": null,
+      "address": "Strada Florilor 27, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVvBRjc_j1P_f-9P4li0jB6oUpG484FoG9abUshYIVVomFlF2EnMRF0CXRwuMrR2fhO4mWzorMuw5MOcTafo681BVjYuT1UCuIPUiBBLIN2AvhGkLj8KCHy3cPSQ9FtKGOGj6VK6drC8gyBmK0gd1pdauEkdlFDCXTQPRMO1n-YIjmY3v9-oEJRRpU9zL3F5qhdCIGKRhAzrV_v5S9sD2-jN0dOUtU_mnYD8X7nxS_sR1DOPGxVldNJFtWoVbFRycinfE5BUSDI19O6r_vvSdVMMajaPDK2LHBe4gnSk-R_mzqJtFl2M-trABWoqYJ366Y2fIhtEqilmzlQlXavRaiFzaWmmBgVz6UJFhGScx9itOyw0KmH0tdLnQdInPs_bcUuFC9jqo-h7YkTxBA99ZZOOjuKe8CjDVfQDDFszQCLe7oAt9V9llwwzFMuUUcdTOBC0TJfnyAqSjV6JM9g65eP6mA7Ymd4ND3mu_dzWTaFwYZd65vLCgDxp_BsTS2FIvYbRXWb9BVz_cFOweRIQroj5eA9Z2a_46JC1NtIsCjKAA-p2atsIpYGR0Xfpm8SMGxg9juGNAwkNvS1nstF6_xk6XhdiHKwhXWfd0gM6Y3wc7fIZu69ij83EuJjrqlRDO9r8A&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/101008852939856466979\">Badaluta Dan</a>"
+        }
+      ],
+      "phone": "0756 403 718",
+      "website": "http://www.rosenau.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 9:00 AM – 10:00 PM",
+          "Tuesday: 9:00 AM – 10:00 PM",
+          "Wednesday: 9:00 AM – 10:00 PM",
+          "Thursday: 9:00 AM – 10:00 PM",
+          "Friday: 9:00 AM – 10:00 PM",
+          "Saturday: 9:00 AM – 10:00 PM",
+          "Sunday: 9:00 AM – 10:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJVdPSd5tBs0ARPqDM8oQcx9w",
+      "name": "Hotel Restaurant Piatra Craiului",
+      "coordinates": {
+        "lat": 45.5134999,
+        "lng": 25.5081355
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 934,
+      "priceLevel": null,
+      "address": "Strada Valea Râșnoavei nr. 10, Predeal",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWMkPJJurqOCG9zvdLIctcWW46CKOHwd8IBgr-iBaHbx2c96UhkbImyQh5Ys6Ux2_bx-QTjcVMy5pFdrfTMpY1WaX9bkDCc2YD5KXx4VDiuu-piw0FTNMRrqSDbIZJ9-8HLfvgCiBhYhRIcRGsYqiIS7E_r7TyeUZGCMONdKOukbH9olshTN4oB3p7x4V3nhAdjpckopbmAz1BOtIxZFtKuatumQsKqGGwI40qAfar6gmCbK4dBlBmqjfCObQDyzwASDsyrIjQZgGkImcAcabIe0rHm9NNUuVaBKzCefjzJioOdGlTKdEEm2TiU12f6RxiDT4g885g&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/116378473836526303481\">Hotel Restaurant Piatra Craiului</a>"
+        }
+      ],
+      "phone": "0722 876 204",
+      "website": "http://www.hotelrestaurantpiatracraiului.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 10:00 PM",
+          "Tuesday: 8:00 AM – 10:00 PM",
+          "Wednesday: 8:00 AM – 10:00 PM",
+          "Thursday: 8:00 AM – 10:00 PM",
+          "Friday: 8:00 AM – 10:00 PM",
+          "Saturday: 8:00 AM – 10:00 PM",
+          "Sunday: 8:00 AM – 10:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJNeIVaqNFs0AR4kqECyWdwik",
+      "name": "Radsor",
+      "coordinates": {
+        "lat": 45.5911553,
+        "lng": 25.4641462
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 972,
+      "priceLevel": null,
+      "address": "Strada Ion Creangă 2, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUNZqRSjILAbR5Hv53JQsU9Cu5W5uxsp5W0Om9uq2VYQrwhi0O2g2D2UH8oILztyONhO5UQonTkMzMJQMmEhcmZjtIqJ0vTa63u_3maeLKanIPvTbb66TPwAihWZeMcmoJ-7Rg6miTwh1v32CItDN7PZCsdh9jGlTROfC7385wTw_YgI_8hx8BG79Z86cEUDrdYzLxkd9MIprA20YWS8gU0H2Fdg7fv5F04RwEI-CfJik-PWkqjCOsqWDLvB8AYjeuhYjkj0MOzSAvxt7QQHjomhb36ZezMeeOb1Plbxn5NX7hu8fdU1Z0pZHqjwx0bml67B5bz1dc&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/115016533805530969059\">Radsor</a>"
+        }
+      ],
+      "phone": "0774 467 136",
+      "website": "https://radsor.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ17-gSadFs0ARbdg3PY0lYIo",
+      "name": "\"La Promenadă\" Restaurant",
+      "coordinates": {
+        "lat": 45.5980093,
+        "lng": 25.4724944
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 6004,
+      "priceLevel": 2,
+      "address": "Strada Teilor 88, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXUgplxF33AafV3-q0LIgSFgdON4rZLrCIEnSF2wnWFJGoPqWDDNTJsFkRi92GuF706vPXjcV-Uhe8phN8VThkGF9Ygsmg-3cwgKzxRRtkVE4y33OipyEH2rLkEViNkVHieKNa2j7zQiLri867efbbnwNOLCQLnnHAyqYHAFEisisdPWO7Dg0zK2OiuXukDCc4JfsHDg243olKD-1dYHC45E5GONVJHUG5l1CQKGW-hqEEBcjv1zJJ-AWW-U8cRrcB2kzohhCEjDLocIvZGk7JqiXFDLfSvZW-BDoS3HMyr2CXq8WHxNhtztSB4JienRujijI7PlZ20og0C7qgxity0nCMtb6iTDyXGQ3O162Jbw3bECdBk4OSf_Yl4otsV0mg6P8RUEwuHqY-0ut7c8mrREePUA03LHieRHWVPebcgCrUM6yGL6yhf697P0YqCZMned9bCjXFZktGgyIH-Cwot9qP_KKsXaGiWSgg8y7Ho7A1-KU6xTl_l3BPZTQXYwQoePDrb7Nkg_M2rxnjjCWCDlqlssMccmUbw9uJ13iCBr8rqnIRVTd3sHQP821UG152R1KENj7B3ZSIw-ftbHeZQUXjA32MPKHp0tZB8zQnyV0wKkgNx-e8fMrv8p9ugQqwVQw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/111998504012559205285\">SIM</a>"
+        }
+      ],
+      "phone": "0371 233 771",
+      "website": "http://www.lapromenada.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 1:30 – 11:00 PM",
+          "Tuesday: 11:00 AM – 11:00 PM",
+          "Wednesday: 11:00 AM – 11:00 PM",
+          "Thursday: 11:00 AM – 11:00 PM",
+          "Friday: 11:00 AM – 11:00 PM",
+          "Saturday: 10:00 AM – 11:00 PM",
+          "Sunday: 10:00 AM – 11:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJHWjF70RFs0ARrHGbplr7HaY",
+      "name": "Conacul Ambient",
+      "coordinates": {
+        "lat": 45.62398559999999,
+        "lng": 25.4763272
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 1063,
+      "priceLevel": null,
+      "address": "Strada Griviţei 5, Cristian",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVY7kBVSjsLMZNi33eTW1iX2tkQFWb-P2L1BiDE0WWVjjyRppgPcLExetzD16zFa3uctRzVbYRvceV9DZwFze2RtHWjKIL-OZaiHWLzoahGPZmPlkWPHG9XGTqSOkzc_dIR3bn9LEt-hm0PvF6qQ47mA4c4QQHfG1XRVeXDog3PbW-tAgZ93ea07kUkHF5yBcfzzdqKfZ1fqm6yhu7-ixagOPRVrN8D-EXmKcaKh4jaWQmIZ6WoJlZ6XmCuIG8t3YCmOeP5RT11_44urnE8w2jjB9p05b4AAIMNnBx7_w6v7z_pqicGukSg3pg-bzIWM9zizEMRzIo&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100907611498245486937\">Conacul Ambient</a>"
+        }
+      ],
+      "phone": "0732 200 900",
+      "website": "https://www.conaculambient.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJoavuUUtPs0ARN7vbecx5duo",
+      "name": "Dumbrava Ursului",
+      "coordinates": {
+        "lat": 45.579693,
+        "lng": 25.3939962
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 319,
+      "priceLevel": null,
+      "address": null,
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVjxYbMAeEpy0zhxZeQkTrmqt8cHcMsdUCKWjw3dDhCNR5kd-MN5GX2583LFOrd9dpqfK-mAIr90kZHi2TExrLO1-67roA0Axgqp0bN4eO8Rul7yKVUj5tdDkhJNxJ_-C0Yl1KywienhOZoqstfNCrOM8Hmz8rdRhqDo_CWb8l9hJo6g1QrRLyC_q886-vsxRS5BdOMNQIhpf9j5jguZrF6wxfoqNMMCGxf8hPISVoJLBz5eeU4d4p_lYO9-vtNKQzTW-0Lj8azoBCIuy5IGND3rXtfVRsxQMUsiiBh2pco4WGZ8DseRYSkSuJd1vWHsJ1nzUz-O4e4tX1jyDydN5jny8EmEDlvmaw5rsE0E7PbPcEZMb79zaawQTZ5B8MlcV8iy9yaLhRUdqUnyOTCWzyb-z_DezFT8uodZ0aDCdm2UDP8QtF7nQwjFoNJH7gZC1hi5vkZ_7gd4vPwDTt7REAgcJz_TjOe0d1LlXBsuSVtb-1Go2PQZmWBak9f14bmbfZn-yLhefzehRzScevBAuSqOZD_LGo4hs-qlJOPmKe-OzEr8RymWNqP5lO5r-GFZo-tOluqAeRG9L6LfMqfKBXh9e7wO41LNgyEicuAqzgAjXw_cuyBJvxAbWPr6RxJyiAhWQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/104128397365239773072\">Niculae Alexandru</a>"
+        }
+      ],
+      "phone": "0741 010 754",
+      "website": null
+    },
+    {
+      "id": "ChIJC7Qryv1Gs0AR5wJGW1zjth0",
+      "name": "Maggie's Ranch",
+      "coordinates": {
+        "lat": 45.5277195,
+        "lng": 25.44032079999999
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 738,
+      "priceLevel": null,
+      "address": "Valea Glăjăriei, DJ101, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfV0zMQWUULFeko0jzlMlcIsHMNoGxZBtU6ugnYAqNgM1eYebWMHDW5uWUHTMWmlGZdPHm_hsEnB25aBkev1upZ77rFJzw5AdTPfMKx3EHgOGdg7zfjRu7LzhgZw-euKVdNCWPqUzBmBgW-0PRk7X0HNrGerMViZwfu9OfAiDe3Y6RpShocPXDpXwfRwRdCYeGXLdwyLVoqNb1qvSzqBw9rFLNGnLU-ehUdYYyeZJO4gK6g3hCx-V1BQ55KbPxqWpNnwoT45OjvXBB9XBKcjkhgfT_y-1Pw-4zfi84WxA91Ai9k3-C1x2yGX0E66eyjJgZUNdxV8wZUWVngWvrOzrWQhtKcq1gPObjWbuW-4nZa8dneUevZM7GjuH9KU-RTxPPZTEQH867j6Gu-EzY4x6yKUwIB_En0f5mFjAsilM3_exj7dpTedpYBTg3M1SNeYwQ01kfHj6rE0t84pyGFAsVcgjq1GIwGFmwj9mz72WghucJiAt7tFj-kJWul03ahF6juIZ9B6UGbFEIgfWHfDOoNXxv01NHYlbCx0Xu_GykEwtWvpOcoSJi9lKdGsczLVZDZf37CtXx4OR-4xwDrmNyhGrkRdIwgjjYlpK44s4190KGRue_52v4jqUUVZT_lv9FMka7t1iucXqfbXEveE8AqFCFo&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100454606486110149923\">Stefan Vlad</a>"
+        }
+      ],
+      "phone": "0733 077 313",
+      "website": "http://www.maggiesranch.ro/"
+    },
+    {
+      "id": "ChIJiWsOrmJDs0ARZTJElKAXxPA",
+      "name": "Teleferic Grand Hotel",
+      "coordinates": {
+        "lat": 45.5891092,
+        "lng": 25.5517148
+      },
+      "rating": 4.7,
+      "userRatingsTotal": 4291,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui 243, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWH_yA824DXZOE6mYLAFqCktEFlA19P__sRMI0TxDsok2128yxolyMpssVB56dBYRu5IceZJhEWOpbYswKlxwR0opS2jd_-8EMoUnsYxEE7Gp5EG-jA-U6Av27QVUGQh00Y2K7nUxPc24djzEK6uxHSVRc1vIHKngDhBjUJ_2LHUOiQgXHNMS7vXjdwCTWll-EZAQo2KkRXPQsitNQz_FAz41t-elnA0_DF9xbBcAFDn7m8yyD9nkjwQgg6VomU8U6uSquGYW6pVY3pMgHd_mvKqbC9TJypQXxZiwAB7Vxl5vDH2QBcg6UHVB7KcM7htGxOggq3&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103035793715798135749\">Teleferic Grand Hotel</a>"
+        }
+      ],
+      "phone": "0368 100 200",
+      "website": "http://www.telefericgrandhotel.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJpfM1_J5Es0ARmUlvKJte5aA",
+      "name": "Casa Vlasin",
+      "coordinates": {
+        "lat": 45.59626799999999,
+        "lng": 25.553309
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 1166,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui 221, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfU6abbFE-XFYdAyKGMB5nmwMgYqkuv4exIT_FkGvvjFaz81bC_4-qceLjMhc85_1of2jbrU4Fiy4Q23iqBXuQaEFMwq_5KOFexV0eW9PVmrwGnqKJmSKr_XPShbB1487XV5c7tAeeIZg7XEZfCh9dvC_Cv5hzqOssIeMYoInWAOQ5L_3YOB59OSwsIEM3FAxnVraivPOyeEA_oIRE00VG-WfxKKFNRna21BaPEsLRukOXwjk7yQU6tBilAloLYvSEKpBK-dQ66B7NUokUBcy-UQxFxRu0XpjdVkDiXR-NxraAoQGX7KH00oOWZGAgi_POKxerM5UJE&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/109882229615639771327\">Casa Vlasin</a>"
+        }
+      ],
+      "phone": "0730 015 560",
+      "website": "https://pensiuneavlasin.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 7:30 AM – 11:00 PM",
+          "Tuesday: 7:30 AM – 11:00 PM",
+          "Wednesday: 7:30 AM – 11:00 PM",
+          "Thursday: 7:30 AM – 11:00 PM",
+          "Friday: 7:30 AM – 11:00 PM",
+          "Saturday: 7:30 AM – 11:00 PM",
+          "Sunday: 7:30 AM – 11:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJhcCbDJ5Es0ARIaKu8t3PabQ",
+      "name": "RESTAURANT THE AMBIANCE",
+      "coordinates": {
+        "lat": 45.5939513,
+        "lng": 25.5539793
+      },
+      "rating": 3.7,
+      "userRatingsTotal": 1060,
+      "priceLevel": 2,
+      "address": "Strada Poiana Soarelui, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXhpDkziuxZRPwTLA9iCrAvlw3J8RgBtJBhIwXic_PwWkbD5SKwOnMoZECypvlNDuqPIC-tY2qFHva2a2N35cvB3ym2D6-woSJle1FYOEF-9YpY42pGV4oOkuK_M5QeJVj-atpdoHYiNKyQOeVhL9rx-TtroybxLv1AFlyheke2adZWytzg5UW-eUzeQylO_mRCYeCZ29QSfDeaDOc9U8pQzD3q2Ne21OjalAv-ZaHQC7mqkwvoZB8w3wY4JQVvD4x6bSviefYAXGTxurRsVFTizmig1qLmF44HqYZJluwmqIr3kGBf1l-SNPGLUOSuLhG9nJwEw9s&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100928508505049637758\">RESTAURANT THE AMBIANCE</a>"
+        }
+      ],
+      "phone": "0368 734 010",
+      "website": null,
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 10:00 AM – 9:30 PM",
+          "Tuesday: 10:00 AM – 9:30 PM",
+          "Wednesday: 10:00 AM – 9:30 PM",
+          "Thursday: 10:00 AM – 9:30 PM",
+          "Friday: 10:00 AM – 10:00 PM",
+          "Saturday: 10:00 AM – 10:00 PM",
+          "Sunday: 10:00 AM – 10:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJq_07l9dHs0ARmco_YRKBKoA",
+      "name": "La Lupi",
+      "coordinates": {
+        "lat": 45.5320211,
+        "lng": 25.3728044
+      },
+      "rating": 4.1,
+      "userRatingsTotal": 1354,
+      "priceLevel": 2,
+      "address": "Strada Branului 36Bis, Bran",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWM8DdP5uxvSgVkPM2iYT72xzx7zNf16pbcnFO49j7c9dIYvx_0tMLXWIZeILzepalnPa51iSpwIUL5jL5VAEExd9PD6rr92Ey85mlEkrRpfsFSdEAUq0XfBLHbGJV877xF1uaOYOsiH9BlvIo8CoG0DmTxNJc0Aiok0-JSysAnliAP8XyECbmaQi2brBZSkJ3yD6Qnd6koi-qEzlfAr5fRFAQwrllehVF4qvzpwQua4sg6KgjwIamqiqpGQhdwlkAqZU6rDykEDBlErcCGxzqIMi7guaidrmpYtCjdXYOG_LQKdEtLXrq49qbbgBY2wTU7O_ccF-s&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/109337484878367919289\">La Lupi</a>"
+        }
+      ],
+      "phone": "0368 401 405",
+      "website": "https://www.la-lupi.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 11:00 AM – 11:00 PM",
+          "Tuesday: 11:00 AM – 11:00 PM",
+          "Wednesday: 11:00 AM – 11:00 PM",
+          "Thursday: 11:00 AM – 11:00 PM",
+          "Friday: 11:00 AM – 11:00 PM",
+          "Saturday: 11:00 AM – 11:00 PM",
+          "Sunday: 11:00 AM – 11:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJrcVUTp1Es0ARW-rWwQx0udo",
+      "name": "Hotel Escalade",
+      "coordinates": {
+        "lat": 45.58982109999999,
+        "lng": 25.5506189
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 2009,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui nr. 160, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWG-rgatTfWpSHOUrs0ERRDZwTMEWUUuENhC9CsNTcPmLRDysUwkX7qCpomklRLbam8bFqtWz_-gfrBuDaasaLt142Hg6CWjnIOHQZhx4bchzPzINJBo-spDJlhG_8vv3Lj795Ld4IUjesTrv-lHnvOoz9hcEAcFfu5hyKpePAQ08WmS5VVerPDIlboK0266jhZVF8OynoyDdpPYxDS19L8u9Pk6BPqKetY6h9kzC0Qbgu4IMxtaLsrBA3bO6bw6311UdnibSe_dg9xLueMMY_xHnQT-4W6Zp4YaDVcyOF0JD3DDuF85Jq31AvohLAqMjAZvCN0s0I&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/104434239044440088468\">Hotel Escalade</a>"
+        }
+      ],
+      "phone": "0752 333 645",
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ4yXBhqJFs0ARwmKm41tSrvc",
+      "name": "Complex Panicel",
+      "coordinates": {
+        "lat": 45.5684866,
+        "lng": 25.4341033
+      },
+      "rating": 4.1,
+      "userRatingsTotal": 1587,
+      "priceLevel": null,
+      "address": "la 2km de Rasnov, DN 73 Brasov, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWrMcril2CkesKBDXIMhAb_3YSwVMzbZxntPOpkd3v14z6vkaAJ0un2CeCytW54g1Mrg5F0RUoZPIMr4KVR8aa_dZaUBtAS3_C0OBJC4695KAZYJVo__FxlJ-KKKxvkrK5cM59fpx8L6Cu-zSqZad6_GLdgtBCi9uKmIP6OfHIT9CyAFy9Y4i-6oUI1F1RRrsTp_c3jwAf73n9l9yeCnfpdKIAuxHDWaQCEkLb-xJwsupbcLRM9jR6m4bQTlYo3w7PCyZKwoS2cn3nZKiQWkWFE73Ct1XfLfWi_A_iCqJTuZQ1H-HNR7O5Whsd8xpsWnBzW7GOm31s&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/108032933942010205042\">Complex Panicel</a>"
+        }
+      ],
+      "phone": "0756 209 963",
+      "website": "https://complexpanicel.ro/"
+    },
+    {
+      "id": "ChIJRcz41mJDs0AR0P06UPG0Qsg",
+      "name": "Coliba Haiducilor",
+      "coordinates": {
+        "lat": 45.5889914,
+        "lng": 25.5547791
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 4968,
+      "priceLevel": 2,
+      "address": "Strada, Drumul Sulinar, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUGls8d15OD4lE05_m6buoleV6rzW4fIfk8_GfM7kd7lm_lM6miXR5qBdK1nd5hEDC0bQJwSuZMu5LMfwARWm6frJdYJxfAhzTGY967pmUHi2Yxm0CN5bItg2RNsnqw-sPcZyfKzpHDLY8gTr7NCudKh65BOJcEv66aa4ccg41NWf4f8IPPsflOopLwVBwSMBt0yg_iOYECjP5_rnpQgL7MUebGUASx2vlpOMgI19SAm1QqeJQnDK_AhHMVghNAOoxcXomtYQd5h3rxXqPDZfQ1xFg7xaUxDjHrgDjg0fvaW-8l66IsDlnhdv4BpMMKfZ_UGzwV9qy8nPKSClaf3GephW7-GQIGB0CnPFGcaWomgmPkoVxPP-ItEvqEFCFEbi7bLP3_5wYSqIlReMtJKwzfrSJObTawjqEerjc57oiusYRXrY4mjSvWAlUad96uQgfo8YQsqmrFGlEz_3z1_UHhpSskIrQr9kfIdMPd2EEOKXUBY05PimKvepfrhroM2DIjkVL4SgUHdIZEXrX8QjKhEiIyWPFeAc2wqe37VTaFLka0iGORc5Q0CXeCOVUBiUuRb6GTLUi2MUPRMlw_VGFjRluhKwD2PdCYuAsqUPv87rkFRkj_r8RgM9H1KMaB-asN2RWfr7jtKfLRdbupPhrzYRs&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103484434989317232364\">Golan Kendler</a>"
+        }
+      ],
+      "phone": "0268 262 137",
+      "website": null,
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 12:00 – 11:00 PM",
+          "Tuesday: 12:00 – 11:00 PM",
+          "Wednesday: 12:00 – 11:00 PM",
+          "Thursday: 12:00 – 11:00 PM",
+          "Friday: 12:00 – 11:00 PM",
+          "Saturday: 12:00 – 11:00 PM",
+          "Sunday: 12:00 – 11:00 PM"
+        ]
+      }
+    }
+  ],
+  "accommodations": [
+    {
+      "id": "ChIJUf1hLp9Es0ARa_EHX4Djh3s",
+      "name": "Alpin Resort Hotel",
+      "coordinates": {
+        "lat": 45.5962808,
+        "lng": 25.5512779
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 5998,
+      "priceLevel": null,
+      "address": "Strada Poiana Doamnei 9, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUn1nUTVGIduiw8Q_tzl6G5XNzH0peHADGtVFNBsp1KcRNtDc0djoNownM77fn-yJX9-f3cQDzkD9UlUNoduqE5sXPBaHbqwjwDJj35RW0InJZzPTqfPgNBWq2AC7kg7q7E7QTEm92wO9t295tuAL_3lrriGPFLGMETnp8MHh8fUz35rQNSaZEPuWPRv-nqGemzJjbAlZYKtagCi7gXJnQL56-djVrnFtmVDqgtSfFnozOynazXdu1LeDyUv-Zkq6Cbk-Q2VJDX3v-Ns2ltAXpo7C8uIcKBmR2cmuS8nl66yl_kxQVfz_QoolkABFx9XF3aUbs2Fv8&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100155688147211762684\">Alpin Resort Hotel</a>"
+        }
+      ],
+      "phone": "0268 262 343",
+      "website": "https://www.hotelalpin.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ58QoD5xEs0AR4Sr7np9iWI4",
+      "name": "Piatra Mare Hotel",
+      "coordinates": {
+        "lat": 45.5947093,
+        "lng": 25.5485191
+      },
+      "rating": 4,
+      "userRatingsTotal": 2942,
+      "priceLevel": null,
+      "address": "Strada Poiana lui Neagoe 10",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWPkgKuJdAz8KmL1gTP6OgG0ent18fEskMbDEuLzVAuWk9sxQ-Tkhl4igU-s4lkkSy-XMaaHZ0132lW_OYkTreKx3xAypsP9zMlF4t-HpooBHcAVhDoQb0BKvQoylz-r5sjNyiJiGZtk3ZNsZneDX2sSou0xT8HGdO4oYClPm7VMaIfb_Ss9s75BmjWSEJW_m9zjVMF60q_yzkUVhcA4YH8fLauOsd6dYoNMtfh787tJTyx_D5Tb7C2rxPYoXBuhuSslab1yC_1BtDKMRqYjTKaCTI0XvmrqtmHwVxl3qWoSSLg6x3K8t5yJ_Bd2THRYCd8uOujrOM&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/102254729804694393602\">Piatra Mare Hotel</a>"
+        }
+      ],
+      "phone": "0268 262 021",
+      "website": "https://www.piatramare.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJgyJfJZ1Es0ARaISqnrDRGCM",
+      "name": "Rizzo Boutique Hotel",
+      "coordinates": {
+        "lat": 45.589593,
+        "lng": 25.54766
+      },
+      "rating": 4,
+      "userRatingsTotal": 1026,
+      "priceLevel": null,
+      "address": "Strada Valea Lungă Poiana, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfX-hxYEEwpK2Ph_0_Ag3LciRdsX4i53nVlBTgQrAfvgc_0NzCat9nKkO9InDhYI7j6pi4VPB6jKy8ErDeeIXZKFcGhI8ex9OFh6MBxSkwOygyIjIVt8n85l2Q5vFO-gNL16Cc8TuhEXlIpQVcDflpJbAxahqHxyWL8ehleRRdumQhuCRQkpyd24_fXm0IuJAK8kZKXfWetDRmc_kP-Yl4Y0VJVHx3Gktbf3erSlZ-5x6RROvZY1inVeue5zkpaDYfv9_X9krEIIaA2F2IydNHZKVzN8CmYZlH2DRkAbHvzNIggobZ9cUvaqYALjohXtTvpmDeuaEvEIvYqT4N1zqWvn0sxB-Yml7f13V0DdiccWxBsR2mBsuWEsM78UgVOEGsGNWr2FUbFp_09bdB8Jc98UIKxyesGVvJAxDGXyKgZsXBwvJakinZBNSv9c8YNQup5MWMZ7iLjaD9utLBfOEwCVVckaJJbgSbNd7wgjWaMxoCRRRPO1lM7kBRC1UsmMhgm7K_lviELqBN3DfAf9IymnwNslq8jdxOU8HFoLXGcqJ-43RjDcAniDAc-d2hp9yqYuFWXHeeXqpmnFIfYWYZm6LXYrAmOZ3gaAx5vk8fGypIgucyuS8HAsf2BXuTgQ2ZaNvg&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100683578045290395993\">Andrew Chee</a>"
+        }
+      ],
+      "phone": "0368 100 160",
+      "website": "http://www.rizzohotel.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJ33jcQZ9Es0ARJNgOY2Io9Gw",
+      "name": "Crisalpin",
+      "coordinates": {
+        "lat": 45.5977762,
+        "lng": 25.553382
+      },
+      "rating": 4.6,
+      "userRatingsTotal": 535,
+      "priceLevel": null,
+      "address": "Poiana Brașov, Strada Poiana Ursului, Behind Favorit complex, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWWVHKk3aoeErzALGUlMzPYCSg8ooBXab5eaEBrzWOAIgpgJcQat8LQtp21-uTvXsnrHinzYlzEV4hPYzECr7V-jkEBi30kStynQCENlbO7V06dMqENXeL-zw6wbpmTH1B-KNS1bnR2z-IEGb1q44PqmXy7gJ7T3jT6DGLmFT_LlK3mdGRUsFSNn5iuS1ng8i7pbG2ne0gmPylwhTx-ku0EgXYnz4PKENMSrkBF8lRXgOPf1XRfxMrU77CzrON9eFT5vj1srAp6B01xm6gVrviGgAKM5C27Tm8oaxBJyr4Or7bysEN3uWJb2Wqd0_17H5WF8i_ID5E&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/115040622044186589431\">Crisalpin</a>"
+        }
+      ],
+      "phone": "0757 050 833",
+      "website": "https://hotelcrisalpin.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: 12:00 AM – 11:30 PM",
+          "Tuesday: 12:00 AM – 11:30 PM",
+          "Wednesday: 12:00 AM – 11:30 PM",
+          "Thursday: 12:00 AM – 11:30 PM",
+          "Friday: 12:00 AM – 11:30 PM",
+          "Saturday: 12:00 AM – 11:30 PM",
+          "Sunday: 12:00 AM – 11:30 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJrzsnG7BEs0AREHK50FXQzqY",
+      "name": "Monterai Resort",
+      "coordinates": {
+        "lat": 45.6092033,
+        "lng": 25.5540428
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 906,
+      "priceLevel": null,
+      "address": "Vila 0, Strada Poiana Soarelui 2, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVHyenDLb1NcCsTKdyU7bdFeeAGy74GY7srWYjstUM9f9GCUngvzPyqc8LB3IfcL7RrXREGUpfvWc52mgClCgnc-ADTS3Eip17nx80IuosCetjEkrPjFU3gebtx08MnhfBKkSXlGOq833XWw02_uKSKxWgZ1xfCziGwYifL_6-3D7GpWW_tHeZAxh9D2wnQg3WOOt3a603hLHcn9O3lN72nQBctMDS0jA8171ue53kXhUSwu4Pc2pmuXj6h_4Y48k2-MOsQE52X0pPgrUNzy1FqhDLAa7qw6b9CtAc3fWIM2NlARMGPLxfbe868-6_Rig8fczZcPPs&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100609864429501562642\">Complex Monterai</a>"
+        }
+      ],
+      "phone": "0268 262 335",
+      "website": "http://www.monterai.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 8:00 PM",
+          "Tuesday: 8:00 AM – 8:00 PM",
+          "Wednesday: 8:00 AM – 8:00 PM",
+          "Thursday: 8:00 AM – 8:00 PM",
+          "Friday: 8:00 AM – 8:00 PM",
+          "Saturday: 8:00 AM – 8:00 PM",
+          "Sunday: 8:00 AM – 8:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJm5tSgWWhTEcRIE-Fp-H2iQg",
+      "name": "Ana Hotels Bradul Poiana Brașov",
+      "coordinates": {
+        "lat": 45.5916398,
+        "lng": 25.557349
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 433,
+      "priceLevel": null,
+      "address": "Strada Valea Dragă 5, Poiana",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfW4FSZ-J_i12z86AqQe-SkOE9oDS7b7N4Sy91sBycN78U5nttiz1jcgirvaiOOWFpYcjiY3BU8fWZHJuugy9LlgZE4dvl-TeqSPXhmr21CfP6o_jlGp5pDSJ1QI9haC9USgyv2mKLoSpTh4APC2ISfa4gzpm_0dC-Ic1PoBrlB7k_v1aKq_n_TNLBKEz0oiDsbACU_z7wX4ijtkHmOjznhlGO4JehEvORXg2MYIops9yODRDTA_N5iLn-EI78WeDjCQNzQVcqZylhtdJBfZ5lNCr9VhG3vYS3SVL2yUgQuYQer91wt9G8ejdZAj_cdTYZgADpmcezM&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/101261275381141382732\">Ana Hotels Bradul</a>"
+        }
+      ],
+      "phone": "0268 407 330",
+      "website": "https://www.anahotels.ro/bradul",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJk_AfJHVFs0AR3LKGG04s-O4",
+      "name": "MAX International Hotel & Resort",
+      "coordinates": {
+        "lat": 45.60157580000001,
+        "lng": 25.4664946
+      },
+      "rating": 4.1,
+      "userRatingsTotal": 1088,
+      "priceLevel": 2,
+      "address": "Strada Brândușelor 32, Clădirea C1P, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWvNOLZvbXNUieB5dP4I2E39q3I2D6fveX08Q9y9tIemVo2NBIbEszW4XQukOXOf3MuaApvdoGQqxknYwt7XJqr7nED8RmqXeS4VJ4LOjwkYdYnBOHJa75FdkL4RWfDO3rMZBEBkTeSUdy3w5RwD_kLxyL_fb_sEw_O4XNmXoPoOXMj_C3aPyKQXMarVGgyYn6mC1GcqOHzjk6RsDspjD-NFonkzuuVA5yqtMdzsUK5GXHJTARcvcDrwLSZ7ZolhuM2DAWIB3-NwBNrs_Ss4TBLHKN7P6UwJw-yA_SpLIsJUm4oXF2oIvh2mEbG7wrB8px9OGcVbMo&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/115907149763005428162\">MAX International Hotel &amp; Resort</a>"
+        }
+      ],
+      "phone": "0757 165 458",
+      "website": "https://maxinternational.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJj0VrSn1Ds0ARTNa7FAuhtR4",
+      "name": "Valentin",
+      "coordinates": {
+        "lat": 45.587995,
+        "lng": 25.5503794
+      },
+      "rating": 3.7,
+      "userRatingsTotal": 31,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui 168, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXsR81rycSsvk2x2QHaliRCcNFr-YHbJVO4luJ_NmVA6AtDW1YGuoVHJNH-LbrKEaSqGH8vdG79eTZ2xYjj18hPdaA2deL0-T9FG2RVVa0xw826pd7PTV-hbNBcDHSgFE2_L3J0rxHALRcLJ_cBpNIpV6m_4RoVdv7P1bxnC_uiPhM624qikM6UOLh1CwrrTGlkaLYQXogG4un2CMLWeBgPCdqq_M72HJvi15bwWX_P36XULg70eEUeuAxDmcv7YDc0ovgxqiEnsJrbekF6jLmJiml-RVPGqguZeOOqfDx1jRmruPJMDyjLvIVwgC38pCMWFfhD-Dg&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/118167968913061109619\">Valentin</a>"
+        }
+      ],
+      "phone": "0268 262 436",
+      "website": "http://www.pensiuneavalentin.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJWzxztKFEs0ARo5SMy4ZOk2o",
+      "name": "Ruia Hotel",
+      "coordinates": {
+        "lat": 45.5995266,
+        "lng": 25.5567969
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 562,
+      "priceLevel": null,
+      "address": "Strada Poiana Ursului 49, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfVSjYt1xeeLnoZWa84qdMk0KFot_X7wRzO3roHkxOCkpxFjCPmPJ5DY5RJQhetvqoy1IpXHevvwIcbHQYXNlESlztgb_B9BGWpoNZeyZJ0Kj56BHxq_IoarqD6_0_BQGGgzpZyS64-BGZHOKXg3NQU3By-nMkMrCnXCAuMhfMlDTDmAKVC1VCOKS4-ZgXXui0fVE-GW8TKQDa1S3onJHgsQnspfKuair8ogrgDaDaxEppGhnu8Q9Yy7DC0e2p4cV_wi3n8CpeUmuSCOY81IHTiwon2EIRLihFW6kiIBTbTZC3CYklAyy8zLGpzjrZ6C-Yc3tJLJvd8tDIHBauaOHbpf9eWdp7y4k5Y3L0p8YxhvKvqQgc8JH7FE3kKpTcWLmUEef0Ab75BLActViZDEoeZMcy_2Eju7PBt7Ld6XbKKj_AMjePwJgpxsWxG7_4tnn-JeJlUpEprnDg3AjxsouySprQk6rRZY7PagArNtAk4MI18wVG1St9VbOe33fMNt94KlLR2ckTk9cp3bOr5KLweYbpF_GupoVxLIbuxN5wMq3fDQIdvYPAEbOl1WKfRHNoOnugja3wZqSYJc-PUTiqc-FoK24Wpwyku4BFMR39OY0-3-jsWbzvhHR1ILGf6he_08dg&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/103299379497740497370\">Ionut Sandru</a>"
+        }
+      ],
+      "phone": "0771 735 643",
+      "website": "https://www.hotelruia.ro/"
+    },
+    {
+      "id": "ChIJEaTlEqBGs0ARqFANuQaM7d4",
+      "name": "Poiana Râșnoavei Doripesco",
+      "coordinates": {
+        "lat": 45.55360719999999,
+        "lng": 25.4870867
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 1469,
+      "priceLevel": null,
+      "address": "KM 14, Orașul, DN73A, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUvBMlQJhb-TQJMZJ-JzdwxVNRyEkwu5esWoTdxlPzWZFBmsT7LHX2EFKmVOre7uKDzFK2CbP0EmuX-4RANL68Tk-5xPlqvwrMTm8iuuJ3_zGIFfXyMNzrjcQ-SiPKo6NRZWpSEnfY-aXnzraTLxLrLJiBxQCcGrKEVFlv1L-iO8UyOZkA5ZiEdXkj94tcFYsjmDqZetSXqSmTsbI8vqPRkA492e4-GBAMIeUi-4KlWFCfTD3ePwuTiUHv9QL5x4oC3UpQ4HmsHm4s5kl5iOg42NSCdjWQXGL3gFcO5iA4DrgvuH8QlRcvQGcXgQ5b82P0PkQn_umHbZsyBplWO3QA3Nv_YTP1WcRrYJB-t6u-IEuK7I0_jYfJj8qkCJMkadCz-ki81B1Yr6rdwfwxUeTjfCDNUoddtL7OCG0zUEMax6CIXAVlmuwZ0pBw5SEjFjvrIoqZ0uqK0Dkas9gi_n1wra-A3RrQdjFXcwZDHoj4Zr0ZRvhdXvMfvvT1BA_kmh1_wmoQqBLEGlNSME6mcQwzvu9rw5Gm8ztThnyFjwimMT2k90gVrWmRLc63loPJWnZ6ZWNjHnt8e0fwile9Q8mUU8jJKyvwXFrig-9qDR0XTWEr1pRBgh8jHdQRBvX3PPJrCuw&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/100956538163578586165\">Robert Epure</a>"
+        }
+      ],
+      "phone": "0720 900 778",
+      "website": "http://www.poiana-rasnoavei.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 9:00 PM",
+          "Tuesday: 8:00 AM – 9:00 PM",
+          "Wednesday: 8:00 AM – 9:00 PM",
+          "Thursday: 8:00 AM – 9:00 PM",
+          "Friday: 8:00 AM – 9:00 PM",
+          "Saturday: 8:00 AM – 9:00 PM",
+          "Sunday: 8:00 AM – 9:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJddU37KFEs0ARZVmvyy6sb8E",
+      "name": "Princess Butique",
+      "coordinates": {
+        "lat": 45.6007042,
+        "lng": 25.5550539
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 320,
+      "priceLevel": null,
+      "address": "Strada Poiana lui Brâncă 30, Poiana Brasov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXABXoIoxSIuX3ZHkOO0MR4oCycuQLt5JzFbGMt3VYXJtg_MsV_7kM9JQ00TpYObYxVwhFCGiibeqYSoYWxaL_UcoEDarBb3XoF1VF2KH_Awu8W-nrxrZI6CI_OMz9uAZZuYSlRlNfipv9WiG9SfZo1IM_ccFJ8gYFEktWJpZHmSpGI7n9cA51yE-vsZjcSzLiVB8V6xSg0qVVLMg674cfnvveaFFStaihuc42hCm4Z5mAtjICPcsdVjlO7Oh4wK0s804NL9SumWwKyy2Jg92omyWkPoNy18W23vFQGoc6NdQgBo4e8uR5VHGxY-8JNHeu2zDzZjts&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106891271937627945295\">Princess Butique</a>"
+        }
+      ],
+      "phone": "0747 180 888",
+      "website": "http://www.hotel-princess.ro/"
+    },
+    {
+      "id": "ChIJEZWw95tEs0ARQ_lgDYK2xGU",
+      "name": "Aurelius Imparatul Romanilor",
+      "coordinates": {
+        "lat": 45.5933309,
+        "lng": 25.5502667
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 2715,
+      "priceLevel": null,
+      "address": "Strada Poiana lui Neagoe 15, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXkbjtzYDjnY83pH-M0pgD_Wv8-LHD759TnEjUiHtemfjpb_oXnHR3TeK8_xC5TCEl7z4-K_TOlm5lpDh9T1Ll9NaP6DKkSYcAbhJ739nvJftKSFMCy4FJxx9l3w4AzhmkUDjOq_sgvvqZGod5FzZCeqVbg2wgH7UKbFuK3EXDg0cgYhUqk81e1h3TcMn4WwuEpBTILoKCmq0zMrMTE6nGpPoeN4rg_nX-tjP08yOJYG-kFTd0ktC22f_VJblIUU9kp62XI4IRvrhlKt-i-BV4EJMngoqvqzM2Eb7hgtUdW_UwOfMTd1mZiyZ0wQ5VmkTmDyq79EX8&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106559772406927767792\">Aurelius Imparatul Romanilor</a>"
+        }
+      ],
+      "phone": "0268 262 166",
+      "website": "http://brasov.imparatulromanilor.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJvXgBdGBDs0ARxEzp6-yFrmY",
+      "name": "Acasă la Dracula",
+      "coordinates": {
+        "lat": 45.5969445,
+        "lng": 25.5609009
+      },
+      "rating": 4.3,
+      "userRatingsTotal": 953,
+      "priceLevel": null,
+      "address": "Strada Poiana lui Stechil 22, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXMWhGfHpGL1fn6DQmlyXbcNagIabegtJV3OIsjtWpXD1W9BcOET_eioKlR3W_A_KRMOGFN9dzx6HYWrmyXKx3gD5eF1TFE24uMw29k-O3j1dEFOTRbBxV-XRF4_FUDRanDmnabxIl7Q0_FYFA-a0ueQvmSMqj0p35ai8mZi25JaGQHNAfQq-mA3v-OCjZFK6TOWIihS4fYLyUHWrtZrFx193InQ10VYAPl_2buDdg1JqSSjBtShgJ91j_SmGYtwSUlHmeHc9vRjjZkaVG2BVP6AKvR3gEn8eZJdjIz2w6pRx0EJLGWRhqOwT1_eXsiuAwXFWfq0dD7UULUem03eHYrV7op5zqxKGuf73xEpbbOy5FThoYvUcWZhEAw4aHiyYEHXt1fIAv0Ji-aEoJW6Aw7xHGOxr67SSokQWcpL5oLapp-RmHV25kppyjnvSOXtg8LHOvL4lFuanCol-UknkcaDTV6RyGys_QXyDuaaWqHBEWN3unkc0C4zKEEJ6VQdYtwpyxO64VMKSVo_8e_leJ9HG3zmJFvhBeB-pbvHFpFUJbvqrb38H2ony6uIiTge7lsXO00aDmQwEXAidy7rcBCQLHIIc64RFQikzqbvX_hGcsRE8C8l_NLMFa8_dc58kiA9uTh&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106835920605413178790\">Denisa Ligia</a>"
+        }
+      ],
+      "phone": "0727 322 068",
+      "website": null,
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJLSRtPDdAs0ARGOmQ5rYPp7E",
+      "name": "Hotel Bucegi Porțile Regatului",
+      "coordinates": {
+        "lat": 45.511684,
+        "lng": 25.508917
+      },
+      "rating": 4.2,
+      "userRatingsTotal": 1144,
+      "priceLevel": 2,
+      "address": "Strada Valea Râșnoavei, nr 10, Pârâul Rece",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWAySrW-DFr0u1tdWlNVXdZkTfdSqlrukZ_vecuyImrNt8lU8Ylfqq2rRbxeCQPym8E7ryd2gRBO_RzKytK5rlJC4mWXncf-UMua165INUJTtRs0Al4BlOSrGdYKWxzLLyK-su_NDPo3XA_3N4U7X3hDb9ULTNf2xCdXPlf85A8kBbr_WJJSsnKiIMk-Bgen_9ByqWzNYf3U7aZ0im1r_DYMIPOYMcWZKqa1J4niL6cWMXyIMprGCCOLz6nHBg_WGQmXpZIh02c3mqQ--tZCYcb9a6a4JINa3jEUzw0wRJtu3yMBOMBu9qe7dZhuTcDeWtSsvtfygQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/107310222074663391496\">Bucegi Porțile Regatului</a>"
+        }
+      ],
+      "phone": "0724 370 658",
+      "website": "http://www.portileregatului.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 8:00 AM – 10:00 PM",
+          "Tuesday: 8:00 AM – 10:00 PM",
+          "Wednesday: 8:00 AM – 10:00 PM",
+          "Thursday: 8:00 AM – 10:00 PM",
+          "Friday: 8:00 AM – 10:00 PM",
+          "Saturday: 8:00 AM – 10:00 PM",
+          "Sunday: 8:00 AM – 10:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJn1t339VHs0ARPCitDjxOohk",
+      "name": "Nostalgia house",
+      "coordinates": {
+        "lat": 45.535443,
+        "lng": 25.3754826
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 389,
+      "priceLevel": null,
+      "address": "Strada Branului 80",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUU-2rIA8jhCGCmIcnDWOkB4pKOI-lEIyf0n0PufmrgGgqqP6AhdwQHpyjEx_JZ65eVHfr5JXHFyoIcgGj0a6nxASsfsi6a0iZVaHKSdE6hxSbPQVLPOgshCNR3GjUmRNHp30jCpxW6886FGAfGS0LuSVkiKUreaaPQaiqU92WWhlmZiU1nK-4xfHHODa9dWjcI_cDTuxNt3vU1IxqvwjFCDWugmryTRtdiVaR8M_Rug0nzzyiAmLUnu974KROIzk6qAVMb7zksI140sAsdED7iH0ja2jMoGsgY_jU52vIpT3XJjEHLWpjqZvvUFA_IQaYxEO1vHw4&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/118392551794490743878\">Casa Nostalgia</a>"
+        }
+      ],
+      "phone": "0368 409 074",
+      "website": "https://www.casanostalgia.ro/",
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 12:00 – 9:00 PM",
+          "Tuesday: 12:00 – 9:00 PM",
+          "Wednesday: 12:00 – 9:00 PM",
+          "Thursday: 12:00 – 9:00 PM",
+          "Friday: 12:00 – 9:00 PM",
+          "Saturday: 12:00 – 9:00 PM",
+          "Sunday: 12:00 – 9:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJvbb7fp9Es0AR5vVgiIm3vGY",
+      "name": "Complex Vile Ruia",
+      "coordinates": {
+        "lat": 45.59936690000001,
+        "lng": 25.5567167
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 25,
+      "priceLevel": null,
+      "address": "Poiana Ursului, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWzUlZDOa3qrAYzeVVTsoANv_sxrickvyJOqceR2RUa8JXIQNwKCK4t9iDyGD1S_pUl6WK-VLZDzOMM5vNetc_MWhpm1_dLAZ5bkBRO99I8eKtvkwGxqxhz9AoTdXhKu4_BUJp2rRS1Cz4-CaJTy8hNSMMkxUVp8Rjo8ys4n1_LVwe91z_HCTqySdDcsP0Bs5QN6jim07LwPFtnCoAA8_2do7C0QzNwlQo7GQ7Wm8fWLjURx5TW7TfeQhvvflO5xg9xRX6VQ9aFMsZIpuZaraLimHLs5LcAhNzOX8m75UpFxI7SRJu7XK0gu-fF1EsiUTBnAuxwn5gTrwWcXcKs1JTU8HCvjhO3NHeHlGsE3KA4UtQ7KYyMRB6ACFmwtUrbeBdmKkOFKdrPOGSYDjpaCzWUUCW6gqliH-ZBXwsGODcNCjI9C-5ltpMK2X6-CZVUUqQgfy1PpiWuhOebbWaw8oorJKm_XHPEOL7RHvazHydNzJyhinr8eyOQV43Egt29pTv4ZNOOEeWb7_oG3_iKq2mH756eb0xEFAP7zct6KVXOI2G-v0Le1jNed6R_ccgjItMaX1ELZt5sV_KAolDkahfsAUf6KjiEHOcZm8JwJ9uA1N6J13xw7ocxsC_bIp28KuVQPQ&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/107037290934607060179\">Gheorghe Floricel</a>"
+        }
+      ],
+      "phone": "0268 262 202",
+      "website": null
+    },
+    {
+      "id": "ChIJH5dLQPRcs0ARdyzqWnNPs1Q",
+      "name": "Edelweiss",
+      "coordinates": {
+        "lat": 45.5885902,
+        "lng": 25.5510524
+      },
+      "rating": 4.5,
+      "userRatingsTotal": 253,
+      "priceLevel": null,
+      "address": "Strada Poiana Soarelui 162, Brașov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUpsxruYndB1vM7Y-q975eotwaD8Zln8G_cHcETTm2YU2wSQP3QVwRqcllDz7QilSX50qLfzrh_icMjG8VONewNiVdk5ISXeMf5mmWVmPzwgyV8gBR9MpJFX2O3Sq0u5MRGhtDC7wvavJC3VZrMbMZRKof9Lfuqc4Kjo0SYBNRNZajBTTDc22ow_7G6mH6zaX53odZOB8RTMUk4E07PUasJqcXe_beZxdo9aAAjQzaefIpD05rLJx9P_3aRkY-fmkxErQXVSLhuINPOnlhodsRcE6-fR7Px-6_dcV2XEZhEUoduXrbzKrHMGrMXZn7-D14DpsUmjIpVidRp5Bwk_Q0utSq1BdCyyyoTGTeQGjsXC8TxU0poLW5tJpiopotbP7xNpUiDiJYTR2V1NYSxmQjfSXWVHTObAH46e31bGIR0ujJpYnCuPJv9mcb3cgnHlp_ZoT09bZZlpuIfRl4f_CuuuLxER8JWcU-MjeEn8TDMH46_1dnJk_PNstFbMoImLyv3c94rnCtPAEArdD2ZZ27FXrRXafm81U3_O0hd39FiZ86lDEQApz5iRhmjN27VidGCbS_ZUYUWBFvPvBISockwzZpyaHi7Ohbm0xeSDz8v4WzltSEYsNYPsW-CjUUBqmh4GA&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/107501600489088745735\">Marius IM</a>"
+        }
+      ],
+      "phone": "0268 262 194",
+      "website": "https://www.hotel-edelweiss.ro/",
+      "openingHours": {
+        "openNow": true,
+        "weekdayText": [
+          "Monday: Open 24 hours",
+          "Tuesday: Open 24 hours",
+          "Wednesday: Open 24 hours",
+          "Thursday: Open 24 hours",
+          "Friday: Open 24 hours",
+          "Saturday: Open 24 hours",
+          "Sunday: Open 24 hours"
+        ]
+      }
+    },
+    {
+      "id": "ChIJKTOAVnVFs0ARCQae5eqITYM",
+      "name": "Pensiunea Belvedere",
+      "coordinates": {
+        "lat": 45.599892,
+        "lng": 25.4656889
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 121,
+      "priceLevel": null,
+      "address": "Calea Brașovului 1, Râșnov",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfUS3iWDz3C2vGKyqunnHs8mpQBcVkyeGQxuMrCHyV3M_CxJDCC7Uwc61IuLXxoQCU7AYK15GnRkuvlCI0eo87TnA9Lm4yzXtv4Ajotn7k567xUIXHEXpBZ0WtXK03tGpLtLuKRTKxWmn915csX7NjDjw-o5_C9Mpn34X-uL1_E7hCX-rBFPWOkAGPAFuhi4umT76Q1tOsVVaLZA2QLIMYfwG7OCgsMLhdfsPmDvKsBEVevK5-A3UUKMZ3Ya6QjJCm9rxOzAAF1Km5s92qZEJCx8L5N69K6aPghpJOqHf6UuDw8_k5lWzIN8lyZ_W1wvmGGFR_QtrSc&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106285505117798309527\">Pensiunea Belvedere</a>"
+        }
+      ],
+      "phone": "0722 375 112",
+      "website": null,
+      "openingHours": {
+        "openNow": false,
+        "weekdayText": [
+          "Monday: 9:00 AM – 12:00 AM",
+          "Tuesday: 9:00 AM – 12:00 AM",
+          "Wednesday: 9:00 AM – 12:00 AM",
+          "Thursday: 9:00 AM – 12:00 AM",
+          "Friday: 9:00 AM – 12:00 AM",
+          "Saturday: 9:00 AM – 12:00 AM",
+          "Sunday: 9:00 AM – 12:00 PM"
+        ]
+      }
+    },
+    {
+      "id": "ChIJfQk6Jr9Bs0ARI5VuulCvwIE",
+      "name": "Bioterra",
+      "coordinates": {
+        "lat": 45.5185502,
+        "lng": 25.5380838
+      },
+      "rating": 3.6,
+      "userRatingsTotal": 82,
+      "priceLevel": null,
+      "address": "Strada Trei Brazi, Predeal",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfWz4l2v9NJAi5MHSrZl36hXEWhwci5-izeLnt721QTAtP9Uawjqkz24N-xuFUs4Vu33sxjsoVHNnV8LA5zUNAYdptkmeKGsapVKDPZoHce-dDj7zVZIJbZ_3sV9KBB4ajQ11O3UWRt5trPCU_yU8hnhjhylD9VOwpRqjhTSoySFYCHiLV86cJjtr04hbo-zr1NZp-v4rKVrmVnnOcE0lW9os-XKjUgGJ3hCyUBW5O-GnIjoOzynzOJEpEXmRkJTVg53K6jlwjDQEkrnoIDh7lxGfgCXsVZek415_jn4Ms5c6O2vISBtjKCO6eit0GBjGU9rI9HPQJnO-8iTpa22RJz6wq9SZsdwo_j6sPKz3FGSuO3UtBgOIls2MJ-hyr_Vu3QikL-BjeSadMs5RoyIw68JHWFh0_vuhjWK7l_lZt78qrdrOBAuZJ1sbPvUPrT9h10sI7m71RUdg3rAwiHilYSQ1i9GCgzJ1e_jdLw3E3XQ34sXREtlAXYOgC-VMZL4JCI0-B_5Q3ZglquBZiJ2DGObcrkWcBzJjXQOKR9OyILY1m3nt_8l4Zb77QZ_jrEO7OhmfyWBPvIjFgYB6G3JjqlBmbKfcB8bpwJBnkwzyHz2Qrd9eUSRSQ_p2bk4fTVU2OM3W-TM&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/106922139515699346825\">babici ruslan</a>"
+        }
+      ],
+      "phone": null,
+      "website": "http://www.bioterraturism.ro/"
+    },
+    {
+      "id": "ChIJk-PtedZHs0ARVMd-3V3vWZk",
+      "name": "Hotel La Dolce Vita",
+      "coordinates": {
+        "lat": 45.5349184,
+        "lng": 25.3754123
+      },
+      "rating": 4.4,
+      "userRatingsTotal": 411,
+      "priceLevel": null,
+      "address": "Strada Branului 78, Zărnești",
+      "photos": [
+        {
+          "url": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=ATCDNfXO0SuVcVH1n9zdSV0R47e6pP1wnYg9L-TgRAloCDW8oCB1Nn_C5m-y6Ax3R2ijNpiG4Z548WadHdQG3CApwzfa9cg3INhGFpTogGbx2LtOfnCY5AY8QkKL5-XTRW94QFTeaz_DIhf8rjIa-PZ5aiH-hKyQ-kHFrAaR4waT8cGA4UYQ3Z9o9zOn6swGErZ9GmdLz2DXc6Xbiuh1LN5IYht69tkZSZvSaAGpw_KLC8dMvdBFIT8ut_mOPkI2t_EvotkXJNl7487S8Rzb7ncMpUiMlJuXy5z6WvJLjORDip2l5A3PKwP_CzkFXBR-5xCAAQxpFugaJ5g&key=AIzaSyDHhdu3WaD9TUvMPgf_Y2lTlJj8wQCRXmo",
+          "attribution": "<a href=\"https://maps.google.com/maps/contrib/102795296318452929519\">Hotel La Dolce Vita</a>"
+        }
+      ],
+      "phone": "0749 250 251",
+      "website": "https://www.ladolcevita-bran.ro/"
+    }
+  ]
+}
