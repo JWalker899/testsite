@@ -29,6 +29,7 @@ const CONFIG = {
   GOOGLE_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
   UNSPLASH_API_KEY: process.env.UNSPLASH_ACCESS_KEY,
   OUTPUT_FILE: path.join(__dirname, '../data/places-data.json'),
+  SAMPLE_FILE: path.join(__dirname, '../data/sample-places-data.json'),
   MAX_PHOTOS_PER_PLACE: 3,
   MAX_RESULTS_PER_TYPE: 20,
   RETRY_ATTEMPTS: 3,
@@ -277,11 +278,13 @@ async function main() {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  fs.writeFileSync(
-    CONFIG.OUTPUT_FILE,
-    JSON.stringify(result, null, 2),
-    'utf8'
-  );
+  const jsonOutput = JSON.stringify(result, null, 2);
+
+  fs.writeFileSync(CONFIG.OUTPUT_FILE, jsonOutput, 'utf8');
+
+  // Also overwrite sample data so real data persists across rebuilds
+  console.log(`💾 Overwriting sample data at ${CONFIG.SAMPLE_FILE}...`);
+  fs.writeFileSync(CONFIG.SAMPLE_FILE, jsonOutput, 'utf8');
 
   // Print summary
   console.log('\n✅ Data fetch complete!');
