@@ -10,7 +10,7 @@ const startHuntBtn = document.getElementById('start-hunt');
 const scanQrBtn = document.getElementById('scan-qr');
 const useLocationBtn = document.getElementById('use-location');
 const testLocationBtn = document.getElementById('test-location');
-const testingModeBtn = document.getElementById('testing-mode');
+const resetHuntBtn = document.getElementById('reset-hunt');
 const progressFill = document.getElementById('progress-fill');
 const progressCount = document.getElementById('progress-count');
 const progressTotal = document.getElementById('progress-total');
@@ -437,6 +437,8 @@ function resetProgress() {
     huntActive = false;
     startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
     startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
+    startHuntBtn.style.display = '';
+    resetHuntBtn.style.display = 'none';
     scanQrBtn.disabled = true;
     useLocationBtn.disabled = true;
 
@@ -482,8 +484,8 @@ function restoreHuntState() {
 
     if (foundLocations.size > 0 && foundLocations.size < Object.keys(huntLocations).length) {
         huntActive = true;
-        startHuntBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Hunt';
-        startHuntBtn.classList.add('active-hunt');
+        startHuntBtn.style.display = 'none';
+        resetHuntBtn.style.display = '';
         scanQrBtn.disabled = false;
         useLocationBtn.disabled = false;
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
@@ -683,13 +685,27 @@ tabButtons.forEach(button => {
         // Add active class to clicked button and corresponding content
         button.classList.add('active');
         document.getElementById(targetTab).classList.add('active');
+    });
+});
+
+// Hunt Tab Functionality
+document.querySelectorAll('.hunt-tab-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const targetPane = button.dataset.huntTab;
         
-        // Load leaderboard if leaderboard tab is clicked
-        if (targetTab === 'leaderboard') {
+        // Remove active class from all hunt tab buttons and panes
+        document.querySelectorAll('.hunt-tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.hunt-tab-pane').forEach(pane => pane.classList.remove('active'));
+        
+        // Add active class to clicked button and corresponding pane
+        button.classList.add('active');
+        document.getElementById(targetPane).classList.add('active');
+        
+        // Load data when tabs are opened
+        if (targetPane === 'leaderboard-pane') {
             loadLeaderboard();
         }
-        // Render unlocks tab when opened
-        if (targetTab === 'unlocks') {
+        if (targetPane === 'unlocks-pane') {
             renderUnlocksTab();
         }
     });
@@ -755,19 +771,48 @@ setInterval(updateWeather, 300000); // Update every 5 minutes
 startHuntBtn.addEventListener('click', () => {
     if (!huntActive) {
         huntActive = true;
-        startHuntBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Hunt';
-        startHuntBtn.classList.add('active-hunt');
+        startHuntBtn.style.display = 'none';
+        resetHuntBtn.style.display = '';
         showNotification('Scavenger hunt started! Find all 8 locations.', 'success');
         
         // Enable other buttons
         scanQrBtn.disabled = false;
         useLocationBtn.disabled = false;
-    } else {
-        huntActive = false;
-        startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
-        startHuntBtn.classList.remove('active-hunt');
-        showNotification('Scavenger hunt stopped.', 'info');
     }
+});
+
+// Timer for reset-hunt confirmation button auto-revert
+let resetHuntConfirmTimeout = null;
+
+resetHuntBtn.addEventListener('click', () => {
+    if (resetHuntBtn.dataset.confirming !== 'true') {
+        // First click: switch to "Are you sure?" state
+        resetHuntBtn.dataset.confirming = 'true';
+        resetHuntBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Are you sure?';
+        resetHuntBtn.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+        resetHuntBtn.style.color = 'white';
+        resetHuntBtn.style.borderColor = '#e74c3c';
+        clearTimeout(resetHuntConfirmTimeout);
+        resetHuntConfirmTimeout = setTimeout(() => {
+            if (resetHuntBtn.dataset.confirming === 'true') {
+                resetHuntBtn.dataset.confirming = 'false';
+                resetHuntBtn.innerHTML = '<i class="fas fa-redo"></i> Reset Hunt';
+                resetHuntBtn.style.background = '';
+                resetHuntBtn.style.color = '';
+                resetHuntBtn.style.borderColor = '';
+            }
+        }, 4000);
+        return;
+    }
+
+    // Second click: execute reset
+    resetHuntBtn.dataset.confirming = 'false';
+    resetHuntBtn.innerHTML = '<i class="fas fa-redo"></i> Reset Hunt';
+    resetHuntBtn.style.background = '';
+    resetHuntBtn.style.color = '';
+    resetHuntBtn.style.borderColor = '';
+    clearTimeout(resetHuntConfirmTimeout);
+    resetProgress();
 });
 
 scanQrBtn.addEventListener('click', () => {
@@ -801,29 +846,6 @@ useLocationBtn.addEventListener('click', () => {
         );
     } else {
         showNotification('Geolocation is not supported by your browser.', 'error');
-    }
-});
-
-testingModeBtn.addEventListener('click', () => {
-    testingMode = !testingMode;
-    if (testingMode) {
-        testingModeBtn.classList.add('testing-active');
-        showNotification('Testing mode enabled! Click on any location to mark it as found.', 'info');
-        
-        // Add click handlers to hunt items in testing mode
-        huntItems.forEach(item => {
-            item.style.cursor = 'pointer';
-            item.addEventListener('click', handleTestingModeClick);
-        });
-    } else {
-        testingModeBtn.classList.remove('testing-active');
-        showNotification('Testing mode disabled.', 'info');
-        
-        // Remove click handlers
-        huntItems.forEach(item => {
-            item.style.cursor = '';
-            item.removeEventListener('click', handleTestingModeClick);
-        });
     }
 });
 
@@ -1091,10 +1113,13 @@ async function discoverLocation(locationKey) {
     document.getElementById('discovery-fact').innerHTML = factHTML;
     openModal('discovery-modal');
 
-    // After the first location found, queue a name prompt if user hasn't set one yet
-    if (foundLocations.size === 1 && currentUser && !currentUser.hasSetName) {
+    // After any location found, queue a name prompt if user hasn't set one yet
+    if (currentUser && !currentUser.hasSetName) {
         firstDiscoveryPending = true;
     }
+    
+    // Refresh leaderboard data in the background after finding a location
+    loadLeaderboard();
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
@@ -1107,6 +1132,8 @@ async function discoverLocation(locationKey) {
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
             startHuntBtn.classList.add('hunt-complete');
+            startHuntBtn.style.display = '';
+            resetHuntBtn.style.display = 'none';
         }, 2000);
     }
 }
@@ -1645,6 +1672,8 @@ function discoverLocationQuietly(locationKey) {
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
             startHuntBtn.classList.add('hunt-complete');
+            startHuntBtn.style.display = '';
+            resetHuntBtn.style.display = 'none';
         }, 1000);
     }
 }
@@ -2592,7 +2621,6 @@ function applyTranslations(lang) {
     if (scanQrBtn) scanQrBtn.innerHTML = dict.ar.scanQr;
     if (useLocationBtn) useLocationBtn.innerHTML = dict.ar.useLocation;
     if (testLocationBtn) testLocationBtn.innerHTML = dict.ar.testLocation;
-    if (testingModeBtn) testingModeBtn.innerHTML = dict.ar.testingMode;
 
     // Hunt items
     if (dict.huntItems) {

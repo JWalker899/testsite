@@ -79,14 +79,7 @@
                         <i class="fas fa-bed"></i>
                         <span>Places to Stay</span>
                     </button>
-                    <button class="tab-button" data-tab="leaderboard">
-                        <i class="fas fa-trophy"></i>
-                        <span>Leaderboard</span>
-                    </button>
-                    <button class="tab-button" data-tab="unlocks">
-                        <i class="fas fa-palette"></i>
-                        <span>Unlocks</span>
-                    </button>
+
                 </div>
 
                 <!-- Locations Tab -->
@@ -438,60 +431,6 @@
                     </div>
                 </div>
 
-                <!-- Leaderboard Tab -->
-                <div class="tab-content" id="leaderboard">
-                    <h2 class="section-title">🏆 Leaderboard</h2>
-                    <p class="leaderboard-subtitle">Top Rasnov Explorers - Ranked by Points</p>
-                    
-                    <div class="leaderboard-container">
-                        <div class="leaderboard-info">
-                            <div class="info-item">
-                                <span class="info-label">Your Rank:</span>
-                                <span class="info-value" id="user-rank">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Your Points:</span>
-                                <span class="info-value" id="user-leaderboard-points">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Total Players:</span>
-                                <span class="info-value" id="total-players">-</span>
-                            </div>
-                        </div>
-
-                        <div class="leaderboard-table-wrapper">
-                            <table class="leaderboard-table">
-                                <thead>
-                                    <tr>
-                                        <th class="rank-col">#</th>
-                                        <th class="name-col">Player</th>
-                                        <th class="points-col">Points</th>
-                                        <th class="locations-col">Locations</th>
-                                        <th class="status-col">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderboard-body">
-                                    <tr class="loading-row">
-                                        <td colspan="5" style="text-align: center; padding: 2rem;">
-                                            <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="leaderboard-actions">
-                            <button class="card-button" onclick="loadLeaderboard()" title="Refresh the leaderboard">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Unlocks Tab -->
-                <div class="tab-content" id="unlocks">
-                    <!-- Populated by renderUnlocksTab() in script.js -->
-                </div>
 
             <!-- AR Scavenger Hunt Section -->
             <section class="ar-section" id="ar-mode">
@@ -504,6 +443,9 @@
                     <button class="ar-button primary" id="start-hunt">
                         <i class="fas fa-play"></i> Start Hunt
                     </button>
+                    <button class="ar-button reset-hunt-btn" id="reset-hunt" style="display:none;">
+                        <i class="fas fa-redo"></i> Reset Hunt
+                    </button>
                     <button class="ar-button" id="scan-qr">
                         <i class="fas fa-qrcode"></i> Scan QR Code
                     </button>
@@ -513,55 +455,128 @@
                     <button class="ar-button test-location-button" id="test-location">
                         <i class="fas fa-camera"></i> Test Location
                     </button>
-                    <button class="ar-button testing-mode" id="testing-mode">
-                        <i class="fas fa-flask"></i> Testing Mode
-                    </button>
                 </div>
 
-                <div class="hunt-status" id="hunt-status">
-                    <div class="progress-container">
-                        <h3>Your Progress</h3>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill"></div>
-                        </div>
-                        <p class="progress-text"><span id="progress-count">0</span> / <span id="progress-total">8</span> locations found</p>
+                <!-- Hunt Tabs -->
+                <div class="hunt-tabs">
+                    <div class="hunt-tab-header">
+                        <button class="hunt-tab-btn active" data-hunt-tab="hunt-pane">
+                            <i class="fas fa-search"></i>
+                            <span>Hunt</span>
+                        </button>
+                        <button class="hunt-tab-btn" data-hunt-tab="leaderboard-pane">
+                            <i class="fas fa-trophy"></i>
+                            <span>Leaderboard</span>
+                        </button>
+                        <button class="hunt-tab-btn" data-hunt-tab="unlocks-pane">
+                            <i class="fas fa-palette"></i>
+                            <span>Unlocks</span>
+                        </button>
                     </div>
-                    
-                    <div class="hunt-items">
-                        <div class="hunt-item" data-location="fortress">
-                            <i class="fas fa-lock"></i>
-                            <span>Rasnov Fortress Gate</span>
+
+                    <div class="hunt-tab-pane active" id="hunt-pane">
+                        <div class="hunt-status" id="hunt-status">
+                            <div class="progress-container">
+                                <h3>Your Progress</h3>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <p class="progress-text"><span id="progress-count">0</span> / <span id="progress-total">8</span> locations found</p>
+                            </div>
+                            
+                            <div class="hunt-items">
+                                <div class="hunt-item" data-location="fortress">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Rasnov Fortress Gate</span>
+                                </div>
+                                <div class="hunt-item" data-location="well">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Ancient Well</span>
+                                </div>
+                                <div class="hunt-item" data-location="tower">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Watch Tower</span>
+                                </div>
+                                <div class="hunt-item" data-location="church">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Old Church</span>
+                                </div>
+                                <div class="hunt-item" data-location="museum">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Village Museum</span>
+                                </div>
+                                <div class="hunt-item" data-location="peak">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Mountain Peak</span>
+                                </div>
+                                <div class="hunt-item" data-location="square">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Town Square</span>
+                                </div>
+                                <div class="hunt-item" data-location="dino">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Dino Park Entrance</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="hunt-item" data-location="well">
-                            <i class="fas fa-lock"></i>
-                            <span>Ancient Well</span>
+                    </div>
+
+                    <div class="hunt-tab-pane" id="leaderboard-pane">
+                        <h2 class="section-title">🏆 Leaderboard</h2>
+                        <p class="leaderboard-subtitle">Top Rasnov Explorers - Ranked by Points</p>
+                        
+                        <div class="leaderboard-container">
+                            <div class="leaderboard-info">
+                                <div class="info-item">
+                                    <span class="info-label">Your Rank:</span>
+                                    <span class="info-value" id="user-rank">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Your Points:</span>
+                                    <span class="info-value" id="user-leaderboard-points">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Total Players:</span>
+                                    <span class="info-value" id="total-players">-</span>
+                                </div>
+                            </div>
+
+                            <div class="leaderboard-table-wrapper">
+                                <table class="leaderboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="rank-col">#</th>
+                                            <th class="name-col">Player</th>
+                                            <th class="points-col">Points</th>
+                                            <th class="locations-col">Locations</th>
+                                            <th class="status-col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="leaderboard-body">
+                                        <tr class="loading-row">
+                                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="leaderboard-actions">
+                                <button class="card-button" onclick="loadLeaderboard()" title="Refresh the leaderboard">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
                         </div>
-                        <div class="hunt-item" data-location="tower">
-                            <i class="fas fa-lock"></i>
-                            <span>Watch Tower</span>
-                        </div>
-                        <div class="hunt-item" data-location="church">
-                            <i class="fas fa-lock"></i>
-                            <span>Old Church</span>
-                        </div>
-                        <div class="hunt-item" data-location="museum">
-                            <i class="fas fa-lock"></i>
-                            <span>Village Museum</span>
-                        </div>
-                        <div class="hunt-item" data-location="peak">
-                            <i class="fas fa-lock"></i>
-                            <span>Mountain Peak</span>
-                        </div>
-                        <div class="hunt-item" data-location="square">
-                            <i class="fas fa-lock"></i>
-                            <span>Town Square</span>
-                        </div>
-                        <div class="hunt-item" data-location="dino">
-                            <i class="fas fa-lock"></i>
-                            <span>Dino Park Entrance</span>
+                    </div>
+
+                    <div class="hunt-tab-pane" id="unlocks-pane">
+                        <div id="unlocks">
+                            <!-- Populated by renderUnlocksTab() in script.js -->
                         </div>
                     </div>
                 </div>
+
 
                 <!-- QR Scanner Modal -->
                 <div class="modal" id="qr-modal">
