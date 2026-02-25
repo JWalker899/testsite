@@ -64,6 +64,14 @@ let arBearVisible = false;         // whether bear is currently shown in compass
 let arTargetBearing = null;        // bearing from user to the target location
 let arBearVisibleCheckId = null;   // setInterval ID for emoji-fallback on-screen polling
 
+// WebXR state
+let arXRSession = null;        // active XRSession (immersive-ar)
+let arXRMode = false;          // true while a WebXR session is active
+let arXRScene = null;          // Three.js Scene ref kept for screenshot
+let arXRCamera = null;         // Three.js Camera ref kept for screenshot
+let arXRBearGroup = null;      // placed bear Group ref kept for screenshot
+let arXRCapturePending = false; // signal animation loop to render screenshot next frame
+
 // ==================== Cookie Helpers ====================
 function setCookie(name, value, days = 365) {
     const expires = new Date();
@@ -1274,6 +1282,17 @@ async function launchARExperience(locationKey, isTestMode = false) {
     } else {
         arTestModeIndicator.style.display = 'none';
     }
+
+    // ── Try WebXR immersive-ar first (Android Chrome + ARCore) ────────────────
+    // WebXR gives true ground-plane hit testing and 6DoF pose – Pokémon GO style.
+    // Falls back to the existing getUserMedia + Three.js overlay approach if not available.
+    if (typeof navigator.xr !== 'undefined') {
+        const xrSupported = await navigator.xr.isSessionSupported('immersive-ar').catch(() => false);
+        if (xrSupported) {
+            await _setupWebXRAR(locationKey);
+            return; // _setupWebXRAR owns the rest of the lifecycle from here
+        }
+    }
     
     try {
         // Request camera permission and initialize
@@ -1339,6 +1358,345 @@ async function initializeARCamera() {
     } catch (error) {
         throw error;
     }
+}
+
+// ── WebXR AR – Pokémon GO style bear placement ────────────────────────────────
+//
+// This function is called when navigator.xr reports immersive-ar support
+// (Android Chrome 81+ with ARCore).  It creates a real WebXR session that:
+//   • Provides camera passthrough (no video element needed)
+//   • Casts hit-test rays so the user can place the bear on a real surface
+//   • Renders the 3D bear at the chosen real-world position (6DoF anchored)
+//   • Shows all existing HTML UI via the dom-overlay feature
+//
+// On devices / browsers without WebXR the caller falls back to the existing
+// getUserMedia + Three.js overlay approach automatically.
+//
+// ── Free 3D bear model options (for a higher-quality "Pokémon GO" look) ──────
+//   1. Quaternius Ultimate Animals (current, CC0, ~1 MB GLTF):
+//      https://quaternius.com/packs/ultimateanimals.html
+//   2. Poly Pizza (free CC0 GLBs, searchable, CDN-friendly):
+//      https://poly.pizza/search/bear
+//   3. Sketchfab free/CC models (download as GLB, self-host or CORS CDN):
+//      https://sketchfab.com/search?q=bear&licenses=7&type=models
+//   4. Mixamo (free animated characters, requires account, export as GLB):
+//      https://www.mixamo.com/#/?type=Character
+//   5. glTF Sample Assets (Khronos Group, CC0, for testing):
+//      https://github.com/KhronosGroup/glTF-Sample-Assets
+// ─────────────────────────────────────────────────────────────────────────────
+async function _setupWebXRAR(locationKey) {
+    const container = arSceneContainer;
+    const w = container.offsetWidth || window.innerWidth;
+    const h = container.offsetHeight || window.innerHeight;
+
+    // Three.js renderer – alpha:true lets the XR camera passthrough show through.
+    // preserveDrawingBuffer is needed for readRenderTargetPixels screenshot.
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(w, h);
+    renderer.xr.enabled = true;
+    renderer.domElement.className = 'ar-three-canvas';
+    container.appendChild(renderer.domElement);
+    arThreeRenderer = renderer;
+
+    const scene = new THREE.Scene();
+    arXRScene = scene;
+
+    // Camera – Three.js/WebXR manager overwrites its view/projection matrices each frame.
+    const camera = new THREE.PerspectiveCamera(70, w / h, 0.01, 20);
+    arXRCamera = camera;
+
+    // Lighting for realistic bear appearance
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    dirLight.position.set(2, 6, 3);
+    scene.add(dirLight);
+
+    const clock = new THREE.Clock();
+    arThreeClock = clock;
+
+    // ── Pokémon GO-style placement reticle (double ring on detected surface) ──
+    // The group's matrix is replaced each frame with the hit-test surface pose.
+    const reticleGroup = new THREE.Group();
+    reticleGroup.matrixAutoUpdate = false;
+    reticleGroup.visible = false;
+    scene.add(reticleGroup);
+
+    const innerRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.07, 0.10, 32).rotateX(-Math.PI / 2),
+        new THREE.MeshBasicMaterial({ color: 0x00ff88, side: THREE.DoubleSide })
+    );
+    reticleGroup.add(innerRing);
+
+    // Outer ring spins (set rotation.y each frame; world pose comes from parent group)
+    const outerRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.13, 0.155, 32).rotateX(-Math.PI / 2),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.55 })
+    );
+    reticleGroup.add(outerRing);
+
+    // ── Contact shadow rendered beneath the bear (like Pokémon GO) ────────────
+    const shadowMesh = new THREE.Mesh(
+        new THREE.CircleGeometry(0.35, 32),
+        new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false })
+    );
+    shadowMesh.rotation.x = -Math.PI / 2;
+    shadowMesh.renderOrder = -1;
+    shadowMesh.visible = false;
+    scene.add(shadowMesh);
+
+    // ── Bear state ─────────────────────────────────────────────────────────────
+    let bearGroup = null;
+    arXRBearGroup = null;
+    let bearPlaced = false;
+    let bearPhase = 'unplaced'; // unplaced | walkin | idle
+    let phaseTimer = 0;
+    const bearAnchorPos = new THREE.Vector3();
+    let walkOffset = 1.5;                // metres from anchor at walk-in start
+    const BEAR_SCALE = 0.014;            // scale GLTF model to ~1.4 m tall (1 unit = 1 m in WebXR)
+    const WALK_SPEED = 0.9;              // m/s walk-in speed
+    const HOP_HEIGHT_METERS = 0.12;      // max vertical displacement during hop animation
+    const IDLE_BOB_FREQUENCY = 1.5;      // radians/s of idle breathing oscillation
+    const IDLE_BOB_AMPLITUDE = 0.008;    // metres of idle vertical displacement
+    const RETICLE_SPIN_SPEED = 1.4;      // radians/s outer ring rotation
+
+    // ── Load bear model (async; placement waits for it) ────────────────────────
+    const LoaderClass = (typeof THREE.GLTFLoader !== 'undefined') ? THREE.GLTFLoader : GLTFLoader;
+    let gltfLoaded = null;
+    new LoaderClass().load(
+        BEAR_MODEL_URL,
+        (gltf) => { gltfLoaded = gltf; },
+        undefined,
+        (err) => { console.warn('Bear model failed to load:', err); }
+    );
+
+    // ── Request WebXR session ─────────────────────────────────────────────────
+    // hit-test is in optionalFeatures so devices that support immersive-ar but
+    // lack ARCore hit-testing can still start a session (bear placement falls
+    // back to a timed auto-place in front of the user in that case).
+    let session;
+    try {
+        session = await navigator.xr.requestSession('immersive-ar', {
+            optionalFeatures: ['hit-test', 'dom-overlay'],
+            domOverlay: { root: arModal }
+        });
+    } catch (sessionErr) {
+        console.warn('WebXR session start failed, falling back to video AR:', sessionErr);
+        if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+        renderer.dispose();
+        arThreeRenderer = null;
+        arXRMode = false;
+        arXRScene = null;
+        arXRCamera = null;
+        try {
+            await initializeARCamera();
+            setupARScene(locationKey);
+        } catch (camErr) {
+            showNotification('Unable to start camera.', 'error');
+            closeARView();
+        }
+        arLoading.classList.add('hidden');
+        return;
+    }
+
+    arXRSession = session;
+    arXRMode = true;
+    await renderer.xr.setSession(session);
+
+    const localSpace = await session.requestReferenceSpace('local');
+
+    // Request hit-test source asynchronously (surface detection)
+    let hitTestSource = null;
+    session.requestReferenceSpace('viewer')
+        .then(vs => session.requestHitTestSource({ space: vs }))
+        .then(src => { hitTestSource = src; })
+        .catch(e => console.warn('Hit-test source unavailable:', e));
+
+    // Update UI
+    arLoading.classList.add('hidden');
+    arHuntText.textContent = (currentLang === 'ro')
+        ? 'Îndreaptă spre pământ, atinge pentru a plasa Grizzly!'
+        : 'Point at the ground, then tap to place Grizzly!';
+    const placeHint = document.getElementById('ar-xr-place-hint');
+    if (placeHint) placeHint.classList.remove('hidden');
+
+    // ── Tap-to-place handler ──────────────────────────────────────────────────
+    function placeBear() {
+        if (bearPlaced) return;
+        if (!gltfLoaded) {
+            showNotification('🐻 Bear model is still loading, tap again in a moment!', 'info');
+            return;
+        }
+        if (!reticleGroup.visible) {
+            showNotification('Point the camera at a flat surface first.', 'info');
+            return;
+        }
+
+        bearPlaced = true;
+        if (placeHint) placeHint.classList.add('hidden');
+
+        // Anchor position is the current reticle world position
+        bearAnchorPos.setFromMatrixPosition(reticleGroup.matrix);
+
+        // Clone so the loaded GLTF can be reused across session resets
+        bearGroup = gltfLoaded.scene.clone();
+        arXRBearGroup = bearGroup;
+        bearGroup.scale.setScalar(BEAR_SCALE);
+        // Start 1.5 m to the right, will walk left to anchor
+        bearGroup.position.set(bearAnchorPos.x + walkOffset, bearAnchorPos.y, bearAnchorPos.z);
+        bearGroup.rotation.y = Math.PI; // face toward anchor
+        scene.add(bearGroup);
+
+        // Shadow sits just above the anchor surface to avoid z-fighting
+        shadowMesh.position.set(bearAnchorPos.x, bearAnchorPos.y + 0.002, bearAnchorPos.z);
+        shadowMesh.visible = true;
+
+        if (gltfLoaded.animations && gltfLoaded.animations.length) {
+            arThreeMixer = new THREE.AnimationMixer(bearGroup);
+            arThreeMixer.clipAction(gltfLoaded.animations[0]).play();
+        }
+
+        bearPhase = 'walkin';
+        reticleGroup.visible = false;
+        arHuntText.textContent = (currentLang === 'ro')
+            ? '🐻 Grizzly vine spre tine!'
+            : '🐻 Grizzly is walking toward you!';
+    }
+
+    function onTap(e) {
+        // Ignore clicks on the close/capture buttons (they have their own handlers)
+        if (e.target.closest('.ar-close-btn') || e.target.closest('.ar-capture-btn')) return;
+        placeBear();
+    }
+
+    container.addEventListener('click', onTap);
+    session.addEventListener('end', () => {
+        container.removeEventListener('click', onTap);
+        if (hitTestSource) { try { hitTestSource.cancel(); } catch (_) {} hitTestSource = null; }
+        arXRSession = null;
+        arXRMode = false;
+    });
+
+    // ── WebXR render loop ─────────────────────────────────────────────────────
+    // renderer.setAnimationLoop is the WebXR-aware replacement for rAF.
+    // Three.js automatically updates the camera pose from the XR frame.
+    let outerAngle = 0;
+    renderer.domElement.style.transition = 'opacity 0.4s ease';
+
+    renderer.setAnimationLoop((timestamp, frame) => {
+        if (!frame) return;
+        const delta = clock.getDelta();
+        if (arThreeMixer) arThreeMixer.update(delta);
+
+        // ── Hit-test → reticle ──────────────────────────────────────────────
+        if (!bearPlaced && hitTestSource) {
+            const hits = frame.getHitTestResults(hitTestSource);
+            if (hits.length > 0) {
+                const pose = hits[0].getPose(localSpace);
+                if (pose) {
+                    reticleGroup.visible = true;
+                    reticleGroup.matrix.fromArray(pose.transform.matrix);
+                    // Spin the outer ring in the reticle's local space
+                    outerAngle += delta * RETICLE_SPIN_SPEED;
+                    outerRing.rotation.y = outerAngle;
+                } else {
+                    reticleGroup.visible = false;
+                }
+            } else {
+                reticleGroup.visible = false;
+            }
+        }
+
+        // ── Bear walk-in animation ───────────────────────────────────────────
+        if (bearGroup) {
+            phaseTimer += delta;
+            if (bearPhase === 'walkin') {
+                walkOffset -= delta * WALK_SPEED;
+                if (walkOffset > 0) {
+                    bearGroup.position.x = bearAnchorPos.x + walkOffset;
+                    // Hopping arc: 3 hops over 1.5 m
+                    const progress = 1 - (walkOffset / 1.5);
+                    bearGroup.position.y = bearAnchorPos.y + Math.max(0, Math.sin(progress * Math.PI * 3)) * HOP_HEIGHT_METERS;
+                } else {
+                    walkOffset = 0;
+                    bearGroup.position.copy(bearAnchorPos);
+                    if (!arBearReady) {
+                        arBearReady = true;
+                        arBearOnScreen = true;
+                        bearPhase = 'idle';
+                        phaseTimer = 0;
+                        arHuntText.textContent = (currentLang === 'ro')
+                            ? '🐻 Grizzly e aici! Fă o poză!'
+                            : '🐻 Grizzly is here! Take a photo!';
+                        showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+                    }
+                }
+            } else if (bearPhase === 'idle') {
+                // Subtle idle breath bob
+                bearGroup.position.y = bearAnchorPos.y + Math.sin(phaseTimer * IDLE_BOB_FREQUENCY) * IDLE_BOB_AMPLITUDE;
+            }
+        }
+
+        // ── Screenshot (triggered by captureARPhoto) ─────────────────────────
+        // We do it inside the animation loop so the GL context is in the right state.
+        if (arXRCapturePending && bearGroup) {
+            arXRCapturePending = false;
+            _doXRScreenshot(renderer, scene, bearGroup);
+        }
+
+        renderer.render(scene, camera);
+    });
+}
+
+// ── WebXR screenshot: render bear from a nice angle to an offscreen target ───
+// In WebXR immersive-ar mode the XR framebuffer is separate from the canvas
+// default framebuffer, so toDataURL() returns blank.  Instead we render to a
+// WebGLRenderTarget with a snapshot camera and read pixels back via readRenderTargetPixels.
+function _doXRScreenshot(renderer, scene, bearGroup) {
+    const W = 640, H = 480;
+
+    // Snapshot camera: position slightly to the side and above, looking at bear
+    const snapCam = new THREE.PerspectiveCamera(55, W / H, 0.01, 20);
+    const bPos = bearGroup.position;
+    snapCam.position.set(bPos.x + 1.0, bPos.y + 0.5, bPos.z + 1.5);
+    snapCam.lookAt(bPos.x, bPos.y + 0.3, bPos.z);
+
+    // Render bear onto a dark AR-style background
+    const rt = new THREE.WebGLRenderTarget(W, H);
+    renderer.setRenderTarget(rt);
+    renderer.setClearColor(0x1a1a2e, 1);
+    renderer.clear();
+    renderer.render(scene, snapCam);
+    renderer.setRenderTarget(null);
+    renderer.setClearColor(0x000000, 0); // restore transparent clear
+
+    // Read raw RGBA pixels from the render target
+    const buf = new Uint8Array(W * H * 4);
+    renderer.readRenderTargetPixels(rt, 0, 0, W, H, buf);
+    rt.dispose();
+
+    // WebGL framebuffer is bottom-up; flip vertically to get a normal image
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const imgData = ctx.createImageData(W, H);
+    for (let row = 0; row < H; row++) {
+        const srcOff = (H - 1 - row) * W * 4;
+        const dstOff = row * W * 4;
+        imgData.data.set(buf.subarray(srcOff, srcOff + W * 4), dstOff);
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Watermark – font size is 3.3% of image width for legibility
+    const wmFontSizeRatio = 0.033;
+    ctx.font = `bold ${Math.round(W * wmFontSizeRatio)}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(AR_WATERMARK_TEXT, 10, H - 8);
+
+    _processCapture(canvas.toDataURL('image/jpeg', 0.82));
 }
 
 // ── Compass / Orientation helpers ─────────────────────────────────────────────
@@ -1576,6 +1934,7 @@ function setupARScene(locationKey) {
 //   https://quaternius.com/packs/ultimateanimals.html (free CC0)
 // place it at /assets/bear.glb and change the URL below.
 const BEAR_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bear/model.gltf';
+const AR_WATERMARK_TEXT = '📍 Rasnov AR Scavenger Hunt';
 
 function setupBearAR(locationKey) {
     // Try Three.js 3D bear first.
@@ -1854,11 +2213,25 @@ function captureARPhoto() {
 
     // Require bear to be on screen before taking a photo
     if (!arBearOnScreen) {
-        showNotification('🐻 Wait for Grizzly to hop onto the screen first!', 'warning');
+        showNotification('🐻 Wait for Grizzly to arrive first!', 'warning');
         return;
     }
 
-    // Use a canvas to composite camera feed + bear overlay
+    // ── WebXR mode: screenshot is rendered inside the animation loop ──────────
+    // We can't use toDataURL() on the WebXR canvas (it writes to the XR framebuffer,
+    // not the canvas default framebuffer).  Instead we set a flag and let the next
+    // animation frame render to an offscreen render target.
+    if (arXRMode) {
+        arXRCapturePending = true;
+        // Flash + button feedback immediately so the UX feels responsive
+        arFlash.classList.add('flashing');
+        arFlash.addEventListener('animationend', () => arFlash.classList.remove('flashing'), { once: true });
+        arCaptureBtn.classList.add('captured');
+        arCaptureBtn.innerHTML = '<i class="fas fa-check"></i>';
+        return;
+    }
+
+    // ── Non-WebXR mode: composite video frame + Three.js/emoji canvas ─────────
     const video = document.getElementById('ar-camera-feed');
     const captureCanvas = document.createElement('canvas');
     const cw = video ? video.videoWidth || 640 : 640;
@@ -1913,26 +2286,28 @@ function captureARPhoto() {
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
-    ctx.fillText('📍 Rasnov Scavenger Hunt', 10, ch - 8);
+    ctx.fillText(AR_WATERMARK_TEXT, 10, ch - 8);
 
-    const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.82);
+    _processCapture(captureCanvas.toDataURL('image/jpeg', 0.82));
+}
 
+// ── Shared save / flash / close logic used by both capture paths ──────────────
+function _processCapture(dataUrl) {
     // Save photo to localStorage under location key
     try {
         localStorage.setItem(`ar_photo_${currentARLocation}`, dataUrl);
     } catch (e) {
-        // localStorage quota exceeded or unavailable
         console.warn('Could not save photo to localStorage (storage full?)', e);
         showNotification('📸 Photo taken! (Could not save – storage full)', 'warning');
     }
 
-    // Flash effect
-    arFlash.classList.add('flashing');
-    arFlash.addEventListener('animationend', () => arFlash.classList.remove('flashing'), { once: true });
-
-    // Capture button feedback
-    arCaptureBtn.classList.add('captured');
-    arCaptureBtn.innerHTML = '<i class="fas fa-check"></i>';
+    // Flash effect (WebXR path already triggered it, but adding class again is harmless)
+    if (!arXRMode) {
+        arFlash.classList.add('flashing');
+        arFlash.addEventListener('animationend', () => arFlash.classList.remove('flashing'), { once: true });
+        arCaptureBtn.classList.add('captured');
+        arCaptureBtn.innerHTML = '<i class="fas fa-check"></i>';
+    }
 
     // Award points and show discovery after a short delay
     setTimeout(() => {
@@ -1977,8 +2352,27 @@ function discoverLocationQuietly(locationKey) {
 function closeARView() {
     // Hide AR modal
     arModal.classList.remove('active');
+
+    // ── End WebXR session (if active) ─────────────────────────────────────────
+    if (arXRSession) {
+        arXRSession.end().catch(() => {});
+        arXRSession = null;
+    }
+    // Stop the WebXR/Three.js animation loop
+    if (arThreeRenderer) {
+        arThreeRenderer.setAnimationLoop(null);
+    }
+    arXRMode = false;
+    arXRCapturePending = false;
+    arXRScene = null;
+    arXRCamera = null;
+    arXRBearGroup = null;
+
+    // Hide WebXR place hint if shown
+    const placeHint = document.getElementById('ar-xr-place-hint');
+    if (placeHint) placeHint.classList.add('hidden');
     
-    // Cancel Three.js animation loop
+    // Cancel rAF-based Three.js animation loop (non-WebXR path)
     if (arAnimationId !== null) {
         cancelAnimationFrame(arAnimationId);
         arAnimationId = null;
@@ -2035,7 +2429,7 @@ function closeARView() {
     currentARLocation = null;
     arTestModeIndicator.style.display = 'none';
     
-    console.log('AR view closed, camera stopped');
+    console.log('AR view closed');
 }
 
 // Modal Functions
