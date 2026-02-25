@@ -126,7 +126,7 @@ body {
     height: 60vh;
     min-height: 400px;
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                url('pictures/background.png') center/cover;
+                url('images/background.png') center/cover;
     display: flex;
     align-items: center;
     justify-content: center;
