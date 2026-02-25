@@ -647,6 +647,43 @@
                         <!-- Content filled dynamically by JavaScript -->
                     </div>
                 </div>
+
+                <!-- Survey Prompt Modal -->
+                <div class="modal" id="survey-modal">
+                    <div class="modal-content survey-prompt-content">
+                        <button class="modal-close" onclick="dismissSurvey()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="discovery-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3 id="survey-modal-title">Quick Survey</h3>
+                        <p id="survey-modal-message">Would you like to take a quick survey about your time in Rasnov? We look over every response to improve the site!</p>
+                        <p id="survey-modal-reward" class="survey-reward-text">🎁 Unlock a special site theme as a thank you!</p>
+                        <div class="survey-btn-row">
+                            <button class="cta-button" id="survey-yes-btn" onclick="startSurvey()">Yes, take the survey!</button>
+                            <button class="skip-btn" id="survey-no-btn" onclick="dismissSurvey()">Maybe later</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Survey Form Modal -->
+                <div class="modal" id="survey-form-modal">
+                    <div class="modal-content survey-form-content">
+                        <button class="modal-close" onclick="closeSurveyForm()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <h3 id="survey-form-title">Rasnov Survey</h3>
+                        <div class="survey-iframe-container">
+                            <iframe src="https://forms.gle/78pqhoedThrKGmXH8"
+                                    class="survey-iframe"
+                                    title="Rasnov Survey">Loading form...</iframe>
+                        </div>
+                        <p class="survey-fallback-link">
+                            <a href="https://forms.gle/78pqhoedThrKGmXH8" target="_blank" rel="noopener noreferrer" id="survey-open-tab">Open in new tab ↗</a>
+                        </p>
+                    </div>
+                </div>
             </section>
 
             <!-- Interactive Map Section -->

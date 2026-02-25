@@ -2046,3 +2046,50 @@ body {
     color: var(--primary-color);
     font-weight: 600;
 }
+/* Survey Modals */
+.survey-reward-text {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.survey-btn-row {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.survey-form-content {
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.survey-iframe-container {
+    width: 100%;
+    height: 520px;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+}
+
+.survey-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.survey-fallback-link {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.survey-fallback-link a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}

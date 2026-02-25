@@ -45,6 +45,7 @@ let userLocation = null;
 let arStream = null;
 let currentARLocation = null;
 let firstDiscoveryPending = false; // true when name prompt should follow discovery modal
+let surveyPromptPending = false; // true when survey prompt should follow discovery/name modal
 
 // Three.js / AR 3D state
 let arThreeRenderer = null;
@@ -1117,6 +1118,11 @@ async function discoverLocation(locationKey) {
     if (currentUser && !currentUser.hasSetName) {
         firstDiscoveryPending = true;
     }
+
+    // Queue survey prompt after 2nd location, if not shown before
+    if (foundLocations.size === 2 && !localStorage.getItem('rasnov_survey_shown')) {
+        surveyPromptPending = true;
+    }
     
     // Refresh leaderboard data in the background after finding a location
     loadLeaderboard();
@@ -1157,6 +1163,10 @@ function onDiscoveryModalContinue() {
     if (firstDiscoveryPending) {
         firstDiscoveryPending = false;
         setTimeout(() => openModal('first-discovery-modal'), MODAL_TRANSITION_DELAY);
+    } else if (surveyPromptPending) {
+        surveyPromptPending = false;
+        localStorage.setItem('rasnov_survey_shown', '1');
+        setTimeout(() => openSurveyPromptModal(), MODAL_TRANSITION_DELAY);
     }
 }
 
@@ -1170,11 +1180,41 @@ function submitFirstDiscoveryName() {
     }
     setUsername(name);
     closeModal('first-discovery-modal');
+    if (surveyPromptPending) {
+        surveyPromptPending = false;
+        localStorage.setItem('rasnov_survey_shown', '1');
+        setTimeout(() => openSurveyPromptModal(), MODAL_TRANSITION_DELAY);
+    }
 }
 
 // Skip setting a name for now
 function skipFirstDiscoveryName() {
     closeModal('first-discovery-modal');
+    if (surveyPromptPending) {
+        surveyPromptPending = false;
+        localStorage.setItem('rasnov_survey_shown', '1');
+        setTimeout(() => openSurveyPromptModal(), MODAL_TRANSITION_DELAY);
+    }
+}
+
+// Survey Functions
+function openSurveyPromptModal() {
+    openModal('survey-modal');
+}
+
+function startSurvey() {
+    localStorage.setItem('rasnov_survey_started', '1');
+    renderUnlocksTab();
+    closeModal('survey-modal');
+    setTimeout(() => openModal('survey-form-modal'), MODAL_TRANSITION_DELAY);
+}
+
+function dismissSurvey() {
+    closeModal('survey-modal');
+}
+
+function closeSurveyForm() {
+    closeModal('survey-form-modal');
 }
 
 // AR Camera Functions
@@ -2462,6 +2502,15 @@ const I18N = {
         qrHelp: 'Îndreptați camera către un cod QR la una dintre locațiile vânătorii',
         mapCta: 'Încarcă Harta',
         discoveryContinue: 'Continuă Vânătoarea',
+        survey: {
+            title: 'Sondaj rapid',
+            message: 'Doriți să completați un sondaj rapid despre timpul petrecut în Râșnov? Analizăm fiecare răspuns pentru a îmbunătăți site-ul!',
+            reward: '🎁 Deblocați o temă specială ca mulțumire!',
+            yes: 'Da, completez sondajul!',
+            no: 'Poate mai târziu',
+            formTitle: 'Sondaj Râșnov',
+            openTab: 'Deschide în filă nouă ↗'
+        },
         footer: {
             about: 'Despre Râșnov',
             quickLinks: 'Linkuri rapide',
@@ -2549,7 +2598,9 @@ const MESSAGE_MAP = {
         'Interactive map showing all locations, restaurants, and accommodations': 'Hartă interactivă care afișează toate locațiile, restaurantele și cazări',
         'Open now': 'Deschis acum',
         '❌ Closed': '❌ Închis',
-        '✅ Open now': '✅ Deschis acum'
+        '✅ Open now': '✅ Deschis acum',
+        'Unlocked by survey': 'Deblocat prin sondaj',
+        'Take the survey to unlock': 'Completați sondajul pentru a debloca'
     }
 };
 
@@ -2655,6 +2706,24 @@ function applyTranslations(lang) {
     // Discovery modal continue button
     const discoveryContinueBtn = document.querySelector('#discovery-modal .cta-button');
     if (discoveryContinueBtn) discoveryContinueBtn.textContent = dict.discoveryContinue;
+
+    // Survey modals
+    if (dict.survey) {
+        const surveyTitle = document.getElementById('survey-modal-title');
+        if (surveyTitle) surveyTitle.textContent = dict.survey.title;
+        const surveyMsg = document.getElementById('survey-modal-message');
+        if (surveyMsg) surveyMsg.textContent = dict.survey.message;
+        const surveyReward = document.getElementById('survey-modal-reward');
+        if (surveyReward) surveyReward.textContent = dict.survey.reward;
+        const surveyYesBtn = document.getElementById('survey-yes-btn');
+        if (surveyYesBtn) surveyYesBtn.textContent = dict.survey.yes;
+        const surveyNoBtn = document.getElementById('survey-no-btn');
+        if (surveyNoBtn) surveyNoBtn.textContent = dict.survey.no;
+        const surveyFormTitle = document.getElementById('survey-form-title');
+        if (surveyFormTitle) surveyFormTitle.textContent = dict.survey.formTitle;
+        const surveyOpenTab = document.getElementById('survey-open-tab');
+        if (surveyOpenTab) surveyOpenTab.textContent = dict.survey.openTab;
+    }
 
     // Footer headings
     const footerAbout = document.querySelector('.footer-section:first-child h4');
@@ -2930,6 +2999,19 @@ const THEMES = [
             '--secondary-color': '#fdd835',
             '--accent-color': '#ff7043'
         }
+    },
+    {
+        id: 'survey',
+        name: 'Survey Supporter',
+        emoji: '📋',
+        description: 'Unlocked by starting the Rasnov survey. Thank you for your feedback!',
+        pointsRequired: 0,
+        surveyRequired: true,
+        vars: {
+            '--primary-color': '#6a1b9a',
+            '--secondary-color': '#f06292',
+            '--accent-color': '#ce93d8'
+        }
     }
 ];
 
@@ -2949,23 +3031,30 @@ function renderUnlocksTab() {
     if (!container) return;
     const userPoints = (currentUser && currentUser.totalPoints) || 0;
     const savedTheme = localStorage.getItem('rasnov_theme') || 'default';
+    const surveyStarted = localStorage.getItem('rasnov_survey_started') === '1';
     container.innerHTML = `
         <h2 class="section-title">🎨 Theme Unlocks</h2>
         <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the scavenger hunt to unlock new site themes.</p>
         <div class="theme-cards">
             ${THEMES.map(theme => {
-                const unlocked = userPoints >= theme.pointsRequired;
+                const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
                 const active = savedTheme === theme.id;
+                const ptsLabel = theme.surveyRequired
+                    ? translateMessage('Unlocked by survey')
+                    : (theme.pointsRequired === 0 ? 'Always unlocked' : `Requires ${theme.pointsRequired} pts`);
+                const lockedBtn = theme.surveyRequired
+                    ? `<button class="ar-button" disabled>📋 ${translateMessage('Take the survey to unlock')}</button>`
+                    : `<button class="ar-button" disabled>🔒 ${userPoints}/${theme.pointsRequired} pts</button>`;
                 return `<div class="theme-card ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
                     <div class="theme-emoji">${theme.emoji}</div>
                     <h3 class="theme-name">${theme.name}</h3>
                     <p class="theme-desc">${theme.description}</p>
-                    <p class="theme-pts">${theme.pointsRequired === 0 ? 'Always unlocked' : `Requires ${theme.pointsRequired} pts`}</p>
+                    <p class="theme-pts">${ptsLabel}</p>
                     ${unlocked
                         ? (active
                             ? `<button class="ar-button primary" disabled>✓ Active</button>`
                             : `<button class="ar-button primary" onclick="applyTheme('${theme.id}')">Apply</button>`)
-                        : `<button class="ar-button" disabled>🔒 ${userPoints}/${theme.pointsRequired} pts</button>`}
+                        : lockedBtn}
                 </div>`;
             }).join('')}
         </div>`;
