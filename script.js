@@ -55,6 +55,15 @@ let arAnimationId = null;
 let arBearReady = false;
 let arBearOnScreen = false; // true once bear is visible in the viewport (during or after walk-in)
 
+// Camera motion / orientation state (for "move camera to find Grizzly" AR mode)
+let arOrientationHandler = null;  // active deviceorientation listener
+let arOrientationAbsHandler = null; // absolute (true-north) orientation listener
+let arCompassBearing = null;       // current device compass heading (degrees, true north)
+let arCompassAbsolute = false;     // whether compass is calibrated to true north
+let arBearVisible = false;         // whether bear is currently shown in compass-AR mode
+let arTargetBearing = null;        // bearing from user to the target location
+let arBearVisibleCheckId = null;   // setInterval ID for emoji-fallback on-screen polling
+
 // ==================== Cookie Helpers ====================
 function setCookie(name, value, days = 365) {
     const expires = new Date();
@@ -1242,12 +1251,22 @@ async function launchARExperience(locationKey, isTestMode = false) {
     arBearReady = false;
     arBearOnScreen = false;
     
-    // Update hunt instruction banner
+    // Update hunt instruction banner – invite user to move the camera
     const locName = localizedField(location, 'name') || location.name;
     arHuntText.textContent = (currentLang === 'ro')
-        ? `Găsește Grizzly la ${locName} și fă o poză!`
-        : `Find Grizzly at the ${locName} and take a picture!`;
+        ? `Mișcă camera și găsește Grizzly la ${locName}!`
+        : `Move the camera around and find Grizzly!`;
     arHuntBanner.style.display = 'flex';
+
+    // Pre-compute compass bearing to target (used for anchored AR if orientation available)
+    arTargetBearing = null;
+    if (userLocation && location.lat && location.lng) {
+        arTargetBearing = _bearingTo(userLocation.lat, userLocation.lng, location.lat, location.lng);
+    }
+    arBearVisible = false;
+
+    // Start lightweight orientation tracking (no image processing – just sensor polling)
+    _startOrientationTracking();
     
     // Show test mode indicator if applicable
     if (isTestMode) {
@@ -1320,6 +1339,174 @@ async function initializeARCamera() {
     } catch (error) {
         throw error;
     }
+}
+
+// ── Compass / Orientation helpers ─────────────────────────────────────────────
+//
+// Current AR approach: GPS bearing + DeviceOrientation compass.
+// No heavy libraries – just lightweight sensor math.
+//
+// Potential enhancements to make AR even better on mobile (feasibility notes):
+//
+//  1. DeviceMotionEvent (accelerometer) – already fires freely; could measure
+//     "shake" for a fun "shake to summon Grizzly" mechanic.  Zero extra deps.
+//
+//  2. Pitch-aware anchoring – use DeviceOrientation beta (tilt up/down) alongside
+//     alpha (compass) so bear only shows when camera is at the right angle.
+//     Single extra trig check, no libraries needed.
+//
+//  3. WebXR Device API – browser-native AR (Chrome 81+ on Android).  Gives real
+//     camera pose without A-Frame.  ~0 extra weight if already using Three.js.
+//     Best for true 3-DoF/6-DoF anchoring.  Requires HTTPS + user gesture.
+//
+//  4. GPS geofencing – already have user GPS; trigger bear only when user is
+//     within ~20 m of the target coordinate.  Pure distance math, no new deps.
+//
+//  5. Magnetometer calibration banner – show a "figure-8 to calibrate compass"
+//     prompt when absolute orientation is unavailable (helps accuracy of #1/#2).
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Calculate bearing (degrees, 0–360 clockwise from north) from one GPS point to another.
+function _bearingTo(lat1, lng1, lat2, lng2) {
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δλ = (lng2 - lng1) * Math.PI / 180;
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+// Smallest angular difference between two headings (0–180).
+function _angleDelta(a, b) {
+    const d = Math.abs(a - b) % 360;
+    return d > 180 ? 360 - d : d;
+}
+
+// Start listening to deviceorientation.  On iOS 13+ permission must be requested
+// explicitly; on Android the event fires without a prompt.  We try the absolute
+// variant first (true-north compass), falling back to the relative variant.
+// This is intentionally lightweight – no image processing, just sensor data.
+function _startOrientationTracking() {
+    _stopOrientationTracking(); // clean up any previous listener
+
+    function handleOrientation(event) {
+        // `alpha` is the compass heading: degrees clockwise from north when
+        // the phone is held flat.  Some browsers expose a `webkitCompassHeading`
+        // property on iOS which already accounts for magnetic declination.
+        let heading = null;
+        if (typeof event.webkitCompassHeading === 'number') {
+            heading = event.webkitCompassHeading; // iOS true-north heading
+            arCompassAbsolute = true;
+        } else if (event.absolute && typeof event.alpha === 'number') {
+            // Android absolute orientation (true north) – alpha is CCW from north, so invert.
+            heading = (360 - event.alpha) % 360;
+            arCompassAbsolute = true;
+        } else if (typeof event.alpha === 'number') {
+            // Relative heading – useful for detecting movement even without true north.
+            heading = (360 - event.alpha) % 360;
+            arCompassAbsolute = false;
+        }
+
+        if (heading === null) return;
+        arCompassBearing = heading;
+
+        // ── Compass-anchored bear visibility ──────────────────────────────────
+        // If we have a true-north compass AND a target bearing, show/hide the
+        // bear based on whether the user is pointing the camera at the target.
+        if (arCompassAbsolute && arTargetBearing !== null) {
+            const delta = _angleDelta(heading, arTargetBearing);
+            const TOLERANCE_DEG = 30; // ±30° window to see Grizzly
+            const shouldShow = delta <= TOLERANCE_DEG;
+
+            if (shouldShow && !arBearVisible) {
+                arBearVisible = true;
+                _triggerBearAppearance();
+            } else if (!shouldShow && arBearVisible) {
+                arBearVisible = false;
+                _hideBear();
+            }
+        }
+    }
+
+    // Absolute-orientation handler (Android `deviceorientationabsolute`).
+    // When this fires we know we have true-north data, so we suppress the
+    // relative `deviceorientation` fallback to avoid double processing.
+    function handleAbsoluteOrientation(event) {
+        handleOrientation(event);
+    }
+
+    function _addListeners() {
+        // Use absolute event (true north) when available, relative as fallback.
+        // Storing handlers separately so we can remove them precisely.
+        arOrientationAbsHandler = handleAbsoluteOrientation;
+        arOrientationHandler = handleOrientation;
+        window.addEventListener('deviceorientationabsolute', arOrientationAbsHandler, { passive: true });
+        // Only add relative listener on devices that don't fire the absolute event
+        // (checked by inspecting whether deviceorientationabsolute is supported).
+        if (typeof window.ondeviceorientationabsolute === 'undefined') {
+            window.addEventListener('deviceorientation', arOrientationHandler, { passive: true });
+        }
+    }
+
+    // Try to request permission on iOS 13+ before adding the listener.
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(state => {
+                if (state === 'granted') {
+                    // iOS only fires `deviceorientation` (with webkitCompassHeading)
+                    arOrientationHandler = handleOrientation;
+                    window.addEventListener('deviceorientation', arOrientationHandler, { passive: true });
+                }
+            })
+            .catch(() => { /* permission denied – no orientation tracking */ });
+    } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        _addListeners();
+    }
+}
+
+function _stopOrientationTracking() {
+    if (arOrientationAbsHandler) {
+        window.removeEventListener('deviceorientationabsolute', arOrientationAbsHandler);
+        arOrientationAbsHandler = null;
+    }
+    if (arOrientationHandler) {
+        window.removeEventListener('deviceorientation', arOrientationHandler);
+        arOrientationHandler = null;
+    }
+    arCompassBearing = null;
+    arCompassAbsolute = false;
+    arBearVisible = false;
+}
+
+// Called when compass says the camera is pointed at the target – trigger bear entry.
+function _triggerBearAppearance() {
+    // Only trigger if a bear isn't already on screen or in walk-in
+    if (arBearReady || arBearOnScreen) return;
+    // Signal bear animation to begin (it may already be running with a delay;
+    // here we just set a flag that the animation loop respects).
+    arBearVisible = true;
+}
+
+// Called when compass says camera moved away – hide bear.
+function _hideBear() {
+    const bearEl = document.getElementById('ar-bear-placeholder');
+    if (bearEl) {
+        bearEl.style.opacity = '0';
+        bearEl.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => {
+            if (!arBearVisible) {
+                // Reset so bear can reappear when camera swings back
+                bearEl.style.opacity = '';
+                bearEl.style.transition = '';
+                bearEl.classList.remove('idle', 'ar-bear-walkin');
+                arBearReady = false;
+                arBearOnScreen = false;
+            }
+        }, 450);
+    }
+    // For 3D bear, the animate loop checks arBearVisible
 }
 
 function setupARScene(locationKey) {
@@ -1430,24 +1617,31 @@ function _setup3DBear(locationKey) {
     const clock = new THREE.Clock();
     arThreeClock = clock;
 
-    // Bear walk-in constants
-    const BEAR_WALK_START_X = 6;  // start off-screen right
+    // ── Randomize entry side & timing ────────────────────────────────────────
+    const sides = ['right', 'left'];
+    const entrySide = sides[Math.floor(Math.random() * sides.length)];
     const BEAR_BASE_Y = -1;        // resting vertical position
-    const HOP_COUNT = 4;           // number of hops during walk-in
-    const HOP_HEIGHT = 0.6;        // peak hop height in world units
-    const FAKEOUT_STOP_X = 3.2;    // how far in the bear peeks during fake-out
-    const FAKEOUT_SPEED = 5.0;     // fast walk-in for fake-out
-    const WALKIN_SPEED = 2.4;      // normal walk-in speed
+    const HOP_COUNT = 4;
+    const HOP_HEIGHT = 0.6;
+    const FAKEOUT_SPEED = 9.0;     // faster pop-in
+    const WALKIN_SPEED = 3.2;      // slightly faster walk-in
+
+    // Side-specific parameters
+    const startX = entrySide === 'right' ? 6 : -6;
+    const fakeStopX = entrySide === 'right' ? 3.2 : -3.2;
+    const faceDir = entrySide === 'right' ? -Math.PI / 2 : Math.PI / 2;
+
+    // Random delay: 0.3–1.8 s before bear appears
+    const initialDelay = 0.3 + Math.random() * 1.5;
 
     // Load GLTF bear
     const LoaderClass = (typeof THREE.GLTFLoader !== 'undefined') ? THREE.GLTFLoader : GLTFLoader;
     const loader = new LoaderClass();
     let bearGroup = null;
-    let walkX = BEAR_WALK_START_X;
+    let walkX = startX;
 
-    // Fake-out + walk-in phase state
-    // Phases: 'fakeout_in' -> 'fakeout_bob' -> 'fakeout_out' -> 'pause' -> 'walkin'
-    let bearPhase = 'fakeout_in';
+    // Phases: 'waiting' -> 'fakeout_in' -> 'fakeout_bob' -> 'fakeout_out' -> 'pause' -> 'walkin'
+    let bearPhase = 'waiting';
     let phaseTimer = 0;
 
     loader.load(
@@ -1455,23 +1649,18 @@ function _setup3DBear(locationKey) {
         (gltf) => {
             bearGroup = gltf.scene;
             bearGroup.scale.set(1.2, 1.2, 1.2);
-            bearGroup.position.set(walkX, BEAR_BASE_Y, 0);
-            // Face left (toward center)
-            bearGroup.rotation.y = -Math.PI / 2;
+            bearGroup.position.set(startX, BEAR_BASE_Y, 0);
+            bearGroup.rotation.y = faceDir;
             scene.add(bearGroup);
 
-            // Play animation if available
             if (gltf.animations && gltf.animations.length) {
                 arThreeMixer = new THREE.AnimationMixer(bearGroup);
-                const clip = gltf.animations[0];
-                arThreeMixer.clipAction(clip).play();
+                arThreeMixer.clipAction(gltf.animations[0]).play();
             }
-            // arBearReady / arBearOnScreen are set by the animate loop phases
         },
         undefined,
         (err) => {
             console.warn('3D bear model failed to load, using fallback.', err);
-            // Cleanup Three.js canvas and use emoji fallback
             if (renderer.domElement.parentNode) {
                 renderer.domElement.parentNode.removeChild(renderer.domElement);
             }
@@ -1481,7 +1670,20 @@ function _setup3DBear(locationKey) {
         }
     );
 
+    // Helper: project bear's world position to NDC and return true if on screen.
+    function isBearOnScreen() {
+        if (!bearGroup) return false;
+        const pos = new THREE.Vector3();
+        bearGroup.getWorldPosition(pos);
+        pos.project(camera);
+        return pos.x >= -1 && pos.x <= 1 && pos.y >= -1 && pos.y <= 1;
+    }
+
     // Animation loop
+    // Set the canvas opacity transition once so we don't touch the style every frame.
+    renderer.domElement.style.transition = 'opacity 0.4s ease';
+    let lastCompassVisible = true; // tracks previous compass visibility state
+
     function animate() {
         arAnimationId = requestAnimationFrame(animate);
         const delta = clock.getDelta();
@@ -1491,11 +1693,34 @@ function _setup3DBear(locationKey) {
         if (bearGroup) {
             phaseTimer += delta;
 
-            if (bearPhase === 'fakeout_in') {
-                // Bear walks in quickly to the fake-out stop point
-                walkX -= delta * FAKEOUT_SPEED;
-                if (walkX <= FAKEOUT_STOP_X) {
-                    walkX = FAKEOUT_STOP_X;
+            // ── Compass-anchored visibility: hide bear when camera points away ──
+            if (arCompassAbsolute && arTargetBearing !== null) {
+                const visible = arBearVisible;
+                if (visible !== lastCompassVisible) {
+                    renderer.domElement.style.opacity = visible ? '1' : '0';
+                    lastCompassVisible = visible;
+                }
+                if (!visible) {
+                    renderer.render(scene, camera);
+                    return; // skip position updates while hidden
+                }
+            }
+
+            if (bearPhase === 'waiting') {
+                // Hold off-screen until initial delay passes
+                bearGroup.position.set(startX, BEAR_BASE_Y, 0);
+                if (phaseTimer >= initialDelay) {
+                    bearPhase = 'fakeout_in';
+                    phaseTimer = 0;
+                }
+
+            } else if (bearPhase === 'fakeout_in') {
+                // Fast peek toward center
+                const dir = entrySide === 'right' ? -1 : 1;
+                walkX += dir * delta * FAKEOUT_SPEED;
+                const peaked = entrySide === 'right' ? walkX <= fakeStopX : walkX >= fakeStopX;
+                if (peaked) {
+                    walkX = fakeStopX;
                     bearPhase = 'fakeout_bob';
                     phaseTimer = 0;
                 }
@@ -1503,19 +1728,19 @@ function _setup3DBear(locationKey) {
                 bearGroup.position.y = BEAR_BASE_Y;
 
             } else if (bearPhase === 'fakeout_bob') {
-                // Bear bobs briefly at the peek position
-                bearGroup.position.x = FAKEOUT_STOP_X;
+                bearGroup.position.x = fakeStopX;
                 bearGroup.position.y = BEAR_BASE_Y + Math.sin(phaseTimer * Math.PI * 3) * 0.25;
-                if (phaseTimer > 0.7) {
+                if (phaseTimer > 0.4) {   // quicker bob
                     bearPhase = 'fakeout_out';
                     phaseTimer = 0;
                 }
 
             } else if (bearPhase === 'fakeout_out') {
-                // Bear retreats quickly back off-screen
-                walkX += delta * (FAKEOUT_SPEED * 1.5);
-                if (walkX >= BEAR_WALK_START_X) {
-                    walkX = BEAR_WALK_START_X;
+                const dir = entrySide === 'right' ? 1 : -1;
+                walkX += dir * delta * (FAKEOUT_SPEED * 1.5);
+                const escaped = entrySide === 'right' ? walkX >= startX : walkX <= startX;
+                if (escaped) {
+                    walkX = startX;
                     bearPhase = 'pause';
                     phaseTimer = 0;
                 }
@@ -1523,29 +1748,33 @@ function _setup3DBear(locationKey) {
                 bearGroup.position.y = BEAR_BASE_Y;
 
             } else if (bearPhase === 'pause') {
-                // Bear stays off-screen briefly before the real walk-in
-                bearGroup.position.x = BEAR_WALK_START_X;
+                bearGroup.position.x = startX;
                 bearGroup.position.y = BEAR_BASE_Y;
-                if (phaseTimer > 1.2) {
+                if (phaseTimer > 0.6) {  // shorter pause
                     bearPhase = 'walkin';
                     phaseTimer = 0;
-                    walkX = BEAR_WALK_START_X;
+                    walkX = startX;
                 }
 
             } else if (bearPhase === 'walkin') {
-                // Main walk-in from right to center with hopping
-                if (walkX > 0) {
-                    walkX -= delta * WALKIN_SPEED;
-                    const clampedX = Math.max(walkX, 0);
-                    bearGroup.position.x = clampedX;
-                    const progress = (BEAR_WALK_START_X - clampedX) / BEAR_WALK_START_X;
-                    bearGroup.position.y = BEAR_BASE_Y + Math.max(0, Math.sin(progress * Math.PI * HOP_COUNT)) * HOP_HEIGHT;
-                    // Bear is "on screen" once it enters the visible viewport area
-                    if (!arBearOnScreen && clampedX < 3) {
-                        arBearOnScreen = true;
-                    }
-                    if (walkX <= 0) {
-                        bearGroup.position.y = BEAR_BASE_Y;
+                const dir = entrySide === 'right' ? -1 : 1;
+                walkX += dir * delta * WALKIN_SPEED;
+                const clampedX = entrySide === 'right' ? Math.max(walkX, 0) : Math.min(walkX, 0);
+                bearGroup.position.x = clampedX;
+                const progress = Math.abs(startX - clampedX) / Math.abs(startX);
+                bearGroup.position.y = BEAR_BASE_Y + Math.max(0, Math.sin(progress * Math.PI * HOP_COUNT)) * HOP_HEIGHT;
+
+                // Use projected NDC coordinates to determine if bear is on screen
+                if (!arBearOnScreen && isBearOnScreen()) {
+                    arBearOnScreen = true;
+                }
+
+                const arrived = entrySide === 'right' ? walkX <= 0 : walkX >= 0;
+                if (arrived) {
+                    walkX = 0;
+                    bearGroup.position.x = 0;
+                    bearGroup.position.y = BEAR_BASE_Y;
+                    if (!arBearReady) {
                         arBearReady = true;
                         arBearOnScreen = true;
                         showNotification('🐻 Grizzly is here! Take a photo!', 'info');
@@ -1560,37 +1789,64 @@ function _setup3DBear(locationKey) {
 }
 
 function _setupBearFallback() {
-    // Animated emoji bear: fake-out peek then full walk-in from the right
-    const FAKEOUT_DURATION_MS = 2000;   // duration of bearFakeOut CSS animation
-    const WALKIN_DELAY_MS = 1200;       // CSS animation delay before walk-in starts
-    const WALKIN_DURATION_MS = 2000;    // CSS animation duration for walk-in
-    const BEAR_VISIBLE_DELAY_MS = 1500; // ms into walk-in when bear enters the visible area
+    // Randomize entry side and timing
+    const sides = ['right', 'left', 'bottom'];
+    const entrySide = sides[Math.floor(Math.random() * sides.length)];
+    const initialDelayMs = 300 + Math.floor(Math.random() * 1500); // 0.3–1.8 s
+
+    const FAKEOUT_DURATION_MS = 1200;  // faster pop-in (was 2000)
+    const WALKIN_DELAY_MS = 800;       // shorter pause (was 1200)
+    const WALKIN_DURATION_MS = 1800;   // walk-in duration (was 2000)
+    const BEAR_VISIBLE_DELAY_MS = 900; // ms into walk-in when bear enters visible area
 
     const bear = document.createElement('div');
-    bear.className = 'ar-bear-placeholder ar-bear-fakeout';
+    // Pick animation class based on entry side
+    const fakeoutClass = entrySide === 'left'   ? 'ar-bear-fakeout-left'
+                       : entrySide === 'bottom' ? 'ar-bear-fakeout-bottom'
+                       :                          'ar-bear-fakeout';
+    const walkinClass  = entrySide === 'left'   ? 'ar-bear-walkin-left'
+                       : entrySide === 'bottom' ? 'ar-bear-walkin-bottom'
+                       :                          'ar-bear-walkin';
+
+    bear.className = `ar-bear-placeholder`;
     bear.id = 'ar-bear-placeholder';
     bear.textContent = '🐻';
     bear.setAttribute('role', 'img');
     bear.setAttribute('aria-label', 'Grizzly Bear');
     arSceneContainer.appendChild(bear);
 
-    // After fake-out animation ends, start main walk-in
     setTimeout(() => {
-        bear.classList.remove('ar-bear-fakeout');
-        bear.classList.add('ar-bear-walkin');
-        // Bear enters visible area partway through the walk-in animation
+        bear.classList.add(fakeoutClass);
+
         setTimeout(() => {
-            arBearOnScreen = true;
-        }, BEAR_VISIBLE_DELAY_MS);
-        // After walk-in animation completes, switch to idle
-        setTimeout(() => {
-            bear.classList.remove('ar-bear-walkin');
-            bear.classList.add('idle');
-            arBearReady = true;
-            arBearOnScreen = true;
-            showNotification('🐻 Grizzly is here! Take a photo!', 'info');
-        }, WALKIN_DELAY_MS + WALKIN_DURATION_MS);
-    }, FAKEOUT_DURATION_MS);
+            bear.classList.remove(fakeoutClass);
+            bear.classList.add(walkinClass);
+
+            // Use getBoundingClientRect to detect on-screen via coordinates.
+            // Store the interval ID so closeARView can cancel it if needed.
+            arBearVisibleCheckId = setInterval(() => {
+                const rect = bear.getBoundingClientRect();
+                if (rect.right > 0 && rect.left < window.innerWidth &&
+                    rect.bottom > 0 && rect.top < window.innerHeight) {
+                    arBearOnScreen = true;
+                    clearInterval(arBearVisibleCheckId);
+                    arBearVisibleCheckId = null;
+                }
+            }, 100);
+
+            setTimeout(() => {
+                if (arBearVisibleCheckId !== null) {
+                    clearInterval(arBearVisibleCheckId);
+                    arBearVisibleCheckId = null;
+                }
+                bear.classList.remove(walkinClass);
+                bear.classList.add('idle');
+                arBearReady = true;
+                arBearOnScreen = true;
+                showNotification('🐻 Grizzly is here! Take a photo!', 'info');
+            }, WALKIN_DELAY_MS + WALKIN_DURATION_MS);
+        }, FAKEOUT_DURATION_MS);
+    }, initialDelayMs);
 }
 
 function captureARPhoto() {
@@ -1737,6 +1993,16 @@ function closeARView() {
     arThreeClock = null;
     arBearReady = false;
     arBearOnScreen = false;
+
+    // Stop orientation/compass tracking
+    _stopOrientationTracking();
+    arTargetBearing = null;
+
+    // Cancel emoji-fallback visibility polling interval
+    if (arBearVisibleCheckId !== null) {
+        clearInterval(arBearVisibleCheckId);
+        arBearVisibleCheckId = null;
+    }
     
     // Stop all video tracks from the camera stream
     if (arStream) {

@@ -1320,22 +1320,53 @@ body {
 
 /* Fake-out peek: bear peeks in, bobs, retreats */
 .ar-bear-placeholder.ar-bear-fakeout {
-    animation: bearFakeOut 2s ease-in-out forwards;
+    animation: bearFakeOut 1.2s ease-in-out forwards;
 }
 
 @keyframes bearFakeOut {
     0%   { transform: translateX(110vw) scaleX(-1) translateY(0); }
-    20%  { transform: translateX(70vw)  scaleX(-1) translateY(-12px); }
-    30%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
-    40%  { transform: translateX(70vw)  scaleX(-1) translateY(-8px); }
-    50%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
-    65%  { transform: translateX(110vw) scaleX(-1) translateY(0); }
+    25%  { transform: translateX(70vw)  scaleX(-1) translateY(-12px); }
+    38%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
+    50%  { transform: translateX(70vw)  scaleX(-1) translateY(-8px); }
+    62%  { transform: translateX(72vw)  scaleX(-1) translateY(0); }
+    80%  { transform: translateX(110vw) scaleX(-1) translateY(0); }
     100% { transform: translateX(110vw) scaleX(-1) translateY(0); }
+}
+
+/* Left-side fake-out */
+.ar-bear-placeholder.ar-bear-fakeout-left {
+    animation: bearFakeOutLeft 1.2s ease-in-out forwards;
+}
+
+@keyframes bearFakeOutLeft {
+    0%   { transform: translateX(-110vw) scaleX(1) translateY(0); }
+    25%  { transform: translateX(-70vw)  scaleX(1) translateY(-12px); }
+    38%  { transform: translateX(-72vw)  scaleX(1) translateY(0); }
+    50%  { transform: translateX(-70vw)  scaleX(1) translateY(-8px); }
+    62%  { transform: translateX(-72vw)  scaleX(1) translateY(0); }
+    80%  { transform: translateX(-110vw) scaleX(1) translateY(0); }
+    100% { transform: translateX(-110vw) scaleX(1) translateY(0); }
+}
+
+/* Bottom fake-out (bear peeks up from below) */
+.ar-bear-placeholder.ar-bear-fakeout-bottom {
+    bottom: -20%;
+    animation: bearFakeOutBottom 1.2s ease-in-out forwards;
+}
+
+@keyframes bearFakeOutBottom {
+    0%   { transform: translateX(-50%) translateY(150px); }
+    25%  { transform: translateX(-50%) translateY(-20px); }
+    40%  { transform: translateX(-50%) translateY(0); }
+    55%  { transform: translateX(-50%) translateY(-15px); }
+    70%  { transform: translateX(-50%) translateY(0); }
+    85%  { transform: translateX(-50%) translateY(150px); }
+    100% { transform: translateX(-50%) translateY(150px); }
 }
 
 /* Main walk-in: applied after fake-out */
 .ar-bear-placeholder.ar-bear-walkin {
-    animation: bearWalkIn 2s ease-out 1.2s forwards;
+    animation: bearWalkIn 1.8s ease-out 0.8s forwards;
 }
 
 @keyframes bearWalkIn {
@@ -1348,6 +1379,40 @@ body {
     75%  { transform: translateX(28vw)  scaleX(-1) translateY(0); }
     87%  { transform: translateX(30vw)  scaleX(-1) translateY(-6px); }
     100% { transform: translateX(30vw)  scaleX(-1) translateY(0); }
+}
+
+/* Left-side walk-in */
+.ar-bear-placeholder.ar-bear-walkin-left {
+    animation: bearWalkInLeft 1.8s ease-out 0.8s forwards;
+}
+
+@keyframes bearWalkInLeft {
+    0%   { transform: translateX(-110vw) scaleX(1) translateY(0); }
+    12%  { transform: translateX(-88vw)  scaleX(1) translateY(-28px); }
+    25%  { transform: translateX(-68vw)  scaleX(1) translateY(0); }
+    37%  { transform: translateX(-52vw)  scaleX(1) translateY(-22px); }
+    50%  { transform: translateX(-40vw)  scaleX(1) translateY(0); }
+    62%  { transform: translateX(-28vw)  scaleX(1) translateY(-14px); }
+    75%  { transform: translateX(-15vw)  scaleX(1) translateY(0); }
+    87%  { transform: translateX(-18vw)  scaleX(1) translateY(-6px); }
+    100% { transform: translateX(-18vw)  scaleX(1) translateY(0); }
+}
+
+/* Bottom walk-in (bear stomps up from bottom center) */
+.ar-bear-placeholder.ar-bear-walkin-bottom {
+    left: 50%;
+    bottom: -20%;
+    animation: bearWalkInBottom 1.8s ease-out 0.8s forwards;
+}
+
+@keyframes bearWalkInBottom {
+    0%   { transform: translateX(-50%) translateY(200px); }
+    20%  { transform: translateX(-50%) translateY(-30px); }
+    35%  { transform: translateX(-50%) translateY(0); }
+    50%  { transform: translateX(-50%) translateY(-20px); }
+    65%  { transform: translateX(-50%) translateY(0); }
+    80%  { transform: translateX(-50%) translateY(-10px); }
+    100% { transform: translateX(-50%) translateY(0); }
 }
 
 .ar-bear-placeholder.idle {
