@@ -126,7 +126,7 @@ body {
     height: 60vh;
     min-height: 400px;
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1600') center/cover;
+                url('pictures/background.png') center/cover;
     display: flex;
     align-items: center;
     justify-content: center;
