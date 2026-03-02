@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 const app = express();
 
 // Middleware
@@ -55,6 +56,137 @@ function sanitizeName(name) {
 // User points per location
 const POINTS_PER_LOCATION = 10;
 const COMPLETION_BONUS = 50;
+
+// ==================== Place Photos Route ====================
+
+const PHOTOS_DIR = path.join(__dirname, 'assets', 'place-photos');
+const PLACES_DATA_FILE = path.join(__dirname, 'data', 'places-data.json');
+const SAMPLE_DATA_FILE = path.join(__dirname, 'data', 'sample-places-data.json');
+
+/**
+ * Load places data (cached in memory after first read).
+ */
+let placesDataCache = null;
+function getPlacesData() {
+  if (placesDataCache) return placesDataCache;
+  for (const file of [PLACES_DATA_FILE, SAMPLE_DATA_FILE]) {
+    if (fs.existsSync(file)) {
+      try {
+        placesDataCache = JSON.parse(fs.readFileSync(file, 'utf8'));
+        return placesDataCache;
+      } catch (e) {
+        console.warn(`Could not parse ${file}:`, e.message);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Find the photoReference stored in places data for a given filename.
+ * Filename format: {placeId}_{index}.jpg  or  {placeId}_{index}.png
+ */
+function findPhotoReference(filename) {
+  const data = getPlacesData();
+  if (!data) return null;
+
+  const allPlaces = [
+    ...(data.locations || []),
+    ...(data.restaurants || []),
+    ...(data.accommodations || []),
+  ];
+
+  for (const place of allPlaces) {
+    const photos = place.photos || [];
+    for (let i = 0; i < photos.length; i++) {
+      const photo = photos[i];
+      // Match by expected filename for both jpg and png
+      const expectedJpg = `${place.id}_${i}.jpg`;
+      const expectedPng = `${place.id}_${i}.png`;
+      if (filename === expectedJpg || filename === expectedPng) {
+        return photo.photoReference || null;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Simple in-memory rate limiter for the photo proxy route.
+ * Allows up to MAX_REQUESTS per IP within WINDOW_MS.
+ */
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 60;     // max requests per IP per window
+const rateLimitMap = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+  if (now > entry.resetAt) {
+    entry.count = 0;
+    entry.resetAt = now + RATE_LIMIT_WINDOW_MS;
+  }
+  entry.count += 1;
+  rateLimitMap.set(ip, entry);
+  return entry.count > RATE_LIMIT_MAX_REQUESTS;
+}
+
+/**
+ * Serve place photos from local cache.
+ * On a cache miss, download the image from Google Places API using the stored
+ * photoReference, save it locally, then serve it — so subsequent requests are fast.
+ */
+app.get('/assets/place-photos/:filename', async (req, res) => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).send('Too many requests');
+  }
+
+  const filename = req.params.filename;
+
+  // Reject filenames that could escape the photos directory
+  if (!/^[A-Za-z0-9_-]+\.(jpg|png)$/i.test(filename)) {
+    return res.status(400).send('Invalid filename');
+  }
+
+  const filepath = path.join(PHOTOS_DIR, filename);
+
+  // Serve from local cache if available
+  if (fs.existsSync(filepath)) {
+    return res.sendFile(filepath);
+  }
+
+  // Attempt on-demand download using stored photo reference
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey || apiKey.startsWith('your_')) {
+    return res.status(404).send('Image not found and API key not configured');
+  }
+
+  const photoReference = findPhotoReference(filename);
+  if (!photoReference) {
+    return res.status(404).send('Image not found');
+  }
+
+  try {
+    const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${encodeURIComponent(photoReference)}&key=${apiKey}`;
+    const response = await axios.get(photoUrl, { responseType: 'arraybuffer' });
+    const contentType = (response.headers['content-type'] || 'image/jpeg').split(';')[0].trim();
+    const imageData = Buffer.from(response.data);
+
+    // Cache the image for future requests
+    if (!fs.existsSync(PHOTOS_DIR)) {
+      fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+    }
+    fs.writeFileSync(filepath, imageData);
+    console.log(`📸 Cached photo: ${filename}`);
+
+    res.setHeader('Content-Type', contentType);
+    res.send(imageData);
+  } catch (error) {
+    console.error(`Could not fetch photo ${filename}:`, error.message);
+    res.status(500).send('Could not fetch image');
+  }
+});
 
 // ==================== API Routes ====================
 
