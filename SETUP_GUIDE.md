@@ -7,10 +7,11 @@ This guide will help you set up the Google Places API integration for your Rasno
 2. [Getting Google Places API Key](#getting-google-places-api-key)
 3. [Getting Unsplash API Key (Optional)](#getting-unsplash-api-key-optional)
 4. [Local Setup](#local-setup)
-5. [GitHub Actions Setup](#github-actions-setup)
-6. [Running the Data Fetch](#running-the-data-fetch)
-7. [Troubleshooting](#troubleshooting)
-8. [API Usage and Costs](#api-usage-and-costs)
+5. [One-Time Image Download](#one-time-image-download)
+6. [GitHub Actions Setup](#github-actions-setup)
+7. [Running the Data Fetch](#running-the-data-fetch)
+8. [Troubleshooting](#troubleshooting)
+9. [API Usage and Costs](#api-usage-and-costs)
 
 ---
 
@@ -25,6 +26,18 @@ By fetching data at build time (weekly via GitHub Actions), you stay well within
 - **Google Places API Free Tier**: $200/month credit = ~28,000 API calls/month
 - **Our Weekly Usage**: ~60-100 API calls/week = ~400/month
 - **Result**: 100% FREE! 🎉
+
+> ⚠️ **Important – Google Photo URLs are Billable Per Request**
+>
+> The Google Places Photo API charges for every HTTP request, including ones made by website
+> visitors' browsers. Embedding raw `maps.googleapis.com/maps/api/place/photo?...` URLs directly
+> in the generated JSON means **every page load bills your Google Cloud account** – not just the
+> data fetch. With many visitors this can exhaust the free-tier credit quickly.
+>
+> The solution is to download photo bytes **once at build time**, save them to
+> `assets/place-photos/`, and write local paths (e.g. `/assets/place-photos/ChIJ…_0.jpg`) into
+> `places-data.json` instead of remote API URLs. Visitors then load images directly from your
+> server/CDN at no API cost. See [One-Time Image Download](#one-time-image-download) below.
 
 ---
 
@@ -175,6 +188,54 @@ Open http://localhost:3000 in your browser.
 
 ---
 
+## One-Time Image Download
+
+To avoid runtime billing from Google Places Photo API URLs, run the data fetch with the
+`--download-images` flag **once** after obtaining your API key. This downloads all place photos
+to `assets/place-photos/` and writes local paths into `places-data.json` instead of remote URLs.
+
+### Step 1: Run the download
+
+```bash
+npm run fetch-data-with-images
+```
+
+Or equivalently:
+
+```bash
+node build-scripts/fetch-places-data.js --download-images
+```
+
+You will see lines like:
+```
+📸 Image download mode: ON (photos will be saved to assets/place-photos/)
+    📸 Saved photo: ChIJxxxxxxxx_0.jpg
+```
+
+### Step 2: Commit the downloaded images
+
+The generated images live in `assets/place-photos/`. These files are not auto-generated at
+deploy time, so you must commit them to git so they are included in the repository and served
+correctly by the site:
+
+```bash
+git add assets/place-photos/
+git commit -m "chore: add cached place photos"
+git push
+```
+
+### Step 3: Future data fetches (without `--download-images`)
+
+Subsequent runs of `npm run fetch-data` (without `--download-images`) will automatically detect
+and re-use any images already present in `assets/place-photos/`, so no extra API calls are made.
+Only run with `--download-images` again when you want to refresh photos (e.g. after a new data
+fetch adds new places).
+
+> **Note**: Do **not** add `assets/place-photos/` to `.gitignore`. These files must be committed
+> so they survive server rebuilds and deployments.
+
+---
+
 ## GitHub Actions Setup
 
 To automatically update data weekly:
@@ -272,8 +333,12 @@ The GitHub Actions workflow runs automatically every Sunday at 2 AM UTC. No acti
 
 **Solutions**:
 1. Check browser console for errors
-2. Verify photo URLs are accessible
-3. Google Places photo URLs expire - re-run data fetch
+2. If photos were never downloaded locally, run `npm run fetch-data-with-images` to download
+   them to `assets/place-photos/` and commit the folder to git
+3. If `assets/place-photos/` exists locally but images are missing on the deployed site,
+   make sure you committed and pushed the `assets/place-photos/` folder
+4. Google Places photo API URLs (used only as a fallback) may be blocked by CORS or expire –
+   the local image approach avoids this entirely
 
 ---
 
@@ -309,11 +374,13 @@ The GitHub Actions workflow runs automatically every Sunday at 2 AM UTC. No acti
 ✅ **Do**:
 - Keep weekly schedule (don't run hourly)
 - Use photo references efficiently
-- Cache photos in JSON
+- Run `npm run fetch-data-with-images` once and commit `assets/place-photos/` to git
+- Use local cached images (avoids runtime billing entirely)
 
 ❌ **Don't**:
 - Run data fetch on every deploy
 - Make runtime API calls from the website
+- Embed raw Google Places Photo API URLs in JSON (bills per visitor browser request)
 - Fetch data more than once per day
 
 ---

@@ -30,6 +30,7 @@ const CONFIG = {
   UNSPLASH_API_KEY: process.env.UNSPLASH_ACCESS_KEY,
   OUTPUT_FILE: path.join(__dirname, '../data/places-data.json'),
   SAMPLE_FILE: path.join(__dirname, '../data/sample-places-data.json'),
+  PHOTOS_DIR: path.join(__dirname, '../assets/place-photos'),
   MAX_PHOTOS_PER_PLACE: 3,
   MAX_RESULTS_PER_TYPE: 20,
   RETRY_ATTEMPTS: 3,
@@ -132,6 +133,59 @@ function getGooglePhotoUrl(photoReference, maxWidth = 800) {
 }
 
 /**
+ * Check whether images should be downloaded this run.
+ * True when --download-images CLI flag is present, OR when today is March 1, 2025.
+ */
+function shouldDownloadImages() {
+  if (process.argv.includes('--download-images')) return true;
+  const now = new Date();
+  return now.getFullYear() === 2025 && now.getMonth() === 2 && now.getDate() === 1;
+}
+
+/**
+ * Download a Google Places photo and save it to the local photos folder.
+ * Returns the relative URL path to the saved image, or null on failure.
+ */
+async function downloadPhoto(photoReference, placeId, index) {
+  const remoteUrl = getGooglePhotoUrl(photoReference);
+  try {
+    const response = await retryRequest(() =>
+      axios.get(remoteUrl, { responseType: 'arraybuffer' })
+    );
+    await sleep(CONFIG.RATE_LIMIT_DELAY);
+
+    const contentType = (response.headers['content-type'] || 'image/jpeg').split(';')[0].trim();
+    const ext = contentType === 'image/png' ? 'png' : 'jpg';
+    const filename = `${placeId}_${index}.${ext}`;
+    const filepath = path.join(CONFIG.PHOTOS_DIR, filename);
+
+    if (!fs.existsSync(CONFIG.PHOTOS_DIR)) {
+      fs.mkdirSync(CONFIG.PHOTOS_DIR, { recursive: true });
+    }
+
+    fs.writeFileSync(filepath, Buffer.from(response.data));
+    console.log(`    📸 Saved photo: ${filename}`);
+    return `/assets/place-photos/${filename}`;
+  } catch (error) {
+    console.error(`    ⚠️  Could not download photo for ${placeId}[${index}]:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Resolve the local path for an already-downloaded photo, or null if not present.
+ */
+function getLocalPhotoPath(placeId, index) {
+  for (const ext of ['jpg', 'png']) {
+    const filename = `${placeId}_${index}.${ext}`;
+    if (fs.existsSync(path.join(CONFIG.PHOTOS_DIR, filename))) {
+      return `/assets/place-photos/${filename}`;
+    }
+  }
+  return null;
+}
+
+/**
  * Fetch Unsplash photos as fallback
  */
 async function fetchUnsplashPhoto(query) {
@@ -207,12 +261,25 @@ async function processPlace(place, index, total) {
   // Process photos
   if (place.photos && place.photos.length > 0) {
     const photoCount = Math.min(place.photos.length, CONFIG.MAX_PHOTOS_PER_PLACE);
+    const downloadImages = shouldDownloadImages();
     for (let i = 0; i < photoCount; i++) {
       const photo = place.photos[i];
-      processedPlace.photos.push({
-        url: getGooglePhotoUrl(photo.photo_reference),
-        attribution: photo.html_attributions ? photo.html_attributions[0] : 'Google Places',
-      });
+      let photoUrl = null;
+
+      if (downloadImages) {
+        // Download image bytes and store locally
+        photoUrl = await downloadPhoto(photo.photo_reference, place.place_id, i);
+      } else {
+        // Use already-downloaded local image if available; skip to avoid billable URL
+        photoUrl = getLocalPhotoPath(place.place_id, i);
+      }
+
+      if (photoUrl) {
+        processedPlace.photos.push({
+          url: photoUrl,
+          attribution: photo.html_attributions ? photo.html_attributions[0] : 'Google Places',
+        });
+      }
     }
   } else {
     // Try Unsplash as fallback
@@ -232,6 +299,11 @@ async function main() {
   console.log('🚀 Starting Google Places data fetch...');
   console.log(`📍 Center: ${CONFIG.CENTER_LAT}, ${CONFIG.CENTER_LNG}`);
   console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m`);
+  if (shouldDownloadImages()) {
+    console.log('📸 Image download mode: ON (photos will be saved to assets/place-photos/)');
+  } else {
+    console.log('📸 Image download mode: OFF (pass --download-images to download photos locally)');
+  }
 
   // Validate API key
   if (!CONFIG.GOOGLE_API_KEY || 
@@ -272,10 +344,13 @@ async function main() {
   // Save to file
   console.log(`\n💾 Saving data to ${CONFIG.OUTPUT_FILE}...`);
   
-  // Ensure data directory exists
+  // Ensure output directories exist
   const dataDir = path.dirname(CONFIG.OUTPUT_FILE);
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
+  }
+  if (!fs.existsSync(CONFIG.PHOTOS_DIR)) {
+    fs.mkdirSync(CONFIG.PHOTOS_DIR, { recursive: true });
   }
 
   const jsonOutput = JSON.stringify(result, null, 2);
