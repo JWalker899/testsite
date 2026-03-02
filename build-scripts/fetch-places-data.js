@@ -134,10 +134,12 @@ function getGooglePhotoUrl(photoReference, maxWidth = 800) {
 
 /**
  * Check whether images should be downloaded this run.
- * True when --download-images CLI flag is present, OR when today is March 1, 2025.
+ * True when --download-images CLI flag is present, the photos directory doesn't
+ * exist yet (first run), or when today is March 1, 2025.
  */
 function shouldDownloadImages() {
   if (process.argv.includes('--download-images')) return true;
+  if (!fs.existsSync(CONFIG.PHOTOS_DIR)) return true;
   const now = new Date();
   return now.getFullYear() === 2025 && now.getMonth() === 2 && now.getDate() === 1;
 }
@@ -300,7 +302,10 @@ async function main() {
   console.log(`📍 Center: ${CONFIG.CENTER_LAT}, ${CONFIG.CENTER_LNG}`);
   console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m`);
   if (shouldDownloadImages()) {
-    console.log('📸 Image download mode: ON (photos will be saved to assets/place-photos/)');
+    const reason = !fs.existsSync(CONFIG.PHOTOS_DIR)
+      ? 'photos directory not found – downloading to cache'
+      : 'explicitly requested';
+    console.log(`📸 Image download mode: ON (${reason}, saving to assets/place-photos/)`);
   } else {
     console.log('📸 Image download mode: OFF (pass --download-images to download photos locally)');
   }
