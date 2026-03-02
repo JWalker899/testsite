@@ -135,13 +135,15 @@ function getGooglePhotoUrl(photoReference, maxWidth = 800) {
 /**
  * Check whether images should be downloaded this run.
  * True when --download-images CLI flag is present, the photos directory doesn't
- * exist yet (first run), or when today is March 1, 2025.
+ * exist yet (first run), or the directory is empty (no cached images).
  */
 function shouldDownloadImages() {
   if (process.argv.includes('--download-images')) return true;
   if (!fs.existsSync(CONFIG.PHOTOS_DIR)) return true;
-  const now = new Date();
-  return now.getFullYear() === 2025 && now.getMonth() === 2 && now.getDate() === 1;
+  // Also download when the cache directory is empty
+  const cached = fs.readdirSync(CONFIG.PHOTOS_DIR).filter(f => /\.(jpg|png)$/i.test(f));
+  if (cached.length === 0) return true;
+  return false;
 }
 
 /**
@@ -276,12 +278,14 @@ async function processPlace(place, index, total) {
         photoUrl = getLocalPhotoPath(place.place_id, i);
       }
 
-      if (photoUrl) {
-        processedPlace.photos.push({
-          url: photoUrl,
-          attribution: photo.html_attributions ? photo.html_attributions[0] : 'Google Places',
-        });
-      }
+      // Always store a reference to the photo so the server can fetch it on demand
+      // Use the local path as the URL (server will proxy-download if missing)
+      const localPath = photoUrl || `/assets/place-photos/${place.place_id}_${i}.jpg`;
+      processedPlace.photos.push({
+        url: localPath,
+        photoReference: photo.photo_reference,
+        attribution: photo.html_attributions ? photo.html_attributions[0] : 'Google Places',
+      });
     }
   } else {
     // Try Unsplash as fallback
