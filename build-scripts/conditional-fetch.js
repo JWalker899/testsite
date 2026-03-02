@@ -19,6 +19,7 @@ const { main: fetchData } = require('./fetch-places-data.js');
 // Configuration
 const DATA_FILE = path.join(__dirname, '../data/places-data.json');
 const SAMPLE_FILE = path.join(__dirname, '../data/sample-places-data.json');
+const PHOTOS_DIR = path.join(__dirname, '../assets/place-photos');
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
 /**
@@ -119,12 +120,22 @@ async function main() {
 
   console.log('🔍 Checking if data fetch is needed...\n');
 
-  // Determine if we should fetch
-  if (shouldFetchData(forceFlag)) {
-    // Fetch new data (fetch-places-data.js writes both places-data.json and sample)
+  // The 30-day recency check applies only to place data (reviews, info, etc.)
+  const needsData = shouldFetchData(forceFlag);
+
+  // Images must always be checked independently of data freshness:
+  // if the photos folder is absent, we must download images via the API.
+  const needsImages = !fs.existsSync(PHOTOS_DIR);
+  if (needsImages && !needsData) {
+    console.log('📸 Images folder not found - fetching data to download images...\n');
+  }
+
+  if (needsData || needsImages) {
+    // Fetch new data (fetch-places-data.js writes both places-data.json and
+    // sample, and downloads images when the photos folder is missing).
     await fetchData();
   } else {
-    // Skip fetch, but ensure sample-places-data.json is in sync with places-data.json
+    // Data is fresh and images are present - skip API calls entirely.
     console.log('💡 Tip: Use --force flag to fetch regardless of cache age.\n');
     syncSampleData();
   }
