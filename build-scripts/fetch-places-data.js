@@ -231,7 +231,7 @@ async function fetchUnsplashPhoto(query) {
 /**
  * Process and format a single place
  */
-async function processPlace(place, index, total) {
+async function processPlace(place, index, total, downloadImages) {
   console.log(`  Processing [${index + 1}/${total}] ${place.name}...`);
 
   const processedPlace = {
@@ -265,7 +265,6 @@ async function processPlace(place, index, total) {
   // Process photos
   if (place.photos && place.photos.length > 0) {
     const photoCount = Math.min(place.photos.length, CONFIG.MAX_PHOTOS_PER_PLACE);
-    const downloadImages = shouldDownloadImages();
     for (let i = 0; i < photoCount; i++) {
       const photo = place.photos[i];
       let photoUrl = null;
@@ -305,10 +304,14 @@ async function main() {
   console.log('🚀 Starting Google Places data fetch...');
   console.log(`📍 Center: ${CONFIG.CENTER_LAT}, ${CONFIG.CENTER_LNG}`);
   console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m`);
-  if (shouldDownloadImages()) {
-    const reason = !fs.existsSync(CONFIG.PHOTOS_DIR)
-      ? 'photos directory not found – downloading to cache'
-      : 'explicitly requested';
+  // Evaluate once so the decision doesn't change mid-run as files are written
+  const downloadImages = shouldDownloadImages();
+  if (downloadImages) {
+    const reason = process.argv.includes('--download-images')
+      ? 'explicitly requested'
+      : !fs.existsSync(CONFIG.PHOTOS_DIR)
+        ? 'photos directory not found – downloading to cache'
+        : 'photos directory is empty – downloading to cache';
     console.log(`📸 Image download mode: ON (${reason}, saving to assets/place-photos/)`);
   } else {
     console.log('📸 Image download mode: OFF (pass --download-images to download photos locally)');
@@ -341,7 +344,7 @@ async function main() {
     // Process each place
     for (let i = 0; i < places.length; i++) {
       try {
-        const processedPlace = await processPlace(places[i], i, places.length);
+        const processedPlace = await processPlace(places[i], i, places.length, downloadImages);
         result[key].push(processedPlace);
         await sleep(CONFIG.RATE_LIMIT_DELAY); // Rate limiting
       } catch (error) {
