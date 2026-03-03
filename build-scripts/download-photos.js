@@ -63,6 +63,9 @@ async function downloadPhoto(photoReference, filepath) {
   // Use the correct extension (rename file if needed)
   const finalPath = filepath.replace(/\.(jpg|png)$/i, `.${ext}`);
   fs.writeFileSync(finalPath, Buffer.from(response.data));
+  // Write sidecar .ref file so the server can detect stale caches
+  const refPath = finalPath.replace(/\.(jpg|png)$/i, '.ref');
+  fs.writeFileSync(refPath, photoReference);
   return finalPath;
 }
 

@@ -64,15 +64,28 @@ const PLACES_DATA_FILE = path.join(__dirname, 'data', 'places-data.json');
 const SAMPLE_DATA_FILE = path.join(__dirname, 'data', 'sample-places-data.json');
 
 /**
- * Load places data (cached in memory after first read).
+ * Load places data, reloading from disk whenever the source file changes.
+ * This ensures that manually copying a new places-data.json is picked up
+ * without restarting the server.
  */
 let placesDataCache = null;
+let placesDataFile = null;
+let placesDataMtime = null;
 function getPlacesData() {
-  if (placesDataCache) return placesDataCache;
   for (const file of [PLACES_DATA_FILE, SAMPLE_DATA_FILE]) {
     if (fs.existsSync(file)) {
       try {
-        placesDataCache = JSON.parse(fs.readFileSync(file, 'utf8'));
+        const stat = fs.statSync(file);
+        if (placesDataCache && placesDataFile === file && placesDataMtime === stat.mtimeMs) {
+          return placesDataCache;
+        }
+        const newData = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (placesDataCache) {
+          console.log(`📄 Reloaded places data from ${path.basename(file)}`);
+        }
+        placesDataCache = newData;
+        placesDataFile = file;
+        placesDataMtime = stat.mtimeMs;
         return placesDataCache;
       } catch (e) {
         console.warn(`Could not parse ${file}:`, e.message);
@@ -80,6 +93,40 @@ function getPlacesData() {
     }
   }
   return null;
+}
+
+/**
+ * Return the path of the sidecar file that records which photoReference
+ * was used to populate a cached photo file.
+ */
+function getRefPath(imagePath) {
+  return imagePath.replace(/\.(jpg|png)$/i, '.ref');
+}
+
+/**
+ * Read the photoReference stored in a sidecar .ref file, or null if absent.
+ */
+function readCachedPhotoRef(imagePath) {
+  try {
+    const refPath = getRefPath(imagePath);
+    if (fs.existsSync(refPath)) {
+      return fs.readFileSync(refPath, 'utf8').trim() || null;
+    }
+  } catch (e) {
+    console.warn(`Could not read ref file for ${path.basename(imagePath)}:`, e.message);
+  }
+  return null;
+}
+
+/**
+ * Write the photoReference used for a cached photo to its sidecar .ref file.
+ */
+function writeCachedPhotoRef(imagePath, photoReference) {
+  try {
+    fs.writeFileSync(getRefPath(imagePath), photoReference);
+  } catch (e) {
+    console.warn(`Could not write ref file for ${path.basename(imagePath)}:`, e.message);
+  }
 }
 
 /**
@@ -133,8 +180,9 @@ function isRateLimited(ip) {
 
 /**
  * Serve place photos from local cache.
- * On a cache miss, download the image from Google Places API using the stored
- * photoReference, save it locally, then serve it — so subsequent requests are fast.
+ * On a cache miss — or when the cached file was built from a different
+ * photoReference than the one in the current data — download the image from
+ * Google Places API, save it locally with a sidecar .ref file, then serve it.
  */
 app.get('/assets/place-photos/:filename', async (req, res) => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
@@ -151,9 +199,28 @@ app.get('/assets/place-photos/:filename', async (req, res) => {
 
   const filepath = path.join(PHOTOS_DIR, filename);
 
-  // Serve from local cache if available
+  // Serve from local cache if the cached file is still valid.
+  // A cached file is considered current only when its sidecar .ref file records
+  // the same photoReference that is in the current places data.
+  // Files with no sidecar (e.g. committed before this feature was added) or
+  // with a mismatched reference are treated as unverified and will be
+  // re-downloaded when the API key is available.
   if (fs.existsSync(filepath)) {
-    return res.sendFile(filepath);
+    const currentRef = findPhotoReference(filename);
+    const cachedRef = readCachedPhotoRef(filepath);
+    if (cachedRef !== null && cachedRef === currentRef) {
+      // Sidecar confirms the cached file matches current data — serve it.
+      return res.sendFile(filepath);
+    }
+    // Unverified or stale: attempt re-download if we have an API key and a ref.
+    const apiKeyCheck = process.env.GOOGLE_PLACES_API_KEY;
+    if (!currentRef || !apiKeyCheck || apiKeyCheck.startsWith('your_')) {
+      // Cannot re-download — serve existing file rather than returning an error.
+      return res.sendFile(filepath);
+    }
+    console.log(`🔄 Refreshing unverified/stale cache for ${filename}`);
+    try { fs.unlinkSync(filepath); } catch (_) {}
+    try { fs.unlinkSync(getRefPath(filepath)); } catch (_) {}
   }
 
   // Attempt on-demand download using stored photo reference
@@ -178,6 +245,7 @@ app.get('/assets/place-photos/:filename', async (req, res) => {
       fs.mkdirSync(PHOTOS_DIR, { recursive: true });
     }
     fs.writeFileSync(filepath, imageData);
+    writeCachedPhotoRef(filepath, photoReference);
     console.log(`📸 Cached photo: ${filename}`);
 
     res.setHeader('Content-Type', contentType);
