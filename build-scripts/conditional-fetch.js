@@ -7,13 +7,18 @@
  * lastUpdated timestamp. If data is older than 1 month or doesn't exist,
  * it fetches new data. Otherwise, it skips the fetch to conserve API tokens.
  * 
+ * Cloudinary is checked first when local data is absent – this avoids
+ * unnecessary Google Places API calls after a fresh deploy.
+ * 
  * Usage:
  *   node conditional-fetch.js          # Fetch only if data is stale
  *   node conditional-fetch.js --force  # Force fetch regardless of age
  */
 
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+const cloudinaryStorage = require('../cloudinary-storage');
 const { main: fetchData } = require('./fetch-places-data.js');
 
 // Configuration
@@ -21,6 +26,43 @@ const DATA_FILE = path.join(__dirname, '../data/places-data.json');
 const SAMPLE_FILE = path.join(__dirname, '../data/sample-places-data.json');
 const PHOTOS_DIR = path.join(__dirname, '../assets/place-photos');
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+/**
+ * Try to restore places data and images from Cloudinary.
+ * Returns true when data was successfully restored (so a Google API call is unnecessary).
+ */
+async function restoreFromCloudinary() {
+  if (!cloudinaryStorage.isConfigured()) return false;
+
+  console.log('☁️  Checking Cloudinary for cached places data...\n');
+  try {
+    const data = await cloudinaryStorage.downloadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA);
+    if (!data || !data.lastUpdated) return false;
+
+    const lastUpdated = new Date(data.lastUpdated);
+    const ageDays = Math.floor((Date.now() - lastUpdated) / (24 * 60 * 60 * 1000));
+
+    if (Date.now() - lastUpdated > ONE_MONTH_MS) {
+      console.log(`   ☁️  Cloudinary data is stale (${ageDays} days) — will re-fetch from Google.\n`);
+      return false;
+    }
+
+    console.log(`   ☁️  Cloudinary data is fresh (${ageDays} days old) — restoring locally.\n`);
+
+    // Write to local files so the server and conditional checks use this data
+    const dir = path.dirname(DATA_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const jsonOutput = JSON.stringify(data, null, 2);
+    fs.writeFileSync(DATA_FILE, jsonOutput, 'utf8');
+    fs.writeFileSync(SAMPLE_FILE, jsonOutput, 'utf8');
+
+    console.log('✅ Places data restored from Cloudinary.\n');
+    return true;
+  } catch (e) {
+    console.warn('⚠️  Could not restore places data from Cloudinary:', e.message, '\n');
+    return false;
+  }
+}
 
 /**
  * Check if data file exists and is recent enough
@@ -131,6 +173,19 @@ async function main() {
   }
 
   if (needsData || needsImages) {
+    // Before hitting the Google Places API, check whether Cloudinary already
+    // has up-to-date data from a previous run (e.g. after a fresh deploy).
+    if (!forceFlag) {
+      const restored = await restoreFromCloudinary();
+      if (restored) {
+        // If images are still missing after restoring data, they will be
+        // downloaded on-demand by the server photo proxy route.
+        console.log('💡 Tip: Use --force flag to fetch fresh data from Google regardless of cache.\n');
+        syncSampleData();
+        return;
+      }
+    }
+
     // Fetch new data (fetch-places-data.js writes both places-data.json and
     // sample, and downloads images when the photos folder is missing).
     await fetchData();

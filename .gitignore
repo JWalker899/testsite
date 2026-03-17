@@ -5,3 +5,6 @@ node_modules/
 npm-debug.log*
 data/places-data.json
 data/leaderboard.json
+assets/place-photos/*.jpg
+assets/place-photos/*.png
+assets/place-photos/*.ref
