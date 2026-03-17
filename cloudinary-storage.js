@@ -117,6 +117,38 @@ async function uploadImageBuffer(publicId, buffer) {
 }
 
 /**
+ * Delete a single image from Cloudinary.
+ * @param {string} publicId  Cloudinary public ID (without extension)
+ * @returns {object|null} Cloudinary destroy result, or null when not configured
+ */
+async function deleteImage(publicId) {
+  if (!isConfigured()) return null;
+  return cloudinary.uploader.destroy(publicId, { resource_type: 'image', invalidate: true });
+}
+
+/**
+ * List all images stored under a given public ID prefix (e.g. "rasnov-photos/").
+ * Handles Cloudinary pagination automatically.
+ * @param {string} prefix  Cloudinary public ID prefix to search under
+ * @returns {string[]} Array of public IDs, or [] when not configured / on error
+ */
+async function listImagesByPrefix(prefix) {
+  if (!isConfigured()) return [];
+  const results = [];
+  let nextCursor = null;
+  do {
+    const params = { type: 'upload', prefix, resource_type: 'image', max_results: 500 };
+    if (nextCursor) params.next_cursor = nextCursor;
+    const response = await cloudinary.api.resources(params);
+    for (const r of (response.resources || [])) {
+      results.push(r.public_id);
+    }
+    nextCursor = response.next_cursor || null;
+  } while (nextCursor);
+  return results;
+}
+
+/**
  * Download an image from Cloudinary and save it to a local path.
  * @param {string} publicId   Cloudinary public ID (without extension)
  * @param {string} localPath  Absolute local path to save the file
@@ -147,4 +179,6 @@ module.exports = {
   uploadImage,
   uploadImageBuffer,
   downloadImage,
+  deleteImage,
+  listImagesByPrefix,
 };
