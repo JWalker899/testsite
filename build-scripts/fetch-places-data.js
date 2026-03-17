@@ -20,6 +20,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const cloudinaryStorage = require('../cloudinary-storage');
 
 // Configuration
 const CONFIG = {
@@ -167,8 +168,21 @@ async function downloadPhoto(photoReference, placeId, index) {
       fs.mkdirSync(CONFIG.PHOTOS_DIR, { recursive: true });
     }
 
-    fs.writeFileSync(filepath, Buffer.from(response.data));
+    const imageData = Buffer.from(response.data);
+    fs.writeFileSync(filepath, imageData);
     console.log(`    📸 Saved photo: ${filename}`);
+
+    // Upload to Cloudinary for persistence across deploys
+    if (cloudinaryStorage.isConfigured()) {
+      try {
+        const baseName = `${placeId}_${index}`;
+        await cloudinaryStorage.uploadImageBuffer(cloudinaryStorage.PUBLIC_IDS.photoId(baseName), imageData);
+        console.log(`    ☁️  Uploaded photo to Cloudinary: ${filename}`);
+      } catch (e) {
+        console.warn(`    ⚠️  Could not upload photo ${filename} to Cloudinary:`, e.message);
+      }
+    }
+
     return `/assets/place-photos/${filename}`;
   } catch (error) {
     console.error(`    ⚠️  Could not download photo for ${placeId}[${index}]:`, error.message);
@@ -372,6 +386,17 @@ async function main() {
   // Also overwrite sample data so real data persists across rebuilds
   console.log(`💾 Overwriting sample data at ${CONFIG.SAMPLE_FILE}...`);
   fs.writeFileSync(CONFIG.SAMPLE_FILE, jsonOutput, 'utf8');
+
+  // Upload to Cloudinary for persistence across deploys
+  if (cloudinaryStorage.isConfigured()) {
+    try {
+      console.log('☁️  Uploading places data to Cloudinary...');
+      await cloudinaryStorage.uploadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA, result);
+      console.log('☁️  Places data uploaded to Cloudinary successfully');
+    } catch (e) {
+      console.warn('⚠️  Could not upload places data to Cloudinary:', e.message);
+    }
+  }
 
   // Print summary
   console.log('\n✅ Data fetch complete!');
