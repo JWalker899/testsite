@@ -22,11 +22,19 @@ const fs = require('fs');
 const path = require('path');
 const cloudinaryStorage = require('../cloudinary-storage');
 
+// Places to exclude from results regardless of what the API returns.
+// Names are matched case-insensitively; partial matches are NOT used – the
+// full place name must appear in this list.
+const BLACKLIST = [
+  'Rockstad Extrem Fest',
+];
+const BLACKLIST_LOWER = BLACKLIST.map(name => name.toLowerCase());
+
 // Configuration
 const CONFIG = {
   CENTER_LAT: 45.5889,
   CENTER_LNG: 25.4631,
-  SEARCH_RADIUS: 10000, // 10km in meters
+  SEARCH_RADIUS: 5000, // 5km in meters – covers the full extent of Rasnov
   GOOGLE_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
   UNSPLASH_API_KEY: process.env.UNSPLASH_ACCESS_KEY,
   OUTPUT_FILE: path.join(__dirname, '../data/places-data.json'),
@@ -79,6 +87,7 @@ async function fetchPlaces(type, typeName) {
     location: `${CONFIG.CENTER_LAT},${CONFIG.CENTER_LNG}`,
     radius: CONFIG.SEARCH_RADIUS,
     type: type,
+    keyword: 'Rasnov',
     key: CONFIG.GOOGLE_API_KEY,
   };
 
@@ -86,7 +95,14 @@ async function fetchPlaces(type, typeName) {
     const response = await retryRequest(() => axios.get(url, { params }));
     
     if (response.data.status === 'OK') {
-      const places = response.data.results.slice(0, CONFIG.MAX_RESULTS_PER_TYPE);
+      const allPlaces = response.data.results;
+      // Filter out blacklisted places (case-insensitive exact name match)
+      const filtered = allPlaces.filter(p => !BLACKLIST_LOWER.includes((p.name || '').toLowerCase()));
+      const skipped = allPlaces.length - filtered.length;
+      if (skipped > 0) {
+        console.log(`  🚫 Skipped ${skipped} blacklisted place(s)`);
+      }
+      const places = filtered.slice(0, CONFIG.MAX_RESULTS_PER_TYPE);
       console.log(`  ✅ Found ${places.length} ${typeName}`);
       return places;
     } else if (response.data.status === 'ZERO_RESULTS') {
@@ -317,7 +333,8 @@ async function processPlace(place, index, total, downloadImages) {
 async function main() {
   console.log('🚀 Starting Google Places data fetch...');
   console.log(`📍 Center: ${CONFIG.CENTER_LAT}, ${CONFIG.CENTER_LNG}`);
-  console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m`);
+  console.log(`📏 Radius: ${CONFIG.SEARCH_RADIUS}m (keyword: Rasnov)`);
+  console.log(`🚫 Blacklist: ${BLACKLIST.length} place(s) excluded`);
   // Evaluate once so the decision doesn't change mid-run as files are written
   const downloadImages = shouldDownloadImages();
   if (downloadImages) {
