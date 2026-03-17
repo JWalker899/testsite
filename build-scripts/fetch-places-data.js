@@ -54,6 +54,9 @@ const PLACE_TYPES = {
   accommodations: 'lodging',
 };
 
+/** Returns the shared base name used for both local files and Cloudinary public IDs. */
+const photoBaseName = (placeId, index) => `${placeId}_${index}`;
+
 /**
  * Sleep utility for rate limiting
  */
@@ -177,7 +180,8 @@ async function downloadPhoto(photoReference, placeId, index) {
 
     const contentType = (response.headers['content-type'] || 'image/jpeg').split(';')[0].trim();
     const ext = contentType === 'image/png' ? 'png' : 'jpg';
-    const filename = `${placeId}_${index}.${ext}`;
+    const baseName = photoBaseName(placeId, index);
+    const filename = `${baseName}.${ext}`;
     const filepath = path.join(CONFIG.PHOTOS_DIR, filename);
 
     if (!fs.existsSync(CONFIG.PHOTOS_DIR)) {
@@ -191,7 +195,6 @@ async function downloadPhoto(photoReference, placeId, index) {
     // Upload to Cloudinary for persistence across deploys
     if (cloudinaryStorage.isConfigured()) {
       try {
-        const baseName = `${placeId}_${index}`;
         await cloudinaryStorage.uploadImageBuffer(cloudinaryStorage.PUBLIC_IDS.photoId(baseName), imageData);
         console.log(`    ☁️  Uploaded photo to Cloudinary: ${filename}`);
       } catch (e) {
@@ -328,6 +331,86 @@ async function processPlace(place, index, total, downloadImages) {
 }
 
 /**
+ * Remove photos (Cloudinary + local cache) that belong to place IDs no longer
+ * present in the freshly-fetched data.  This keeps storage clean after places
+ * rotate in/out of the search results or are blacklisted.
+ */
+async function cleanupOrphanedPhotos(newData) {
+  const allPlaces = [
+    ...newData.locations,
+    ...newData.restaurants,
+    ...newData.accommodations,
+  ];
+  const newPlaceIds = new Set(allPlaces.map(p => p.id));
+
+  // Build the full set of photo public IDs that are expected for the new places.
+  // We include all possible index slots (0..MAX_PHOTOS_PER_PLACE-1) for every
+  // place so that images for current places are never accidentally deleted.
+  const expectedCloudinaryIds = new Set();
+  for (const place of allPlaces) {
+    for (let i = 0; i < CONFIG.MAX_PHOTOS_PER_PLACE; i++) {
+      expectedCloudinaryIds.add(cloudinaryStorage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
+    }
+  }
+
+  // ── Cloudinary cleanup ──────────────────────────────────────────────────
+  if (cloudinaryStorage.isConfigured()) {
+    try {
+      console.log('\n🧹 Checking for orphaned Cloudinary photos...');
+      const existing = await cloudinaryStorage.listImagesByPrefix('rasnov-photos/');
+      const toDelete = existing.filter(id => !expectedCloudinaryIds.has(id));
+
+      if (toDelete.length === 0) {
+        console.log('  ✅ No orphaned Cloudinary photos found');
+      } else {
+        console.log(`  🗑️  Deleting ${toDelete.length} orphaned Cloudinary photo(s)...`);
+        for (const publicId of toDelete) {
+          try {
+            await cloudinaryStorage.deleteImage(publicId);
+            console.log(`    ✅ Deleted from Cloudinary: ${publicId}`);
+          } catch (e) {
+            console.warn(`    ⚠️  Could not delete ${publicId} from Cloudinary:`, e.message);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️  Could not clean up orphaned Cloudinary photos:', e.message);
+    }
+  }
+
+  // ── Local cache cleanup ─────────────────────────────────────────────────
+  try {
+    if (fs.existsSync(CONFIG.PHOTOS_DIR)) {
+      const files = fs.readdirSync(CONFIG.PHOTOS_DIR).filter(f => /\.(jpg|png)$/i.test(f));
+      const orphanFiles = files.filter(filename => {
+        // filename format: {placeId}_{index}.{ext}
+        const base = filename.replace(/\.(jpg|png)$/i, ''); // e.g. "ChIJ..._0"
+        const lastUnderscore = base.lastIndexOf('_');
+        if (lastUnderscore === -1) return false;
+        const placeId = base.slice(0, lastUnderscore);
+        return !newPlaceIds.has(placeId);
+      });
+
+      if (orphanFiles.length === 0) {
+        console.log('  ✅ No orphaned local photos found');
+      } else {
+        console.log(`  🗑️  Removing ${orphanFiles.length} orphaned local photo(s)...`);
+        for (const filename of orphanFiles) {
+          try {
+            fs.unlinkSync(path.join(CONFIG.PHOTOS_DIR, filename));
+            console.log(`    ✅ Removed local file: ${filename}`);
+          } catch (e) {
+            console.warn(`    ⚠️  Could not remove ${filename}:`, e.message);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('⚠️  Could not clean up orphaned local photos:', e.message);
+  }
+}
+
+/**
  * Main function to fetch all data
  */
 async function main() {
@@ -414,6 +497,9 @@ async function main() {
       console.warn('⚠️  Could not upload places data to Cloudinary:', e.message);
     }
   }
+
+  // Remove photos that belong to places no longer in the results
+  await cleanupOrphanedPhotos(result);
 
   // Print summary
   console.log('\n✅ Data fetch complete!');
