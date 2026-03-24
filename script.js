@@ -699,6 +699,8 @@ const huntOrder = ['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'squ
 
 // Returns the next unvisited location in the circular order after currentKey.
 // Returns null if all locations have been found.
+// Note: if currentKey is not in huntOrder (should not happen with valid data), falls back to
+// returning the first unvisited location in order to avoid breaking the hunt.
 function getNextUnvisitedLocation(currentKey) {
     const currentIndex = huntOrder.indexOf(currentKey);
     if (currentIndex === -1) return huntOrder.find(k => !foundLocations.has(k)) || null;
@@ -709,9 +711,12 @@ function getNextUnvisitedLocation(currentKey) {
     return null; // All locations found
 }
 
-// Returns the QR code URL for a given location key (used for printing/displaying QR codes)
+// Returns the QR code URL for a given location key (used for printing/displaying QR codes).
+// Resolves relative to hunt.html so it works regardless of deployment subdirectory.
 function getQRCodeURL(locationKey) {
-    return window.location.origin + '/hunt.html?location=' + encodeURIComponent(locationKey);
+    const url = new URL('hunt.html', window.location.href);
+    url.searchParams.set('location', encodeURIComponent(locationKey));
+    return url.href;
 }
 
 // Update the "Next Site" banner to show the next location after currentKey
@@ -779,9 +784,11 @@ function handleURLParameters() {
         showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
     }
 
-    // Clean up the URL so refreshing doesn't re-trigger the discovery
-    const cleanURL = window.location.pathname;
-    window.history.replaceState({}, document.title, cleanURL);
+    // Clean up the URL so refreshing doesn't re-trigger the discovery,
+    // while preserving any other query parameters (e.g. utm_source).
+    const cleanURL = new URL(window.location.href);
+    cleanURL.searchParams.delete('location');
+    window.history.replaceState({}, document.title, cleanURL.pathname + (cleanURL.search || ''));
 }
 
 
@@ -831,7 +838,21 @@ document.querySelectorAll('.hunt-tab-btn').forEach(button => {
     });
 });
 
-// Navigation
+// Navigation - dynamically set active class based on current page
+(function setActiveNavLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href') || '';
+        const linkPage = href.split('/').pop().split('#')[0] || 'index.html';
+        // Mark as active if link points to current page (ignoring hash fragments)
+        if (linkPage === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+})();
+
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
