@@ -1002,6 +1002,11 @@ useLocationBtn.addEventListener('click', () => {
 });
 --- end geolocation handler --- */
 
+/* TEST LOCATION BUTTON – handler commented out intentionally.
+   The button is also commented out in hunt.html (search for "TEST LOCATION BUTTON").
+   Kept here in case it needs to be restored in a future revision.
+   To re-enable: uncomment this block and re-enable the button in hunt.html.
+
 // Test Location Button - Launch AR for first unfound location
 if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
     // Find first unfound location
@@ -1024,6 +1029,7 @@ if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
     showNotification(`Testing AR at ${huntLocations[targetLocation].name}...`, 'info');
     launchARExperience(targetLocation, true);
 });
+*/
 
 // AR Close Button
 if (arCloseBtn) arCloseBtn.addEventListener('click', () => {
@@ -3506,7 +3512,7 @@ function applyTranslations(lang) {
     if (startHuntBtn) startHuntBtn.innerHTML = dict.ar.startHunt;
     if (scanQrBtn) scanQrBtn.innerHTML = dict.ar.scanQr;
     if (useLocationBtn) useLocationBtn.innerHTML = dict.ar.useLocation;
-    if (testLocationBtn) testLocationBtn.innerHTML = dict.ar.testLocation;
+    // if (testLocationBtn) testLocationBtn.innerHTML = dict.ar.testLocation; // button commented out – see hunt.html
 
     // Hunt items
     if (dict.huntItems) {

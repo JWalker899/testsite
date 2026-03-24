@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+const QRCode = require('qrcode');
 require('dotenv').config();
 const cloudinaryStorage = require('./cloudinary-storage');
 const app = express();
@@ -454,9 +455,47 @@ app.get('/api/leaderboard', (req, res) => {
 
 // ==================== Static Routes ====================
 
+// QR code image endpoint – used by the /qrcodes debug page.
+// Generates a PNG QR code for the given absolute URL query parameter.
+const VALID_QR_LOCATIONS = new Set(['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino']);
+app.get('/api/qrcode', (req, res) => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).send('Too many requests');
+  }
+
+  const location = req.query.location;
+  if (!location || !VALID_QR_LOCATIONS.has(location)) {
+    return res.status(400).send('Invalid location');
+  }
+
+  // Build the canonical hunt URL using Express's protocol/host helpers, which
+  // respect the app's trust-proxy setting and avoid direct use of forwarded headers.
+  const huntUrl = `${req.protocol}://${req.get('host')}/hunt.html?location=${encodeURIComponent(location)}`;
+
+  QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
+    if (err) {
+      console.error('QR generation error:', err.message);
+      return res.status(500).send('QR generation failed');
+    }
+    res.set('Content-Type', 'image/png');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(buf);
+  });
+});
+
 // Serve index.html for root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// QR codes debug/print page – accessible by URL only, not linked from the site
+app.get('/qrcodes', (req, res) => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).send('Too many requests');
+  }
+  return res.sendFile(path.join(__dirname, 'qrcodes.html'));
 });
 
 // Handle all other routes by serving index.html (for single-page app behavior)
