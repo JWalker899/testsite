@@ -2198,3 +2198,72 @@ body {
     color: var(--primary-color);
     text-decoration: underline;
 }
+
+/* ==================== Next Site Banner ==================== */
+.next-site-banner {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: #fff;
+    text-align: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 70px; /* below the header */
+    z-index: 900;
+    animation: bannerFadeIn 0.4s ease;
+}
+
+@keyframes bannerFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.next-site-banner .next-site-arrow {
+    font-size: 1.1rem;
+}
+
+.next-site-banner .next-site-label {
+    opacity: 0.9;
+}
+
+.next-site-banner .next-site-name {
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+}
+
+/* ==================== Welcome Modal ==================== */
+.welcome-content {
+    max-width: 420px;
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+
+.welcome-content h3 {
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.welcome-lang-block {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.welcome-ro {
+    font-size: 0.95rem;
+    color: var(--text-muted, #666);
+    border-top: 1px solid var(--border-color, #eee);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.welcome-content .cta-button {
+    margin-top: 1.25rem;
+}
