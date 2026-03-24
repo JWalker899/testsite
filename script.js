@@ -5,7 +5,10 @@ const navLinks = document.querySelectorAll('.nav-link');
 const navToggle = document.querySelector('.nav-toggle');
 const navList = document.querySelector('.nav-list');
 
-// AR Hunt Elements
+// Detect which page we are on (hunt.html has the scan-qr button; index.html does not)
+const isHuntPage = !!document.getElementById('scan-qr');
+
+// AR Hunt Elements (only present on hunt.html)
 const startHuntBtn = document.getElementById('start-hunt');
 const scanQrBtn = document.getElementById('scan-qr');
 const useLocationBtn = document.getElementById('use-location');
@@ -453,12 +456,17 @@ function resetProgress() {
 
     // Reset hunt buttons
     huntActive = false;
-    startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
-    startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
-    startHuntBtn.style.display = '';
-    resetHuntBtn.style.display = 'none';
-    scanQrBtn.disabled = true;
-    useLocationBtn.disabled = true;
+    if (startHuntBtn) {
+        startHuntBtn.innerHTML = '<i class="fas fa-play"></i> Start Hunt';
+        startHuntBtn.classList.remove('active-hunt', 'hunt-complete');
+        startHuntBtn.style.display = '';
+    }
+    if (resetHuntBtn) resetHuntBtn.style.display = 'none';
+    if (scanQrBtn) scanQrBtn.disabled = true;
+
+    // Hide the Next Site banner
+    const nextSiteBanner = document.getElementById('next-site-banner');
+    if (nextSiteBanner) nextSiteBanner.style.display = 'none';
 
     closeModal('user-profile-modal');
     showNotification('Progress reset successfully', 'info');
@@ -502,14 +510,18 @@ function restoreHuntState() {
 
     if (foundLocations.size > 0 && foundLocations.size < Object.keys(huntLocations).length) {
         huntActive = true;
-        startHuntBtn.style.display = 'none';
-        resetHuntBtn.style.display = '';
-        scanQrBtn.disabled = false;
-        useLocationBtn.disabled = false;
+        if (startHuntBtn) startHuntBtn.style.display = 'none';
+        if (resetHuntBtn) resetHuntBtn.style.display = '';
+        if (scanQrBtn) scanQrBtn.disabled = false;
+        // Update Next Site banner based on most recently found location
+        const lastFound = currentUser.locationsFound[currentUser.locationsFound.length - 1];
+        if (lastFound) updateNextSiteBanner(lastFound);
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
-        startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-        startHuntBtn.classList.remove('active-hunt');
-        startHuntBtn.classList.add('hunt-complete');
+        if (startHuntBtn) {
+            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
+            startHuntBtn.classList.remove('active-hunt');
+            startHuntBtn.classList.add('hunt-complete');
+        }
     }
 }
 
@@ -682,7 +694,104 @@ const huntLocations = {
     }
 };
 
-// Helper to get localized field from objects like huntLocations
+// Circular hunt order: scanning any location points to the next one in this loop
+const huntOrder = ['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino'];
+
+// Returns the next unvisited location in the circular order after currentKey.
+// Returns null if all locations have been found.
+// Note: if currentKey is not in huntOrder (should not happen with valid data), falls back to
+// returning the first unvisited location in order to avoid breaking the hunt.
+function getNextUnvisitedLocation(currentKey) {
+    const currentIndex = huntOrder.indexOf(currentKey);
+    if (currentIndex === -1) return huntOrder.find(k => !foundLocations.has(k)) || null;
+    for (let i = 1; i <= huntOrder.length; i++) {
+        const nextKey = huntOrder[(currentIndex + i) % huntOrder.length];
+        if (!foundLocations.has(nextKey)) return nextKey;
+    }
+    return null; // All locations found
+}
+
+// Returns the QR code URL for a given location key (used for printing/displaying QR codes).
+// Resolves relative to hunt.html so it works regardless of deployment subdirectory.
+function getQRCodeURL(locationKey) {
+    const url = new URL('hunt.html', window.location.href);
+    url.searchParams.set('location', encodeURIComponent(locationKey));
+    return url.href;
+}
+
+// Update the "Next Site" banner to show the next location after currentKey
+function updateNextSiteBanner(currentKey) {
+    const banner = document.getElementById('next-site-banner');
+    if (!banner) return;
+    const nextKey = getNextUnvisitedLocation(currentKey);
+    if (nextKey) {
+        const nextLoc = huntLocations[nextKey];
+        const nextName = localizedField(nextLoc, 'name') || nextLoc.name;
+        banner.querySelector('.next-site-name').textContent = nextName;
+        banner.style.display = '';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+// Show the first-visit welcome popup when arriving via QR code for the first time
+function showWelcomeModal(currentLocationKey) {
+    const nextKey = getNextUnvisitedLocation(currentLocationKey);
+    const nextName = nextKey ? (localizedField(huntLocations[nextKey], 'name') || huntLocations[nextKey].name) : '';
+
+    const enEl = document.getElementById('welcome-next-en');
+    const roEl = document.getElementById('welcome-next-ro');
+    if (enEl) enEl.textContent = nextName;
+    if (roEl) roEl.textContent = nextName;
+
+    openModal('welcome-modal');
+}
+
+// Callback when welcome modal is closed (proceed to regular discovery modal chain if needed)
+let welcomeModalPendingKey = null;
+function onWelcomeModalClose() {
+    if (welcomeModalPendingKey) {
+        welcomeModalPendingKey = null;
+        // Show the discovery modal after the welcome modal closes
+        setTimeout(() => openModal('discovery-modal'), 200);
+    }
+}
+
+// Handle the ?location= URL parameter when the page loads (from a scanned QR code URL)
+function handleURLParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationParam = urlParams.get('location');
+    if (!locationParam || !huntLocations[locationParam]) return;
+
+    // Start the hunt if not already active
+    if (!huntActive) {
+        huntActive = true;
+        if (startHuntBtn) startHuntBtn.style.display = 'none';
+        if (resetHuntBtn) resetHuntBtn.style.display = '';
+        if (scanQrBtn) scanQrBtn.disabled = false;
+    }
+
+    const isFirstVisit = foundLocations.size === 0;
+
+    if (!foundLocations.has(locationParam)) {
+        // Small delay to allow page to finish rendering before showing modal
+        setTimeout(() => {
+            discoverLocation(locationParam, isFirstVisit);
+        }, 600);
+    } else {
+        // Already found this location — just update the Next Site banner
+        updateNextSiteBanner(locationParam);
+        showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
+    }
+
+    // Clean up the URL so refreshing doesn't re-trigger the discovery,
+    // while preserving any other query parameters (e.g. utm_source).
+    const cleanURL = new URL(window.location.href);
+    cleanURL.searchParams.delete('location');
+    window.history.replaceState({}, document.title, cleanURL.pathname + (cleanURL.search || ''));
+}
+
+
 function localizedField(obj, field) {
     if (currentLang && currentLang !== 'en') {
         const key = `${field}_` + currentLang;
@@ -729,11 +838,29 @@ document.querySelectorAll('.hunt-tab-btn').forEach(button => {
     });
 });
 
-// Navigation
+// Navigation - dynamically set active class based on current page
+(function setActiveNavLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href') || '';
+        const linkPage = href.split('/').pop().split('#')[0] || 'index.html';
+        // Mark as active if link points to current page (ignoring hash fragments)
+        if (linkPage === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+})();
+
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        // Only intercept in-page anchor links (starting with #)
+        if (!href || !href.startsWith('#')) return;
+
         e.preventDefault();
-        const targetId = link.getAttribute('href').substring(1);
+        const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
         
         if (targetElement) {
@@ -743,7 +870,7 @@ navLinks.forEach(link => {
             targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             
             // Close mobile menu if open
-            if (navList.classList.contains('active')) {
+            if (navList && navList.classList.contains('active')) {
                 navList.classList.remove('active');
             }
         }
@@ -786,7 +913,7 @@ updateWeather();
 setInterval(updateWeather, 300000); // Update every 5 minutes
 
 // AR Scavenger Hunt Functions
-startHuntBtn.addEventListener('click', () => {
+if (startHuntBtn) startHuntBtn.addEventListener('click', () => {
     if (!huntActive) {
         huntActive = true;
         startHuntBtn.style.display = 'none';
@@ -794,15 +921,14 @@ startHuntBtn.addEventListener('click', () => {
         showNotification('Scavenger hunt started! Find all 8 locations.', 'success');
         
         // Enable other buttons
-        scanQrBtn.disabled = false;
-        useLocationBtn.disabled = false;
+        if (scanQrBtn) scanQrBtn.disabled = false;
     }
 });
 
 // Timer for reset-hunt confirmation button auto-revert
 let resetHuntConfirmTimeout = null;
 
-resetHuntBtn.addEventListener('click', () => {
+if (resetHuntBtn) resetHuntBtn.addEventListener('click', () => {
     if (resetHuntBtn.dataset.confirming !== 'true') {
         // First click: switch to "Are you sure?" state
         resetHuntBtn.dataset.confirming = 'true';
@@ -833,7 +959,7 @@ resetHuntBtn.addEventListener('click', () => {
     resetProgress();
 });
 
-scanQrBtn.addEventListener('click', () => {
+if (scanQrBtn) scanQrBtn.addEventListener('click', () => {
     if (!huntActive) {
         showNotification('Please start the hunt first!', 'warning');
         return;
@@ -842,6 +968,14 @@ scanQrBtn.addEventListener('click', () => {
     startQRScanner();
 });
 
+// ==================== LOCATION-BASED DISCOVERY (Commented out for now) ====================
+// NOTE: The GPS/geolocation feature is preserved here for potential future reimplementation.
+// To re-enable it, uncomment the useLocationBtn event listener below and the
+// checkNearbyLocations() and calculateDistance() functions further in this file.
+// Also restore the "Use Location" button visibility in hunt.html.
+// ========================================================================================
+
+/* --- useLocationBtn click handler (geolocation disabled) ---
 useLocationBtn.addEventListener('click', () => {
     if (!huntActive) {
         showNotification('Please start the hunt first!', 'warning');
@@ -866,9 +1000,10 @@ useLocationBtn.addEventListener('click', () => {
         showNotification('Geolocation is not supported by your browser.', 'error');
     }
 });
+--- end geolocation handler --- */
 
 // Test Location Button - Launch AR for first unfound location
-testLocationBtn.addEventListener('click', () => {
+if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
     // Find first unfound location
     const locationKeys = Object.keys(huntLocations);
     let targetLocation = locationKeys[0]; // Default to fortress
@@ -891,12 +1026,12 @@ testLocationBtn.addEventListener('click', () => {
 });
 
 // AR Close Button
-arCloseBtn.addEventListener('click', () => {
+if (arCloseBtn) arCloseBtn.addEventListener('click', () => {
     closeARView();
 });
 
 // AR Capture Button – take photo of the bear
-arCaptureBtn.addEventListener('click', () => {
+if (arCaptureBtn) arCaptureBtn.addEventListener('click', () => {
     captureARPhoto();
 });
 
@@ -993,20 +1128,33 @@ function scanQRCode() {
 }
 
 function processQRCode(qrData) {
-    // Look for matching location based on QR code data
+    // First try to parse as a URL with a 'location' parameter (new URL-based QR code format)
     let foundLocationKey = null;
-    
-    for (const [key, location] of Object.entries(huntLocations)) {
-        if (location.qr === qrData) {
-            foundLocationKey = key;
-            break;
+    try {
+        const url = new URL(qrData);
+        const locationParam = url.searchParams.get('location');
+        if (locationParam && huntLocations[locationParam]) {
+            foundLocationKey = locationParam;
+        }
+    } catch (e) {
+        // Not a valid URL — fall through to legacy matching below
+    }
+
+    // Fall back to legacy QR string matching (e.g. 'RASNOV_FORTRESS')
+    if (!foundLocationKey) {
+        for (const [key, location] of Object.entries(huntLocations)) {
+            if (location.qr === qrData) {
+                foundLocationKey = key;
+                break;
+            }
         }
     }
-    
+
     if (foundLocationKey) {
         if (!foundLocations.has(foundLocationKey)) {
             qrScannerActive = false;
-            discoverLocation(foundLocationKey);
+            const isFirstVisit = foundLocations.size === 0;
+            discoverLocation(foundLocationKey, isFirstVisit);
             closeModal('qr-modal');
             showNotification('QR Code scanned successfully!', 'success');
         } else {
@@ -1034,13 +1182,20 @@ function showQRCodeOptions() {
 
 function simulateQRScan(locationKey) {
     if (huntLocations[locationKey] && !foundLocations.has(locationKey)) {
-        discoverLocation(locationKey);
+        const isFirstVisit = foundLocations.size === 0;
+        discoverLocation(locationKey, isFirstVisit);
         closeModal('qr-modal');
     } else if (foundLocations.has(locationKey)) {
         showNotification('You already found this location!', 'info');
     }
 }
 
+/* ==================== LOCATION-BASED DISCOVERY FUNCTIONS (Commented out) ====================
+ * NOTE: These GPS/geolocation functions are preserved for potential future reimplementation.
+ * To re-enable, uncomment both functions below and restore the useLocationBtn handler above.
+ * ========================================================================================= */
+
+/* --- checkNearbyLocations (geolocation disabled) ---
 function checkNearbyLocations() {
     if (!userLocation) return;
     
@@ -1068,7 +1223,9 @@ function checkNearbyLocations() {
         showNotification('No locations nearby. Keep exploring!', 'info');
     }
 }
+--- end checkNearbyLocations --- */
 
+/* --- calculateDistance (geolocation disabled) ---
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3; // Earth's radius in meters
     const φ1 = lat1 * Math.PI / 180;
@@ -1083,8 +1240,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
     return R * c;
 }
+--- end calculateDistance --- */
 
-async function discoverLocation(locationKey) {
+async function discoverLocation(locationKey, isFirstVisit = false) {
     foundLocations.add(locationKey);
     
     // Update UI
@@ -1104,13 +1262,20 @@ async function discoverLocation(locationKey) {
     
     // Update progress
     updateProgress();
+
+    // Update the "Next Site" banner with the next location in the circular order
+    updateNextSiteBanner(locationKey);
     
     // Show discovery modal with points
     const localizedFact = localizedField(location, 'fact') || location.fact || '';
     const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
 
-    document.getElementById('discovery-title').textContent = (currentLang === 'ro') ? `Ai găsit ${localizedName}!` : `You found ${localizedName}!`;
-    document.getElementById('discovery-message').textContent = discoveryMsg;
+    const discoveryTitleEl = document.getElementById('discovery-title');
+    const discoveryMsgEl = document.getElementById('discovery-message');
+    const discoveryFactEl = document.getElementById('discovery-fact');
+
+    if (discoveryTitleEl) discoveryTitleEl.textContent = (currentLang === 'ro') ? `Ai găsit ${localizedName}!` : `You found ${localizedName}!`;
+    if (discoveryMsgEl) discoveryMsgEl.textContent = discoveryMsg;
     
     let factHTML = `<strong>${currentLang === 'ro' ? 'Curiozitate' : 'Fun Fact'}:</strong> ${localizedFact}`;
     if (pointsResult) {
@@ -1128,8 +1293,7 @@ async function discoverLocation(locationKey) {
         factHTML += `<br><p class="ar-photo-label">📸 Your Grizzly photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your AR bear photo at ${localizedName}">`;
     }
     
-    document.getElementById('discovery-fact').innerHTML = factHTML;
-    openModal('discovery-modal');
+    if (discoveryFactEl) discoveryFactEl.innerHTML = factHTML;
 
     // After any location found, queue a name prompt if user hasn't set one yet
     if (currentUser && !currentUser.hasSetName) {
@@ -1140,7 +1304,16 @@ async function discoverLocation(locationKey) {
     if (foundLocations.size === 2 && !localStorage.getItem('rasnov_survey_shown')) {
         surveyPromptPending = true;
     }
-    
+
+    // Show welcome modal for first-time QR scan, then chain to discovery/name modals
+    if (isFirstVisit) {
+        welcomeModalPendingKey = locationKey;
+        showWelcomeModal(locationKey);
+        // discovery modal will be shown after welcome modal is closed (via onWelcomeModalClose)
+    } else {
+        openModal('discovery-modal');
+    }
+
     // Refresh leaderboard data in the background after finding a location
     loadLeaderboard();
     
@@ -1152,11 +1325,13 @@ async function discoverLocation(locationKey) {
                 : `🎉 Congratulations! You completed the scavenger hunt! Total points: ${currentUser.totalPoints}`;
             showNotification(celebrationMsg, 'success');
             huntActive = false;
-            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.classList.remove('active-hunt');
-            startHuntBtn.classList.add('hunt-complete');
-            startHuntBtn.style.display = '';
-            resetHuntBtn.style.display = 'none';
+            if (startHuntBtn) {
+                startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
+                startHuntBtn.classList.remove('active-hunt');
+                startHuntBtn.classList.add('hunt-complete');
+                startHuntBtn.style.display = '';
+            }
+            if (resetHuntBtn) resetHuntBtn.style.display = 'none';
         }, 2000);
     }
 }
@@ -1166,9 +1341,9 @@ function updateProgress() {
     const found = foundLocations.size;
     const percentage = (found / total) * 100;
     
-    progressFill.style.width = `${percentage}%`;
-    progressCount.textContent = found;
-    progressTotal.textContent = total;
+    if (progressFill) progressFill.style.width = `${percentage}%`;
+    if (progressCount) progressCount.textContent = found;
+    if (progressTotal) progressTotal.textContent = total;
 }
 
 // Delay (ms) between closing discovery modal and opening name prompt
@@ -3729,15 +3904,20 @@ initializeUser();
     if (saved && saved !== 'default') applyTheme(saved);
 })();
 
-// Initialize button states (before restoreHuntState which may re-enable them)
-scanQrBtn.disabled = true;
-useLocationBtn.disabled = true;
+// Hunt-page-only initialization
+if (isHuntPage) {
+    // Initialize button states (before restoreHuntState which may re-enable them)
+    if (scanQrBtn) scanQrBtn.disabled = true;
 
-// Restore hunt state (found locations, photos, button states) from saved data
-restoreHuntState();
+    // Restore hunt state (found locations, photos, button states) from saved data
+    restoreHuntState();
 
-// Initialize progress display
-updateProgress();
+    // Initialize progress display
+    updateProgress();
+
+    // Handle QR code URL parameters (?location=...) from scanned QR codes
+    handleURLParameters();
+}
 
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
