@@ -110,8 +110,8 @@
                             <span>Leaderboard</span>
                         </button>
                         <button class="hunt-tab-btn" data-hunt-tab="unlocks-pane">
-                            <i class="fas fa-palette"></i>
-                            <span>Unlocks</span>
+                            <i class="fas fa-gift"></i>
+                            <span>Rewards</span>
                         </button>
                     </div>
 
@@ -323,6 +323,21 @@
                         <div class="survey-btn-row">
                             <button class="cta-button" id="survey-yes-btn" onclick="startSurvey()">Yes, take the survey!</button>
                             <button class="skip-btn" id="survey-no-btn" onclick="dismissSurvey()">Maybe later</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collage Unlock Modal -->
+                <div class="modal" id="collage-unlock-modal">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeModal('collage-unlock-modal')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="collage-modal-content">
+                            <div class="collage-modal-badge" id="collage-unlock-badge">🥈</div>
+                            <h3 id="collage-unlock-title">Silver Collage Unlocked!</h3>
+                            <p id="collage-unlock-msg"></p>
+                            <button class="ar-button primary" onclick="closeModal('collage-unlock-modal'); document.querySelector('[data-hunt-tab=unlocks-pane]').click()">View My Collage</button>
                         </div>
                     </div>
                 </div>

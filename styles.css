@@ -2172,6 +2172,250 @@ body {
     color: var(--primary-color);
     font-weight: 600;
 }
+
+/* ==================== Rewards Tab ==================== */
+
+/* Compact theme badges (one-line row) */
+.theme-unlocks-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.theme-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 2rem;
+    border: 2px solid #e0e0e0;
+    background: white;
+    font-size: 0.83rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.theme-badge.unlocked {
+    border-color: var(--primary-color);
+}
+
+.theme-badge.active-theme {
+    border-color: var(--success-color);
+    background: #f1f8f1;
+}
+
+.theme-badge.locked {
+    opacity: 0.55;
+    filter: grayscale(0.4);
+}
+
+.theme-badge-emoji { font-size: 1rem; }
+.theme-badge-name { color: var(--dark-color); }
+.theme-badge-pts { font-size: 0.75rem; color: #888; }
+
+.theme-badge-apply {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.theme-badge-apply:hover {
+    opacity: 0.85;
+}
+
+/* Rewards sections */
+.rewards-section {
+    margin-bottom: 2rem;
+}
+
+.rewards-section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Discounts */
+.discounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1rem;
+}
+
+.discount-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.discount-card.unlocked {
+    border-color: var(--secondary-color);
+}
+
+.discount-card.locked {
+    opacity: 0.6;
+    filter: grayscale(0.4);
+}
+
+.discount-emoji { font-size: 1.7rem; }
+
+.discount-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.discount-desc {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.discount-req {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-top: 0.2rem;
+}
+
+/* Collage */
+.collage-wrapper {
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    background: #f5f5f5;
+    border: 3px solid transparent;
+    transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.collage-wrapper.silver-border {
+    border-color: #aaa9ad;
+    box-shadow: 0 0 0 3px rgba(170, 169, 173, 0.25), var(--shadow);
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+}
+
+.collage-wrapper.gold-border {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), var(--shadow);
+    background: linear-gradient(135deg, #fffdf0, #fdf3cc);
+}
+
+.collage-tier-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.collage-tier-label.silver { color: #7a7a82; }
+.collage-tier-label.gold   { color: #b8960c; }
+
+.collage-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+}
+
+.collage-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collage-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.collage-placeholder {
+    font-size: 1.2rem;
+    opacity: 0.4;
+}
+
+.collage-footer {
+    margin-top: 0.6rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: #888;
+}
+
+/* Social share */
+.social-share-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    justify-content: center;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 2rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    color: white;
+}
+
+.share-btn.twitter   { background: #1da1f2; }
+.share-btn.facebook  { background: #1877f2; }
+.share-btn.whatsapp  { background: #25d366; }
+.share-btn.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    cursor: default;
+}
+.share-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+.collage-instagram-note {
+    font-size: 0.72rem;
+    color: #888;
+    text-align: center;
+    margin-top: 0.35rem;
+}
+
+.collage-intro {
+    font-size: 0.88rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+}
+
+/* Collage unlock modal */
+.collage-modal-content {
+    text-align: center;
+    padding: 0.5rem 0 1rem;
+}
+
+.collage-modal-badge {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
 /* Survey Modals */
 .survey-reward-text {
     font-size: 0.9rem;
