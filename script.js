@@ -38,6 +38,10 @@ let huntActive = false;
 let testingMode = false;
 let foundLocations = new Set();
 
+// Timer state for treasure hunt
+let huntStartTime = null; // Absolute time when first location was found
+let lastDiscoveryTime = null; // Time when last location was found
+
 // Rasnov geographic coordinates (used for weather API)
 const RASNOV_LATITUDE = 45.59;
 const RASNOV_LONGITUDE = 25.46;
@@ -436,6 +440,11 @@ function resetProgress() {
     currentUser.totalPoints = 0;
     currentUser.completedAt = null;
     foundLocations.clear();
+    
+    // Reset timer state
+    huntStartTime = null;
+    lastDiscoveryTime = null;
+    
     saveUserToLocalStorage();
     updateUserDisplayUI();
     updateProgress();
@@ -1272,6 +1281,25 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     // Update the "Next Site" banner with the next location in the circular order
     updateNextSiteBanner(locationKey);
     
+    // Handle timer logic
+    const currentTime = Date.now();
+    let timerText = '';
+    
+    if (foundLocations.size === 1) {
+        // First location found - start the hunt timer
+        huntStartTime = currentTime;
+        lastDiscoveryTime = currentTime;
+        timerText = `<br><br><strong>⏱️ ${currentLang === 'ro' ? 'Vânătoarea a început!' : 'Hunt Started!'}</strong>`;
+    } else {
+        // Subsequent locations - show time since last discovery
+        const timeSinceLast = Math.floor((currentTime - lastDiscoveryTime) / 1000); // seconds
+        const minutes = Math.floor(timeSinceLast / 60);
+        const seconds = timeSinceLast % 60;
+        const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        timerText = `<br><br><strong>⏱️ ${currentLang === 'ro' ? 'Timp pentru a găsi această locație' : 'Time to find this location'}: ${timeString}</strong>`;
+        lastDiscoveryTime = currentTime;
+    }
+    
     // Show discovery modal with points
     const localizedFact = localizedField(location, 'fact') || location.fact || '';
     const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
@@ -1292,6 +1320,9 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
         }
         factHTML += pointsText;
     }
+    
+    // Add timer information
+    factHTML += timerText;
     
     // Show saved AR photo if available (validate it's a safe JPEG data URL)
     const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
