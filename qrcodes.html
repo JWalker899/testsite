@@ -28,6 +28,20 @@
             font-size: 0.95rem;
         }
 
+        h2 {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+            color: #333;
+        }
+
+        .section-note {
+            text-align: center;
+            color: #666;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+
         .grid {
             display: flex;
             flex-wrap: wrap;
@@ -45,6 +59,11 @@
             flex-direction: column;
             align-items: center;
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .qr-card.bonus {
+            border-color: #f0b429;
+            background: #fffbf0;
         }
 
         .qr-label {
@@ -67,6 +86,13 @@
             font-family: monospace;
         }
 
+        .qr-pts {
+            font-size: 0.8rem;
+            color: #c97d00;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
         @media print {
             body { background: #fff; padding: 12px; }
             .qr-card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
@@ -77,6 +103,8 @@
 <body>
     <h1>Discover Rasnov — QR Codes</h1>
     <p class="subtitle">All hunt location QR codes for debugging and printing. Access via URL only – not linked from the main site.</p>
+
+    <h2>Main Hunt Locations</h2>
 
     <div class="grid">
         <!-- Cards are generated server-side via /api/qrcode – no external scripts needed -->
@@ -127,6 +155,28 @@
             <div class="qr-label">Dino Park Entrance</div>
             <img src="/api/qrcode?location=dino" alt="QR code for Dino Park Entrance">
             <div class="qr-key">dino</div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         Bonus / Extra QR Codes
+         These are off-track locations (businesses, small spots, etc.).
+         Generate more at: /api/qrcode-extra?name=Place_Name&points=5
+         The name uses underscores for spaces; points can be 1–999.
+    ====================================================================== -->
+
+    <h2>⭐ Bonus Locations</h2>
+    <p class="section-note">
+        Off-track bonus QR codes. Generate more at
+        <code>/api/qrcode-extra?name=Place_Name&amp;points=5</code>
+    </p>
+
+    <div class="grid">
+        <div class="qr-card bonus">
+            <div class="qr-label">Local Bakery</div>
+            <img src="/api/qrcode-extra?name=Local_Bakery&points=3" alt="QR code for Local Bakery (bonus)">
+            <div class="qr-key">Local_Bakery-3</div>
+            <div class="qr-pts">+3 bonus points</div>
         </div>
     </div>
 </body>

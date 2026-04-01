@@ -37,6 +37,19 @@ const arFlash = document.getElementById('ar-flash');
 let huntActive = false;
 let testingMode = false;
 let foundLocations = new Set();
+let foundExtraLocations = new Set(); // keys of found bonus (off-track) locations
+
+// Site configuration – loaded from /api/config on startup; falls back to current origin
+let siteDomain = window.location.origin;
+(async function loadSiteConfig() {
+    try {
+        const r = await fetch('/api/config');
+        if (r.ok) {
+            const cfg = await r.json();
+            if (cfg && cfg.siteDomain) siteDomain = cfg.siteDomain;
+        }
+    } catch (e) { /* use fallback */ }
+})();
 
 // Rasnov geographic coordinates (used for weather API)
 const RASNOV_LATITUDE = 45.59;
@@ -436,6 +449,7 @@ function resetProgress() {
     currentUser.totalPoints = 0;
     currentUser.completedAt = null;
     foundLocations.clear();
+    foundExtraLocations.clear();
     saveUserToLocalStorage();
     updateUserDisplayUI();
     updateProgress();
@@ -448,6 +462,9 @@ function resetProgress() {
         const photo = item.querySelector('.hunt-item-photo');
         if (photo) photo.remove();
     });
+
+    // Remove dynamically-added extra location cards
+    document.querySelectorAll('.hunt-item.extra-location').forEach(el => el.remove());
 
     // Clear saved photos
     Object.keys(huntLocations).forEach(key => {
@@ -495,14 +512,23 @@ function restoreHuntState() {
     if (!currentUser || !currentUser.locationsFound) return;
 
     currentUser.locationsFound.forEach(locationKey => {
-        foundLocations.add(locationKey);
-
-        const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
-        if (huntItem) {
-            huntItem.classList.add('found');
-            const icon = huntItem.querySelector('i');
-            if (icon) icon.className = 'fas fa-check-circle';
-            addPhotoToHuntItem(locationKey, huntItem);
+        if (huntLocations[locationKey]) {
+            // Regular hunt location
+            foundLocations.add(locationKey);
+            const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
+            if (huntItem) {
+                huntItem.classList.add('found');
+                const icon = huntItem.querySelector('i');
+                if (icon) icon.className = 'fas fa-check-circle';
+                addPhotoToHuntItem(locationKey, huntItem);
+            }
+        } else {
+            // Extra (bonus) location – restore its card without re-awarding points
+            const extraInfo = parseExtraLocation(locationKey);
+            if (extraInfo) {
+                foundExtraLocations.add(locationKey);
+                addExtraHuntItem(extraInfo);
+            }
         }
     });
 
@@ -513,9 +539,9 @@ function restoreHuntState() {
         if (startHuntBtn) startHuntBtn.style.display = 'none';
         if (resetHuntBtn) resetHuntBtn.style.display = '';
         if (scanQrBtn) scanQrBtn.disabled = false;
-        // Update Next Site banner based on most recently found location
-        const lastFound = currentUser.locationsFound[currentUser.locationsFound.length - 1];
-        if (lastFound) updateNextSiteBanner(lastFound);
+        // Update Next Site banner based on the most recently found regular location
+        const lastRegular = [...currentUser.locationsFound].reverse().find(k => huntLocations[k]);
+        if (lastRegular) updateNextSiteBanner(lastRegular);
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
         if (startHuntBtn) {
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
@@ -761,27 +787,41 @@ function onWelcomeModalClose() {
 function handleURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const locationParam = urlParams.get('location');
-    if (!locationParam || !huntLocations[locationParam]) return;
+    if (!locationParam) return;
 
-    // Start the hunt if not already active
-    if (!huntActive) {
-        huntActive = true;
-        if (startHuntBtn) startHuntBtn.style.display = 'none';
-        if (resetHuntBtn) resetHuntBtn.style.display = '';
-        if (scanQrBtn) scanQrBtn.disabled = false;
-    }
+    if (huntLocations[locationParam]) {
+        // Regular hunt location
+        if (!huntActive) {
+            huntActive = true;
+            if (startHuntBtn) startHuntBtn.style.display = 'none';
+            if (resetHuntBtn) resetHuntBtn.style.display = '';
+            if (scanQrBtn) scanQrBtn.disabled = false;
+        }
 
-    const isFirstVisit = foundLocations.size === 0;
+        const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
 
-    if (!foundLocations.has(locationParam)) {
-        // Small delay to allow page to finish rendering before showing modal
-        setTimeout(() => {
-            discoverLocation(locationParam, isFirstVisit);
-        }, 600);
+        if (!foundLocations.has(locationParam)) {
+            // Small delay to allow page to finish rendering before showing modal
+            setTimeout(() => {
+                discoverLocation(locationParam, isFirstVisit);
+            }, 600);
+        } else {
+            // Already found this location — just update the Next Site banner
+            updateNextSiteBanner(locationParam);
+            showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
+        }
     } else {
-        // Already found this location — just update the Next Site banner
-        updateNextSiteBanner(locationParam);
-        showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
+        // Check if it's an extra (bonus) location
+        const extraInfo = parseExtraLocation(locationParam);
+        if (extraInfo) {
+            if (!foundExtraLocations.has(extraInfo.key)) {
+                setTimeout(() => {
+                    discoverExtraLocation(extraInfo);
+                }, 600);
+            } else {
+                showNotification(`You've already found ${extraInfo.name}!`, 'info');
+            }
+        }
     }
 
     // Clean up the URL so refreshing doesn't re-trigger the discovery,
@@ -1133,21 +1173,43 @@ function scanQRCode() {
     }
 }
 
+// Regex for the extra location key format: alphanumerics/underscores/spaces/hyphens/apostrophes then -<1-3 digit points>
+const EXTRA_LOCATION_RE = /^([A-Za-z0-9][A-Za-z0-9_ '-]{0,49})-(\d{1,3})$/;
+
+// Parse a location parameter as an extra bonus location.
+// Returns { key, name, points } or null if the format does not match.
+function parseExtraLocation(locationParam) {
+    const m = EXTRA_LOCATION_RE.exec(locationParam);
+    if (!m) return null;
+    const points = parseInt(m[2], 10);
+    if (points < 1 || points > 999) return null;
+    return { key: locationParam, name: m[1].replace(/_/g, ' '), points };
+}
+
 function processQRCode(qrData) {
     // First try to parse as a URL with a 'location' parameter (new URL-based QR code format)
     let foundLocationKey = null;
+    let extraLocationInfo = null;
     try {
         const url = new URL(qrData);
-        const locationParam = url.searchParams.get('location');
-        if (locationParam && huntLocations[locationParam]) {
-            foundLocationKey = locationParam;
+        // Only accept QR codes from our own site domain to avoid accepting random URLs
+        const expectedHost = new URL(siteDomain).host;
+        if (url.host === expectedHost) {
+            const locationParam = url.searchParams.get('location');
+            if (locationParam) {
+                if (huntLocations[locationParam]) {
+                    foundLocationKey = locationParam;
+                } else {
+                    extraLocationInfo = parseExtraLocation(locationParam);
+                }
+            }
         }
     } catch (e) {
         // Not a valid URL — fall through to legacy matching below
     }
 
     // Fall back to legacy QR string matching (e.g. 'RASNOV_FORTRESS')
-    if (!foundLocationKey) {
+    if (!foundLocationKey && !extraLocationInfo) {
         for (const [key, location] of Object.entries(huntLocations)) {
             if (location.qr === qrData) {
                 foundLocationKey = key;
@@ -1159,8 +1221,17 @@ function processQRCode(qrData) {
     if (foundLocationKey) {
         if (!foundLocations.has(foundLocationKey)) {
             qrScannerActive = false;
-            const isFirstVisit = foundLocations.size === 0;
+            const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
             discoverLocation(foundLocationKey, isFirstVisit);
+            closeModal('qr-modal');
+            showNotification('QR Code scanned successfully!', 'success');
+        } else {
+            showNotification('You already found this location!', 'info');
+        }
+    } else if (extraLocationInfo) {
+        if (!foundExtraLocations.has(extraLocationInfo.key)) {
+            qrScannerActive = false;
+            discoverExtraLocation(extraLocationInfo);
             closeModal('qr-modal');
             showNotification('QR Code scanned successfully!', 'success');
         } else {
@@ -1184,6 +1255,65 @@ function showQRCodeOptions() {
             </div>
         </div>
     `;
+}
+
+// Add a dynamically-created hunt item card for a bonus location
+function addExtraHuntItem(info) {
+    const huntItemsContainer = document.querySelector('.hunt-items');
+    if (!huntItemsContainer) return;
+    // Avoid duplicates by comparing the data attribute via the DOM dataset property
+    const duplicate = Array.from(huntItemsContainer.querySelectorAll('.hunt-item.extra-location'))
+        .find(el => el.dataset.extraLocation === info.key);
+    if (duplicate) return;
+    const item = document.createElement('div');
+    item.className = 'hunt-item found extra-location';
+    item.dataset.extraLocation = info.key;
+    item.innerHTML = `
+        <i class="fas fa-star"></i>
+        <span>${escapeHtml(info.name)}</span>
+        <span class="extra-pts-badge">+${info.points} pts</span>
+    `;
+    huntItemsContainer.appendChild(item);
+}
+
+// Discover and award points for a bonus (off-track) location
+async function discoverExtraLocation(info) {
+    // info: { key: string, name: string, points: number }
+    foundExtraLocations.add(info.key);
+
+    // Award points locally
+    if (currentUser) {
+        currentUser.totalPoints += info.points;
+        saveUserToLocalStorage();
+        updateUserDisplayUI();
+        showPointsNotification(info.points, 0, info.name);
+
+        // Sync to server (non-blocking)
+        try {
+            await fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/extra-found`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ locationKey: info.key })
+            });
+        } catch (e) {
+            console.log('Server sync unavailable (offline mode):', e.message);
+        }
+    }
+
+    // Add the new hunt item card below the regular places
+    addExtraHuntItem(info);
+
+    // Show discovery modal
+    const discoveryTitleEl = document.getElementById('discovery-title');
+    const discoveryMsgEl = document.getElementById('discovery-message');
+    const discoveryFactEl = document.getElementById('discovery-fact');
+
+    if (discoveryTitleEl) discoveryTitleEl.textContent = `You found ${info.name}!`;
+    if (discoveryMsgEl) discoveryMsgEl.textContent = 'Bonus location discovered!';
+    if (discoveryFactEl) discoveryFactEl.innerHTML = `<strong>Bonus Points: +${info.points}</strong>`;
+
+    openModal('discovery-modal');
+    loadLeaderboard();
 }
 
 function simulateQRScan(locationKey) {
@@ -3157,9 +3287,20 @@ function loadMap() {
         iconAnchor: [16, 40],
         popupAnchor: [0, -40]
     });
+
+    // Hunt destination icons: green question mark (difficulty 1) and red (difficulty 2)
+    const makeHuntIcon = (color) => L.divIcon({
+        className: '',
+        html: `<div style="width:32px;height:40px;display:flex;align-items:flex-start;justify-content:center;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"><path fill="${color}" d="M16 0C10.486 0 6 4.486 6 10c0 7.5 10 17.5 10 30 0 0 10-22.5 10-30 0-5.514-4.486-10-10-10z"/><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial,sans-serif">?</text></svg></div>`,
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+    });
+    const huntEasyIcon = makeHuntIcon('#27ae60'); // green – difficulty 1
+    const huntHardIcon = makeHuntIcon('#e74c3c'); // red   – difficulty 2
     
     // Load markers from places data
-    loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon);
+    loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon);
     
     mapDiv.classList.add('loaded');
     showNotification('Map loaded successfully!', 'success');
@@ -3168,7 +3309,7 @@ function loadMap() {
 /**
  * Load map markers from places data
  */
-async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
+async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon) {
     // Use event-based approach to wait for data
     const placesData = await waitForPlacesData();
     
@@ -3179,10 +3320,15 @@ async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
     
     console.log('📍 Loading map markers from places data...');
     
-    // Add locations
+    // Add locations – use hunt destination icons for tagged places
     if (placesData.locations) {
         placesData.locations.forEach(place => {
-            addMarkerToMap(place, 'location', locationIcon);
+            if (place.huntDestination && huntEasyIcon && huntHardIcon) {
+                const huntIcon = place.difficulty === 2 ? huntHardIcon : huntEasyIcon;
+                addMarkerToMap(place, 'location', huntIcon);
+            } else {
+                addMarkerToMap(place, 'location', locationIcon);
+            }
         });
     }
     

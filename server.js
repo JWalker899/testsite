@@ -5,6 +5,8 @@ const axios = require('axios');
 const QRCode = require('qrcode');
 require('dotenv').config();
 const cloudinaryStorage = require('./cloudinary-storage');
+const siteConfig = require('./site.config');
+const SITE_DOMAIN = siteConfig.SITE_DOMAIN;
 const app = express();
 
 // Middleware
@@ -435,6 +437,46 @@ app.post('/api/user/:uuid/location-found', (req, res) => {
   });
 });
 
+// Award points for finding an extra (bonus, off-track) location.
+// locationKey format: "Name_With_Underscores-<points>" e.g. "Local_Bakery-5"
+const EXTRA_LOCATION_KEY_RE = /^[A-Za-z0-9][A-Za-z0-9_ '-]{0,49}-(\d{1,3})$/;
+app.post('/api/user/:uuid/extra-found', (req, res) => {
+  const { uuid } = req.params;
+  const { locationKey } = req.body;
+
+  if (!isValidUUID(uuid)) {
+    return res.status(400).json({ error: 'Invalid UUID format' });
+  }
+
+  const match = EXTRA_LOCATION_KEY_RE.exec(locationKey || '');
+  if (!match) {
+    return res.status(400).json({ error: 'Invalid extra location key format' });
+  }
+  const points = parseInt(match[1], 10);
+  if (points < 1 || points > 999) {
+    return res.status(400).json({ error: 'Points out of range' });
+  }
+
+  if (!userAccounts[uuid]) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const user = userAccounts[uuid];
+
+  // Idempotent: do not award duplicate points
+  if (user.locationsFound.includes(locationKey)) {
+    return res.status(400).json({ error: 'Location already found', user });
+  }
+
+  user.locationsFound.push(locationKey);
+  user.totalPoints += points;
+  user.lastLocationAt = new Date().toISOString();
+
+  saveLeaderboardData();
+
+  res.json({ success: true, pointsAwarded: points, user });
+});
+
 // Get leaderboard (top 50 users who have made progress)
 app.get('/api/leaderboard', (req, res) => {
   const leaderboard = Object.values(userAccounts)
@@ -455,6 +497,11 @@ app.get('/api/leaderboard', (req, res) => {
 
 // ==================== Static Routes ====================
 
+// Expose site configuration to the client (domain only – no secrets)
+app.get('/api/config', (req, res) => {
+  res.json({ siteDomain: SITE_DOMAIN });
+});
+
 // QR code image endpoint – used by the /qrcodes debug page.
 // Generates a PNG QR code for the given absolute URL query parameter.
 const VALID_QR_LOCATIONS = new Set(['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino']);
@@ -469,9 +516,43 @@ app.get('/api/qrcode', (req, res) => {
     return res.status(400).send('Invalid location');
   }
 
-  // Build the canonical hunt URL using Express's protocol/host helpers, which
-  // respect the app's trust-proxy setting and avoid direct use of forwarded headers.
-  const huntUrl = `${req.protocol}://${req.get('host')}/hunt.html?location=${encodeURIComponent(location)}`;
+  // Build the canonical hunt URL using the configured site domain.
+  const huntUrl = `${SITE_DOMAIN}/hunt.html?location=${encodeURIComponent(location)}`;
+
+  QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
+    if (err) {
+      console.error('QR generation error:', err.message);
+      return res.status(500).send('QR generation failed');
+    }
+    res.set('Content-Type', 'image/png');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(buf);
+  });
+});
+
+// Extra (bonus) QR code endpoint – generates a QR code for an off-track location.
+// Usage: /api/qrcode-extra?name=Coffee_Shop&points=5
+// The resulting QR encodes: {SITE_DOMAIN}/hunt.html?location=Coffee_Shop-5
+const EXTRA_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9_ '-]{0,49}$/;
+app.get('/api/qrcode-extra', (req, res) => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).send('Too many requests');
+  }
+
+  const { name, points } = req.query;
+  if (!name || !EXTRA_NAME_RE.test(name)) {
+    return res.status(400).send('Invalid name: use letters, numbers, underscores, spaces, hyphens or apostrophes (max 50 chars)');
+  }
+  const pts = parseInt(points, 10);
+  if (!points || isNaN(pts) || pts < 1 || pts > 999) {
+    return res.status(400).send('Invalid points: must be a number between 1 and 999');
+  }
+
+  // Encode name: spaces become underscores, then append -<pts>
+  const encodedName = name.replace(/ /g, '_');
+  const locationParam = `${encodedName}-${pts}`;
+  const huntUrl = `${SITE_DOMAIN}/hunt.html?location=${encodeURIComponent(locationParam)}`;
 
   QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
     if (err) {

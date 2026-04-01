@@ -8,6 +8,8 @@
     {
       "id": "sample_fortress",
       "name": "Rasnov Fortress",
+      "huntDestination": true,
+      "difficulty": 1,
       "coordinates": {
         "lat": 45.5889,
         "lng": 25.4631
@@ -40,6 +42,8 @@
     {
       "id": "sample_dino",
       "name": "Dino Parc",
+      "huntDestination": true,
+      "difficulty": 1,
       "coordinates": {
         "lat": 45.5895,
         "lng": 25.4625
@@ -72,6 +76,8 @@
     {
       "id": "sample_peak",
       "name": "Piatra Mica Peak",
+      "huntDestination": true,
+      "difficulty": 2,
       "coordinates": {
         "lat": 45.57,
         "lng": 25.45
@@ -104,6 +110,8 @@
     {
       "id": "sample_museum",
       "name": "Village Museum",
+      "huntDestination": true,
+      "difficulty": 1,
       "coordinates": {
         "lat": 45.585,
         "lng": 25.46
