@@ -471,6 +471,10 @@ function resetProgress() {
         localStorage.removeItem(`ar_photo_${key}`);
     });
 
+    // Clear collage unlock milestone flags so popups show again on replay
+    localStorage.removeItem('rasnov_collage_silver_shown');
+    localStorage.removeItem('rasnov_collage_gold_shown');
+
     // Reset hunt buttons
     huntActive = false;
     if (startHuntBtn) {
@@ -1314,6 +1318,7 @@ async function discoverExtraLocation(info) {
 
     openModal('discovery-modal');
     loadLeaderboard();
+    checkCollageUnlocks();
 }
 
 function simulateQRScan(locationKey) {
@@ -1452,6 +1457,9 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
 
     // Refresh leaderboard data in the background after finding a location
     loadLeaderboard();
+
+    // Check if a new collage tier has been unlocked
+    checkCollageUnlocks();
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
@@ -4002,6 +4010,34 @@ const THEMES = [
     }
 ];
 
+// ==================== Discounts System ====================
+const DISCOUNTS = [
+    {
+        emoji: '☕',
+        name: '10% off at local cafés',
+        description: 'Show your progress to any participating café in Rasnov old town.',
+        placesRequired: 2
+    },
+    {
+        emoji: '🦕',
+        name: 'Free Dino Park upgrade',
+        description: 'Upgrade your Dino Park ticket to premium for free.',
+        placesRequired: 4
+    },
+    {
+        emoji: '🏰',
+        name: 'Free fortress audio guide',
+        description: 'Download the Rasnov Fortress audio guide at no charge.',
+        placesRequired: 6
+    },
+    {
+        emoji: '🎁',
+        name: 'Rasnov explorer souvenir',
+        description: 'Collect a free Rasnov explorer pin from the tourism office.',
+        placesRequired: 8
+    }
+];
+
 function applyTheme(themeId) {
     const theme = THEMES.find(t => t.id === themeId);
     if (!theme) return;
@@ -4013,37 +4049,124 @@ function applyTheme(themeId) {
     renderUnlocksTab();
 }
 
+// Check if a new collage tier has been unlocked and show the popup
+function checkCollageUnlocks() {
+    const total = foundLocations.size + foundExtraLocations.size;
+    if (total >= 10 && !localStorage.getItem('rasnov_collage_gold_shown')) {
+        localStorage.setItem('rasnov_collage_gold_shown', '1');
+        setTimeout(() => showCollageUnlockModal('gold'), 2500);
+    } else if (total >= 6 && !localStorage.getItem('rasnov_collage_silver_shown')) {
+        localStorage.setItem('rasnov_collage_silver_shown', '1');
+        setTimeout(() => showCollageUnlockModal('silver'), 2500);
+    }
+}
+
+function showCollageUnlockModal(tier) {
+    const isGold = tier === 'gold';
+    const modal = document.getElementById('collage-unlock-modal');
+    if (!modal) return;
+    const badgeEl = document.getElementById('collage-unlock-badge');
+    const titleEl = document.getElementById('collage-unlock-title');
+    const msgEl = document.getElementById('collage-unlock-msg');
+    if (badgeEl) badgeEl.textContent = isGold ? '🥇' : '🥈';
+    if (titleEl) titleEl.textContent = isGold ? 'Gold Collage Unlocked!' : 'Silver Collage Unlocked!';
+    if (msgEl) msgEl.textContent = isGold
+        ? "You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!"
+        : "You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!";
+    openModal('collage-unlock-modal');
+}
+
+function buildCollageHTML(totalFound) {
+    const locationKeys = Object.keys(huntLocations);
+    const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
+    const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
+    const tierLabelHTML = tier
+        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? '🥇 Gold Collage' : '🥈 Silver Collage'}</div>`
+        : '';
+
+    const cells = locationKeys.map(key => {
+        const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
+        const loc = huntLocations[key];
+        if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+            return `<div class="collage-cell"><img src="${savedPhoto}" alt="${escapeHtml(loc.name)}"></div>`;
+        }
+        return `<div class="collage-cell"><span class="collage-placeholder">📍</span></div>`;
+    }).join('');
+
+    const shareText = encodeURIComponent('Check out my Rasnov exploration! #discoverrasnov');
+    const shareUrl = encodeURIComponent('https://discoverrasnov.com');
+    const shareHTML = tier ? `
+        <div class="social-share-row">
+            <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn twitter"><i class="fab fa-twitter"></i> X / Twitter</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <span class="share-btn instagram" title="Open Instagram and post manually with #discoverrasnov"><i class="fab fa-instagram"></i> Instagram*</span>
+        </div>
+        <p class="collage-instagram-note">*Instagram does not support direct web sharing. Open Instagram and post with <strong>#discoverrasnov</strong>.</p>
+    ` : '';
+
+    return `<div class="collage-wrapper ${borderClass}">
+        ${tierLabelHTML}
+        <div class="collage-grid">${cells}</div>
+        <div class="collage-footer">${totalFound} / 10 places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        ${shareHTML}
+    </div>`;
+}
+
 function renderUnlocksTab() {
     const container = document.getElementById('unlocks');
     if (!container) return;
     const userPoints = (currentUser && currentUser.totalPoints) || 0;
     const savedTheme = localStorage.getItem('rasnov_theme') || 'default';
     const surveyStarted = localStorage.getItem('rasnov_survey_started') === '1';
+    const totalFound = foundLocations.size + foundExtraLocations.size;
+
+    // Compact one-line theme badges
+    const themeBadgesHTML = THEMES.map(theme => {
+        const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
+        const active = savedTheme === theme.id;
+        const ptsLabel = theme.surveyRequired
+            ? translateMessage('Survey')
+            : (theme.pointsRequired === 0 ? '🔓' : `${theme.pointsRequired} pts`);
+        const applyBtn = (unlocked && !active)
+            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">Apply</button>`
+            : '';
+        return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
+            <span class="theme-badge-emoji">${theme.emoji}</span>
+            <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
+            <span class="theme-badge-pts">${ptsLabel}</span>
+            ${applyBtn}
+        </div>`;
+    }).join('');
+
+    // Discounts
+    const discountsHTML = DISCOUNTS.map(d => {
+        const unlocked = totalFound >= d.placesRequired;
+        return `<div class="discount-card ${unlocked ? 'unlocked' : 'locked'}">
+            <div class="discount-emoji">${d.emoji}</div>
+            <div class="discount-name">${d.name}</div>
+            <div class="discount-desc">${d.description}</div>
+            <div class="discount-req">${unlocked ? '✓ Unlocked!' : `🔒 Find ${d.placesRequired} places`}</div>
+        </div>`;
+    }).join('');
+
     container.innerHTML = `
-        <h2 class="section-title">🎨 Theme Unlocks</h2>
-        <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the scavenger hunt to unlock new site themes.</p>
-        <div class="theme-cards">
-            ${THEMES.map(theme => {
-                const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
-                const active = savedTheme === theme.id;
-                const ptsLabel = theme.surveyRequired
-                    ? translateMessage('Unlocked by survey')
-                    : (theme.pointsRequired === 0 ? 'Always unlocked' : `Requires ${theme.pointsRequired} pts`);
-                const lockedBtn = theme.surveyRequired
-                    ? `<button class="ar-button" disabled>📋 ${translateMessage('Take the survey to unlock')}</button>`
-                    : `<button class="ar-button" disabled>🔒 ${userPoints}/${theme.pointsRequired} pts</button>`;
-                return `<div class="theme-card ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
-                    <div class="theme-emoji">${theme.emoji}</div>
-                    <h3 class="theme-name">${theme.name}</h3>
-                    <p class="theme-desc">${theme.description}</p>
-                    <p class="theme-pts">${ptsLabel}</p>
-                    ${unlocked
-                        ? (active
-                            ? `<button class="ar-button primary" disabled>✓ Active</button>`
-                            : `<button class="ar-button primary" onclick="applyTheme('${theme.id}')">Apply</button>`)
-                        : lockedBtn}
-                </div>`;
-            }).join('')}
+        <h2 class="section-title">🎁 Rewards</h2>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🎨 Theme Unlocks</div>
+            <div class="theme-unlocks-row">${themeBadgesHTML}</div>
+        </div>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🏷️ Discounts</div>
+            <div class="discounts-grid">${discountsHTML}</div>
+        </div>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🖼️ Your Rasnov Collage</div>
+            <p class="collage-intro">Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.</p>
+            ${buildCollageHTML(totalFound)}
         </div>`;
 }
 
