@@ -268,7 +268,27 @@
                         <h3 id="discovery-title">Location Found!</h3>
                         <p id="discovery-message"></p>
                         <div id="discovery-fact" class="fact-box"></div>
+                        <div id="discovery-photo-section"></div>
                         <button class="cta-button" onclick="onDiscoveryModalContinue()">Continue Hunt</button>
+                    </div>
+                </div>
+
+                <!-- Photo Capture Modal -->
+                <div class="modal" id="photo-capture-modal">
+                    <div class="modal-content photo-capture-content">
+                        <button class="modal-close" onclick="closePhotoCapture()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <h3 id="photo-capture-title">📸 Capture This Location</h3>
+                        <p class="help-text">Take a photo to add to your Rasnov collage!</p>
+                        <div class="photo-capture-container" id="photo-capture-container">
+                            <video id="photo-capture-video" autoplay playsinline muted></video>
+                            <div class="ar-flash" id="photo-capture-flash"></div>
+                            <button class="ar-capture-btn" id="photo-capture-btn" onclick="captureLocationPhoto()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        <button class="skip-btn" onclick="closePhotoCapture()">Skip for now</button>
                     </div>
                 </div>
 

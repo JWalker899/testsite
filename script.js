@@ -1106,6 +1106,126 @@ let qrScannerActive = false;
 let qrScannerCanvas = null;
 let qrScannerContext = null;
 
+// Simple photo capture (no AR) — used after QR code discovery
+let photoCaptureStream = null;
+let photoCaptureLocationKey = null;
+
+function startPhotoCapture(locationKey) {
+    photoCaptureLocationKey = locationKey;
+    const loc = huntLocations[locationKey];
+    const localizedName = loc ? (localizedField(loc, 'name') || loc.name) : 'Location';
+    const titleEl = document.getElementById('photo-capture-title');
+    if (titleEl) titleEl.textContent = `📸 ${localizedName}`;
+
+    // Reset capture button state
+    const btn = document.getElementById('photo-capture-btn');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-camera"></i>';
+        btn.classList.remove('captured');
+    }
+
+    openModal('photo-capture-modal');
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                photoCaptureStream = stream;
+                const video = document.getElementById('photo-capture-video');
+                if (video) {
+                    video.srcObject = stream;
+                    video.play();
+                }
+            })
+            .catch(err => {
+                console.error('Camera error for photo capture:', err);
+                showNotification('Could not access camera.', 'warning');
+                closePhotoCapture();
+            });
+    } else {
+        showNotification('Camera not supported on this device.', 'warning');
+        closePhotoCapture();
+    }
+}
+
+function captureLocationPhoto() {
+    const video = document.getElementById('photo-capture-video');
+    if (!video || !photoCaptureLocationKey) return;
+
+    const cw = video.videoWidth || 640;
+    const ch = video.videoHeight || 480;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, cw, ch);
+
+    // Watermark
+    ctx.font = `bold ${Math.round(cw * 0.033)}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('📍 Rasnov Treasure Hunt', 10, ch - 8);
+
+    // Flash effect
+    const flash = document.getElementById('photo-capture-flash');
+    if (flash) {
+        flash.classList.add('flashing');
+        flash.addEventListener('animationend', () => flash.classList.remove('flashing'), { once: true });
+    }
+
+    // Disable button to prevent double-tap
+    const captureBtn = document.getElementById('photo-capture-btn');
+    if (captureBtn) {
+        captureBtn.disabled = true;
+        captureBtn.innerHTML = '<i class="fas fa-check"></i>';
+        captureBtn.classList.add('captured');
+    }
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+    try {
+        localStorage.setItem(`ar_photo_${photoCaptureLocationKey}`, dataUrl);
+    } catch (e) {
+        console.warn('Could not save photo to localStorage:', e);
+        showNotification('📸 Photo taken! (Could not save – storage full)', 'warning');
+        setTimeout(() => closePhotoCapture(), 600);
+        return;
+    }
+
+    const locKey = photoCaptureLocationKey;
+    const loc = huntLocations[locKey];
+    const localizedName = loc ? (localizedField(loc, 'name') || loc.name) : 'Location';
+
+    setTimeout(() => {
+        closePhotoCapture();
+
+        // Update hunt item thumbnail
+        const huntItem = document.querySelector(`.hunt-item[data-location="${locKey}"]`);
+        if (huntItem) addPhotoToHuntItem(locKey, huntItem);
+
+        // Update discovery modal photo section if still open
+        const photoSection = document.getElementById('discovery-photo-section');
+        if (photoSection) {
+            photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p>
+                <img src="${dataUrl}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
+        }
+
+        showNotification('📸 Photo saved to your collage!', 'success');
+        renderUnlocksTab();
+    }, 600);
+}
+
+function closePhotoCapture() {
+    if (photoCaptureStream) {
+        photoCaptureStream.getTracks().forEach(t => t.stop());
+        photoCaptureStream = null;
+    }
+    const video = document.getElementById('photo-capture-video');
+    if (video) video.srcObject = null;
+    closeModal('photo-capture-modal');
+}
+
 function startQRScanner() {
     const video = document.getElementById('qr-video');
     
@@ -1458,13 +1578,21 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     // Add timer information
     factHTML += timerText;
     
-    // Show saved AR photo if available (validate it's a safe JPEG data URL)
-    const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
-    if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
-        factHTML += `<br><p class="ar-photo-label">📸 Your Grizzly photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your AR bear photo at ${localizedName}">`;
-    }
-    
     if (discoveryFactEl) discoveryFactEl.innerHTML = factHTML;
+
+    // Show saved photo or offer to take one
+    const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
+    const photoSection = document.getElementById('discovery-photo-section');
+    if (photoSection) {
+        if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+            photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
+        } else {
+            const takePicLabel = currentLang === 'ro' ? '📸 Fă o poză aici' : '📸 Take a Photo Here';
+            photoSection.innerHTML = `<button class="discovery-photo-btn" id="discovery-photo-take-btn" data-location="${escapeHtml(locationKey)}">${takePicLabel}</button>`;
+            const takeBtn = document.getElementById('discovery-photo-take-btn');
+            if (takeBtn) takeBtn.addEventListener('click', function() { startPhotoCapture(this.dataset.location); });
+        }
+    }
 
     // After any location found, queue a name prompt if user hasn't set one yet
     if (currentUser && !currentUser.hasSetName) {
@@ -4114,13 +4242,28 @@ function buildCollageHTML(totalFound) {
         ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? '🥇 Gold Collage' : '🥈 Silver Collage'}</div>`
         : '';
 
-    const cells = locationKeys.map(key => {
+    // Pre-defined rotations and tape colours for a natural scattered/polaroid look
+    const cellMeta = [
+        { rot: -3, tape: '#ffd966' },
+        { rot:  2, tape: '#b6d7a8' },
+        { rot: -1, tape: '#9fc5e8' },
+        { rot:  4, tape: '#f9cb9c' },
+        { rot: -2, tape: '#ead1dc' },
+        { rot:  1, tape: '#ffd966' },
+        { rot:  3, tape: '#b6d7a8' },
+        { rot: -4, tape: '#9fc5e8' },
+    ];
+
+    const cells = locationKeys.map((key, i) => {
         const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
         const loc = huntLocations[key];
+        const label = escapeHtml(localizedField(loc, 'name') || loc.name);
+        const meta = cellMeta[i % cellMeta.length];
+        const style = `--cell-rot: ${meta.rot}deg; --tape-color: ${meta.tape};`;
         if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
-            return `<div class="collage-cell"><img src="${savedPhoto}" alt="${escapeHtml(loc.name)}"></div>`;
+            return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}"><span class="collage-cell-label">${label}</span></div>`;
         }
-        return `<div class="collage-cell"><span class="collage-placeholder">📍</span></div>`;
+        return `<div class="collage-cell collage-cell-empty" style="${style}"><span class="collage-placeholder">📍</span><span class="collage-cell-label">${label}</span></div>`;
     }).join('');
 
     const shareText = encodeURIComponent('Check out my Rasnov exploration! #discoverrasnov');
