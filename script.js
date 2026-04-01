@@ -37,6 +37,19 @@ const arFlash = document.getElementById('ar-flash');
 let huntActive = false;
 let testingMode = false;
 let foundLocations = new Set();
+let foundExtraLocations = new Set(); // keys of found bonus (off-track) locations
+
+// Site configuration – loaded from /api/config on startup; falls back to current origin
+let siteDomain = window.location.origin;
+(async function loadSiteConfig() {
+    try {
+        const r = await fetch('/api/config');
+        if (r.ok) {
+            const cfg = await r.json();
+            if (cfg && cfg.siteDomain) siteDomain = cfg.siteDomain;
+        }
+    } catch (e) { /* use fallback */ }
+})();
 
 // Timer state for treasure hunt
 let huntStartTime = null; // Absolute time when first location was found
@@ -458,10 +471,17 @@ function resetProgress() {
         if (photo) photo.remove();
     });
 
+    // Remove dynamically-added extra location cards
+    document.querySelectorAll('.hunt-item.extra-location').forEach(el => el.remove());
+
     // Clear saved photos
     Object.keys(huntLocations).forEach(key => {
         localStorage.removeItem(`ar_photo_${key}`);
     });
+
+    // Clear collage unlock milestone flags so popups show again on replay
+    localStorage.removeItem('rasnov_collage_silver_shown');
+    localStorage.removeItem('rasnov_collage_gold_shown');
 
     // Reset hunt buttons
     huntActive = false;
@@ -504,14 +524,23 @@ function restoreHuntState() {
     if (!currentUser || !currentUser.locationsFound) return;
 
     currentUser.locationsFound.forEach(locationKey => {
-        foundLocations.add(locationKey);
-
-        const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
-        if (huntItem) {
-            huntItem.classList.add('found');
-            const icon = huntItem.querySelector('i');
-            if (icon) icon.className = 'fas fa-check-circle';
-            addPhotoToHuntItem(locationKey, huntItem);
+        if (huntLocations[locationKey]) {
+            // Regular hunt location
+            foundLocations.add(locationKey);
+            const huntItem = document.querySelector(`.hunt-item[data-location="${locationKey}"]`);
+            if (huntItem) {
+                huntItem.classList.add('found');
+                const icon = huntItem.querySelector('i');
+                if (icon) icon.className = 'fas fa-check-circle';
+                addPhotoToHuntItem(locationKey, huntItem);
+            }
+        } else {
+            // Extra (bonus) location – restore its card without re-awarding points
+            const extraInfo = parseExtraLocation(locationKey);
+            if (extraInfo) {
+                foundExtraLocations.add(locationKey);
+                addExtraHuntItem(extraInfo);
+            }
         }
     });
 
@@ -522,9 +551,9 @@ function restoreHuntState() {
         if (startHuntBtn) startHuntBtn.style.display = 'none';
         if (resetHuntBtn) resetHuntBtn.style.display = '';
         if (scanQrBtn) scanQrBtn.disabled = false;
-        // Update Next Site banner based on most recently found location
-        const lastFound = currentUser.locationsFound[currentUser.locationsFound.length - 1];
-        if (lastFound) updateNextSiteBanner(lastFound);
+        // Update Next Site banner based on the most recently found regular location
+        const lastRegular = [...currentUser.locationsFound].reverse().find(k => huntLocations[k]);
+        if (lastRegular) updateNextSiteBanner(lastRegular);
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
         if (startHuntBtn) {
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
@@ -770,27 +799,41 @@ function onWelcomeModalClose() {
 function handleURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const locationParam = urlParams.get('location');
-    if (!locationParam || !huntLocations[locationParam]) return;
+    if (!locationParam) return;
 
-    // Start the hunt if not already active
-    if (!huntActive) {
-        huntActive = true;
-        if (startHuntBtn) startHuntBtn.style.display = 'none';
-        if (resetHuntBtn) resetHuntBtn.style.display = '';
-        if (scanQrBtn) scanQrBtn.disabled = false;
-    }
+    if (huntLocations[locationParam]) {
+        // Regular hunt location
+        if (!huntActive) {
+            huntActive = true;
+            if (startHuntBtn) startHuntBtn.style.display = 'none';
+            if (resetHuntBtn) resetHuntBtn.style.display = '';
+            if (scanQrBtn) scanQrBtn.disabled = false;
+        }
 
-    const isFirstVisit = foundLocations.size === 0;
+        const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
 
-    if (!foundLocations.has(locationParam)) {
-        // Small delay to allow page to finish rendering before showing modal
-        setTimeout(() => {
-            discoverLocation(locationParam, isFirstVisit);
-        }, 600);
+        if (!foundLocations.has(locationParam)) {
+            // Small delay to allow page to finish rendering before showing modal
+            setTimeout(() => {
+                discoverLocation(locationParam, isFirstVisit);
+            }, 600);
+        } else {
+            // Already found this location — just update the Next Site banner
+            updateNextSiteBanner(locationParam);
+            showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
+        }
     } else {
-        // Already found this location — just update the Next Site banner
-        updateNextSiteBanner(locationParam);
-        showNotification(`You've already visited ${huntLocations[locationParam].name}!`, 'info');
+        // Check if it's an extra (bonus) location
+        const extraInfo = parseExtraLocation(locationParam);
+        if (extraInfo) {
+            if (!foundExtraLocations.has(extraInfo.key)) {
+                setTimeout(() => {
+                    discoverExtraLocation(extraInfo);
+                }, 600);
+            } else {
+                showNotification(`You've already found ${extraInfo.name}!`, 'info');
+            }
+        }
     }
 
     // Clean up the URL so refreshing doesn't re-trigger the discovery,
@@ -1142,21 +1185,43 @@ function scanQRCode() {
     }
 }
 
+// Regex for the extra location key format: alphanumerics/underscores/spaces/hyphens/apostrophes then -<1-3 digit points>
+const EXTRA_LOCATION_RE = /^([A-Za-z0-9][A-Za-z0-9_ '-]{0,49})-(\d{1,3})$/;
+
+// Parse a location parameter as an extra bonus location.
+// Returns { key, name, points } or null if the format does not match.
+function parseExtraLocation(locationParam) {
+    const m = EXTRA_LOCATION_RE.exec(locationParam);
+    if (!m) return null;
+    const points = parseInt(m[2], 10);
+    if (points < 1 || points > 999) return null;
+    return { key: locationParam, name: m[1].replace(/_/g, ' '), points };
+}
+
 function processQRCode(qrData) {
     // First try to parse as a URL with a 'location' parameter (new URL-based QR code format)
     let foundLocationKey = null;
+    let extraLocationInfo = null;
     try {
         const url = new URL(qrData);
-        const locationParam = url.searchParams.get('location');
-        if (locationParam && huntLocations[locationParam]) {
-            foundLocationKey = locationParam;
+        // Only accept QR codes from our own site domain to avoid accepting random URLs
+        const expectedHost = new URL(siteDomain).host;
+        if (url.host === expectedHost) {
+            const locationParam = url.searchParams.get('location');
+            if (locationParam) {
+                if (huntLocations[locationParam]) {
+                    foundLocationKey = locationParam;
+                } else {
+                    extraLocationInfo = parseExtraLocation(locationParam);
+                }
+            }
         }
     } catch (e) {
         // Not a valid URL — fall through to legacy matching below
     }
 
     // Fall back to legacy QR string matching (e.g. 'RASNOV_FORTRESS')
-    if (!foundLocationKey) {
+    if (!foundLocationKey && !extraLocationInfo) {
         for (const [key, location] of Object.entries(huntLocations)) {
             if (location.qr === qrData) {
                 foundLocationKey = key;
@@ -1168,8 +1233,17 @@ function processQRCode(qrData) {
     if (foundLocationKey) {
         if (!foundLocations.has(foundLocationKey)) {
             qrScannerActive = false;
-            const isFirstVisit = foundLocations.size === 0;
+            const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
             discoverLocation(foundLocationKey, isFirstVisit);
+            closeModal('qr-modal');
+            showNotification('QR Code scanned successfully!', 'success');
+        } else {
+            showNotification('You already found this location!', 'info');
+        }
+    } else if (extraLocationInfo) {
+        if (!foundExtraLocations.has(extraLocationInfo.key)) {
+            qrScannerActive = false;
+            discoverExtraLocation(extraLocationInfo);
             closeModal('qr-modal');
             showNotification('QR Code scanned successfully!', 'success');
         } else {
@@ -1193,6 +1267,66 @@ function showQRCodeOptions() {
             </div>
         </div>
     `;
+}
+
+// Add a dynamically-created hunt item card for a bonus location
+function addExtraHuntItem(info) {
+    const huntItemsContainer = document.querySelector('.hunt-items');
+    if (!huntItemsContainer) return;
+    // Avoid duplicates by comparing the data attribute via the DOM dataset property
+    const duplicate = Array.from(huntItemsContainer.querySelectorAll('.hunt-item.extra-location'))
+        .find(el => el.dataset.extraLocation === info.key);
+    if (duplicate) return;
+    const item = document.createElement('div');
+    item.className = 'hunt-item found extra-location';
+    item.dataset.extraLocation = info.key;
+    item.innerHTML = `
+        <i class="fas fa-star"></i>
+        <span>${escapeHtml(info.name)}</span>
+        <span class="extra-pts-badge">+${info.points} pts</span>
+    `;
+    huntItemsContainer.appendChild(item);
+}
+
+// Discover and award points for a bonus (off-track) location
+async function discoverExtraLocation(info) {
+    // info: { key: string, name: string, points: number }
+    foundExtraLocations.add(info.key);
+
+    // Award points locally
+    if (currentUser) {
+        currentUser.totalPoints += info.points;
+        saveUserToLocalStorage();
+        updateUserDisplayUI();
+        showPointsNotification(info.points, 0, info.name);
+
+        // Sync to server (non-blocking)
+        try {
+            await fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/extra-found`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ locationKey: info.key })
+            });
+        } catch (e) {
+            console.log('Server sync unavailable (offline mode):', e.message);
+        }
+    }
+
+    // Add the new hunt item card below the regular places
+    addExtraHuntItem(info);
+
+    // Show discovery modal
+    const discoveryTitleEl = document.getElementById('discovery-title');
+    const discoveryMsgEl = document.getElementById('discovery-message');
+    const discoveryFactEl = document.getElementById('discovery-fact');
+
+    if (discoveryTitleEl) discoveryTitleEl.textContent = `You found ${info.name}!`;
+    if (discoveryMsgEl) discoveryMsgEl.textContent = 'Bonus location discovered!';
+    if (discoveryFactEl) discoveryFactEl.innerHTML = `<strong>Bonus Points: +${info.points}</strong>`;
+
+    openModal('discovery-modal');
+    loadLeaderboard();
+    checkCollageUnlocks();
 }
 
 function simulateQRScan(locationKey) {
@@ -1353,6 +1487,9 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
 
     // Refresh leaderboard data in the background after finding a location
     loadLeaderboard();
+
+    // Check if a new collage tier has been unlocked
+    checkCollageUnlocks();
     
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
@@ -3188,9 +3325,20 @@ function loadMap() {
         iconAnchor: [16, 40],
         popupAnchor: [0, -40]
     });
+
+    // Hunt destination icons: green question mark (difficulty 1) and red (difficulty 2)
+    const makeHuntIcon = (color) => L.divIcon({
+        className: '',
+        html: `<div style="width:32px;height:40px;display:flex;align-items:flex-start;justify-content:center;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"><path fill="${color}" d="M16 0C10.486 0 6 4.486 6 10c0 7.5 10 17.5 10 30 0 0 10-22.5 10-30 0-5.514-4.486-10-10-10z"/><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial,sans-serif">?</text></svg></div>`,
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+    });
+    const huntEasyIcon = makeHuntIcon('#27ae60'); // green – difficulty 1
+    const huntHardIcon = makeHuntIcon('#e74c3c'); // red   – difficulty 2
     
     // Load markers from places data
-    loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon);
+    loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon);
     
     mapDiv.classList.add('loaded');
     showNotification('Map loaded successfully!', 'success');
@@ -3199,7 +3347,7 @@ function loadMap() {
 /**
  * Load map markers from places data
  */
-async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
+async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon) {
     // Use event-based approach to wait for data
     const placesData = await waitForPlacesData();
     
@@ -3210,10 +3358,15 @@ async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon) {
     
     console.log('📍 Loading map markers from places data...');
     
-    // Add locations
+    // Add locations – use hunt destination icons for tagged places
     if (placesData.locations) {
         placesData.locations.forEach(place => {
-            addMarkerToMap(place, 'location', locationIcon);
+            if (place.huntDestination && huntEasyIcon && huntHardIcon) {
+                const huntIcon = place.difficulty === 2 ? huntHardIcon : huntEasyIcon;
+                addMarkerToMap(place, 'location', huntIcon);
+            } else {
+                addMarkerToMap(place, 'location', locationIcon);
+            }
         });
     }
     
@@ -3887,6 +4040,34 @@ const THEMES = [
     }
 ];
 
+// ==================== Discounts System ====================
+const DISCOUNTS = [
+    {
+        emoji: '☕',
+        name: '10% off at local cafés',
+        description: 'Show your progress to any participating café in Rasnov old town.',
+        placesRequired: 2
+    },
+    {
+        emoji: '🦕',
+        name: 'Free Dino Park upgrade',
+        description: 'Upgrade your Dino Park ticket to premium for free.',
+        placesRequired: 4
+    },
+    {
+        emoji: '🏰',
+        name: 'Free fortress audio guide',
+        description: 'Download the Rasnov Fortress audio guide at no charge.',
+        placesRequired: 6
+    },
+    {
+        emoji: '🎁',
+        name: 'Rasnov explorer souvenir',
+        description: 'Collect a free Rasnov explorer pin from the tourism office.',
+        placesRequired: 8
+    }
+];
+
 function applyTheme(themeId) {
     const theme = THEMES.find(t => t.id === themeId);
     if (!theme) return;
@@ -3898,37 +4079,124 @@ function applyTheme(themeId) {
     renderUnlocksTab();
 }
 
+// Check if a new collage tier has been unlocked and show the popup
+function checkCollageUnlocks() {
+    const total = foundLocations.size + foundExtraLocations.size;
+    if (total >= 10 && !localStorage.getItem('rasnov_collage_gold_shown')) {
+        localStorage.setItem('rasnov_collage_gold_shown', '1');
+        setTimeout(() => showCollageUnlockModal('gold'), 2500);
+    } else if (total >= 6 && !localStorage.getItem('rasnov_collage_silver_shown')) {
+        localStorage.setItem('rasnov_collage_silver_shown', '1');
+        setTimeout(() => showCollageUnlockModal('silver'), 2500);
+    }
+}
+
+function showCollageUnlockModal(tier) {
+    const isGold = tier === 'gold';
+    const modal = document.getElementById('collage-unlock-modal');
+    if (!modal) return;
+    const badgeEl = document.getElementById('collage-unlock-badge');
+    const titleEl = document.getElementById('collage-unlock-title');
+    const msgEl = document.getElementById('collage-unlock-msg');
+    if (badgeEl) badgeEl.textContent = isGold ? '🥇' : '🥈';
+    if (titleEl) titleEl.textContent = isGold ? 'Gold Collage Unlocked!' : 'Silver Collage Unlocked!';
+    if (msgEl) msgEl.textContent = isGold
+        ? "You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!"
+        : "You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!";
+    openModal('collage-unlock-modal');
+}
+
+function buildCollageHTML(totalFound) {
+    const locationKeys = Object.keys(huntLocations);
+    const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
+    const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
+    const tierLabelHTML = tier
+        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? '🥇 Gold Collage' : '🥈 Silver Collage'}</div>`
+        : '';
+
+    const cells = locationKeys.map(key => {
+        const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
+        const loc = huntLocations[key];
+        if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+            return `<div class="collage-cell"><img src="${savedPhoto}" alt="${escapeHtml(loc.name)}"></div>`;
+        }
+        return `<div class="collage-cell"><span class="collage-placeholder">📍</span></div>`;
+    }).join('');
+
+    const shareText = encodeURIComponent('Check out my Rasnov exploration! #discoverrasnov');
+    const shareUrl = encodeURIComponent('https://discoverrasnov.com');
+    const shareHTML = tier ? `
+        <div class="social-share-row">
+            <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn twitter"><i class="fab fa-twitter"></i> X / Twitter</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <span class="share-btn instagram" title="Open Instagram and post manually with #discoverrasnov"><i class="fab fa-instagram"></i> Instagram*</span>
+        </div>
+        <p class="collage-instagram-note">*Instagram does not support direct web sharing. Open Instagram and post with <strong>#discoverrasnov</strong>.</p>
+    ` : '';
+
+    return `<div class="collage-wrapper ${borderClass}">
+        ${tierLabelHTML}
+        <div class="collage-grid">${cells}</div>
+        <div class="collage-footer">${totalFound} / 10 places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        ${shareHTML}
+    </div>`;
+}
+
 function renderUnlocksTab() {
     const container = document.getElementById('unlocks');
     if (!container) return;
     const userPoints = (currentUser && currentUser.totalPoints) || 0;
     const savedTheme = localStorage.getItem('rasnov_theme') || 'default';
     const surveyStarted = localStorage.getItem('rasnov_survey_started') === '1';
+    const totalFound = foundLocations.size + foundExtraLocations.size;
+
+    // Compact one-line theme badges
+    const themeBadgesHTML = THEMES.map(theme => {
+        const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
+        const active = savedTheme === theme.id;
+        const ptsLabel = theme.surveyRequired
+            ? translateMessage('Survey')
+            : (theme.pointsRequired === 0 ? '🔓' : `${theme.pointsRequired} pts`);
+        const applyBtn = (unlocked && !active)
+            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">Apply</button>`
+            : '';
+        return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
+            <span class="theme-badge-emoji">${theme.emoji}</span>
+            <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
+            <span class="theme-badge-pts">${ptsLabel}</span>
+            ${applyBtn}
+        </div>`;
+    }).join('');
+
+    // Discounts
+    const discountsHTML = DISCOUNTS.map(d => {
+        const unlocked = totalFound >= d.placesRequired;
+        return `<div class="discount-card ${unlocked ? 'unlocked' : 'locked'}">
+            <div class="discount-emoji">${d.emoji}</div>
+            <div class="discount-name">${d.name}</div>
+            <div class="discount-desc">${d.description}</div>
+            <div class="discount-req">${unlocked ? '✓ Unlocked!' : `🔒 Find ${d.placesRequired} places`}</div>
+        </div>`;
+    }).join('');
+
     container.innerHTML = `
-        <h2 class="section-title">🎨 Theme Unlocks</h2>
-        <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the treasure hunt to unlock new site themes.</p>
-        <div class="theme-cards">
-            ${THEMES.map(theme => {
-                const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
-                const active = savedTheme === theme.id;
-                const ptsLabel = theme.surveyRequired
-                    ? translateMessage('Unlocked by survey')
-                    : (theme.pointsRequired === 0 ? 'Always unlocked' : `Requires ${theme.pointsRequired} pts`);
-                const lockedBtn = theme.surveyRequired
-                    ? `<button class="ar-button" disabled>📋 ${translateMessage('Take the survey to unlock')}</button>`
-                    : `<button class="ar-button" disabled>🔒 ${userPoints}/${theme.pointsRequired} pts</button>`;
-                return `<div class="theme-card ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
-                    <div class="theme-emoji">${theme.emoji}</div>
-                    <h3 class="theme-name">${theme.name}</h3>
-                    <p class="theme-desc">${theme.description}</p>
-                    <p class="theme-pts">${ptsLabel}</p>
-                    ${unlocked
-                        ? (active
-                            ? `<button class="ar-button primary" disabled>✓ Active</button>`
-                            : `<button class="ar-button primary" onclick="applyTheme('${theme.id}')">Apply</button>`)
-                        : lockedBtn}
-                </div>`;
-            }).join('')}
+        <h2 class="section-title">🎁 Rewards</h2>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🎨 Theme Unlocks</div>
+            <div class="theme-unlocks-row">${themeBadgesHTML}</div>
+        </div>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🏷️ Discounts</div>
+            <div class="discounts-grid">${discountsHTML}</div>
+        </div>
+
+        <div class="rewards-section">
+            <div class="rewards-section-title">🖼️ Your Rasnov Collage</div>
+            <p class="collage-intro">Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.</p>
+            ${buildCollageHTML(totalFound)}
         </div>`;
 }
 
