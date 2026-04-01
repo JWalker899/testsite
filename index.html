@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://cdn.jsdelivr.net/npm/i18next@23.11.5/i18next.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.2/i18nextHttpBackend.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -17,28 +19,28 @@
             <div class="nav-wrapper">
                 <div class="logo">
                     <i class="fas fa-mountain"></i>
-                    <h1>Discover Rasnov</h1>
+                    <h1 data-i18n="logo">Discover Rasnov</h1>
                 </div>
                 <nav class="nav-menu">
-                    <button class="nav-toggle" aria-label="Toggle navigation">
+                    <button class="nav-toggle" data-i18n="[aria-label]header.nav_toggle_label" aria-label="Toggle navigation">
                         <i class="fas fa-bars"></i>
                     </button>
                     <ul class="nav-list">
-                        <li><a href="index.html" class="nav-link">Discover Rasnov</a></li>
-                        <li><a href="hunt.html" class="nav-link">Treasure Hunt</a></li>
-                        <li><a href="#map" class="nav-link">Map</a></li>
-                        <li><a href="#info" class="nav-link">Info</a></li>
+                        <li><a href="index.html" class="nav-link" data-i18n="nav.discover_rasnov">Discover Rasnov</a></li>
+                        <li><a href="hunt.html" class="nav-link" data-i18n="nav.treasure_hunt">Treasure Hunt</a></li>
+                        <li><a href="#map" class="nav-link" data-i18n="nav.map">Map</a></li>
+                        <li><a href="#info" class="nav-link" data-i18n="nav.info">Info</a></li>
                     </ul>
                 </nav>
                 <div class="header-actions">
-                    <button class="user-profile-btn" id="user-profile-btn" onclick="showUserProfile()" title="View profile and points">
+                    <button class="user-profile-btn" id="user-profile-btn" onclick="showUserProfile()" data-i18n="[title]header.profile_title" title="View profile and points">
                         <i class="fas fa-user-circle"></i>
                         <span id="user-points-display" class="user-points-badge">
-                            <span class="user-name">Guest</span>
+                            <span class="user-name" data-i18n="header.guest">Guest</span>
                             <span class="user-points">⭐ 0 pts</span>
                         </span>
                     </button>
-                    <button class="lang-toggle" aria-label="Change language">
+                    <button class="lang-toggle" data-i18n="[aria-label]header.lang_toggle_label" aria-label="Change language">
                         <i class="fas fa-globe"></i> EN
                     </button>
                     <button class="weather-widget" id="weather-btn">
@@ -53,10 +55,10 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h2 class="hero-title">Welcome to Rasnov</h2>
-            <p class="hero-subtitle">Explore Historic Fortress, Stunning Nature & Romanian Culture</p>
+            <h2 class="hero-title" data-i18n="index_hero.title">Welcome to Rasnov</h2>
+            <p class="hero-subtitle" data-i18n="index_hero.subtitle">Explore Historic Fortress, Stunning Nature & Romanian Culture</p>
             <button class="cta-button" onclick="scrollToSection('locations')">
-                <i class="fas fa-compass"></i> Start Exploring
+                <i class="fas fa-compass"></i> <span data-i18n="index_hero.cta">Start Exploring</span>
             </button>
         </div>
         <div class="hero-overlay"></div>
@@ -70,141 +72,141 @@
                 <div class="tab-header">
                     <button class="tab-button active" data-tab="locations">
                         <i class="fas fa-landmark"></i>
-                        <span>Locations</span>
+                        <span data-i18n="tabs.locations">Locations</span>
                     </button>
                     <button class="tab-button" data-tab="restaurants">
                         <i class="fas fa-utensils"></i>
-                        <span>Restaurants</span>
+                        <span data-i18n="tabs.restaurants">Restaurants</span>
                     </button>
                     <button class="tab-button" data-tab="accommodations">
                         <i class="fas fa-bed"></i>
-                        <span>Places to Stay</span>
+                        <span data-i18n="tabs.accommodations">Places to Stay</span>
                     </button>
 
                 </div>
 
                 <!-- Locations Tab -->
                 <div class="tab-content active" id="locations">
-                    <h2 class="section-title">Top Locations to Visit</h2>
+                    <h2 class="section-title" data-i18n="sections.top_locations">Top Locations to Visit</h2>
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Rasnov Fortress</h3>
-                                <p class="card-description">A medieval citadel built by Teutonic Knights in the 13th century. Offers breathtaking panoramic views of the surrounding Carpathian Mountains.</p>
+                                <h3 class="card-title" data-i18n="locations.fortress.title">Rasnov Fortress</h3>
+                                <p class="card-description" data-i18n="locations.fortress.desc">A medieval citadel built by Teutonic Knights in the 13th century. Offers breathtaking panoramic views of the surrounding Carpathian Mountains.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 2-3 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 20 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.fortress.time">2-3 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.fortress.price">20 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('fortress')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('fortress')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Dino Parc</h3>
-                                <p class="card-description">The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs. Perfect for families and children.</p>
+                                <h3 class="card-title" data-i18n="locations.dinoparc.title">Dino Parc</h3>
+                                <p class="card-description" data-i18n="locations.dinoparc.desc">The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs. Perfect for families and children.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 1-2 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 40 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.dinoparc.time">1-2 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.dinoparc.price">40 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('dinoparc')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('dinoparc')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Piatra Mica Peak</h3>
-                                <p class="card-description">Hiking trail to a stunning mountain peak. Accessible via cable car or hiking trail, offering spectacular mountain views.</p>
+                                <h3 class="card-title" data-i18n="locations.peak.title">Piatra Mica Peak</h3>
+                                <p class="card-description" data-i18n="locations.peak.desc">Hiking trail to a stunning mountain peak. Accessible via cable car or hiking trail, offering spectacular mountain views.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 3-4 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> Free (30 RON cable car)</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.peak.time">3-4 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.peak.price">Free (30 RON cable car)</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('peak')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('peak')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1605649487212-47e4c5c77215?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Village Museum</h3>
-                                <p class="card-description">Explore traditional Romanian rural life with authentic houses, tools, and artifacts from the region's history.</p>
+                                <h3 class="card-title" data-i18n="locations.museum.title">Village Museum</h3>
+                                <p class="card-description" data-i18n="locations.museum.desc">Explore traditional Romanian rural life with authentic houses, tools, and artifacts from the region's history.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 1 hour</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 10 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.museum.time">1 hour</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.museum.price">10 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('museum')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('museum')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Bran Castle</h3>
-                                <p class="card-description">Famous Dracula's Castle, just 15 minutes away. Gothic fortress with fascinating history and stunning architecture.</p>
+                                <h3 class="card-title" data-i18n="locations.bran.title">Bran Castle</h3>
+                                <p class="card-description" data-i18n="locations.bran.desc">Famous Dracula's Castle, just 15 minutes away. Gothic fortress with fascinating history and stunning architecture.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 2 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 45 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.bran.time">2 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.bran.price">45 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('bran')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('bran')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Poiana Brasov Ski Resort</h3>
-                                <p class="card-description">Premier ski resort nearby with 23km of slopes. Great for winter sports enthusiasts and summer hiking.</p>
+                                <h3 class="card-title" data-i18n="locations.poiana.title">Poiana Brasov Ski Resort</h3>
+                                <p class="card-description" data-i18n="locations.poiana.desc">Premier ski resort nearby with 23km of slopes. Great for winter sports enthusiasts and summer hiking.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> Full day</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 150 RON/day</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.poiana.time">Full day</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.poiana.price">150 RON/day</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('poiana')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('poiana')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1548013146-72479768bada?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Brasov Old Town</h3>
-                                <p class="card-description">Medieval city center with Council Square, Black Church, and charming cobblestone streets. Only 15km away.</p>
+                                <h3 class="card-title" data-i18n="locations.brasov.title">Brasov Old Town</h3>
+                                <p class="card-description" data-i18n="locations.brasov.desc">Medieval city center with Council Square, Black Church, and charming cobblestone streets. Only 15km away.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 3-4 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> Free</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.brasov.time">3-4 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.brasov.price">Free</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('brasov')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('brasov')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Peles Castle</h3>
-                                <p class="card-description">Neo-Renaissance masterpiece in Sinaia. One of Europe's most beautiful castles with 160 lavishly decorated rooms.</p>
+                                <h3 class="card-title" data-i18n="locations.peles.title">Peles Castle</h3>
+                                <p class="card-description" data-i18n="locations.peles.desc">Neo-Renaissance masterpiece in Sinaia. One of Europe's most beautiful castles with 160 lavishly decorated rooms.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 2-3 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 50 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.peles.time">2-3 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.peles.price">50 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('peles')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('peles')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Piatra Craiului National Park</h3>
-                                <p class="card-description">Protected natural area with dramatic limestone ridge. Excellent hiking, wildlife watching, and pristine nature.</p>
+                                <h3 class="card-title" data-i18n="locations.national_park.title">Piatra Craiului National Park</h3>
+                                <p class="card-description" data-i18n="locations.national_park.desc">Protected natural area with dramatic limestone ridge. Excellent hiking, wildlife watching, and pristine nature.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> Full day</span>
-                                    <span><i class="fas fa-ticket-alt"></i> Free</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.national_park.time">Full day</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.national_park.price">Free</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('national-park')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('national-park')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Libearty Bear Sanctuary</h3>
-                                <p class="card-description">Europe's largest brown bear sanctuary. Home to rescued bears in natural habitat. Educational and ethical tourism.</p>
+                                <h3 class="card-title" data-i18n="locations.bear_sanctuary.title">Libearty Bear Sanctuary</h3>
+                                <p class="card-description" data-i18n="locations.bear_sanctuary.desc">Europe's largest brown bear sanctuary. Home to rescued bears in natural habitat. Educational and ethical tourism.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-clock"></i> 1-2 hours</span>
-                                    <span><i class="fas fa-ticket-alt"></i> 25 RON</span>
+                                    <span><i class="fas fa-clock"></i> <span data-i18n="locations.bear_sanctuary.time">1-2 hours</span></span>
+                                    <span><i class="fas fa-ticket-alt"></i> <span data-i18n="locations.bear_sanctuary.price">25 RON</span></span>
                                 </div>
-                                <button class="card-button" onclick="showLocationDetails('bear-sanctuary')">Learn More</button>
+                                <button class="card-button" onclick="showLocationDetails('bear-sanctuary')" data-i18n="common.learn_more">Learn More</button>
                             </div>
                         </div>
                     </div>
@@ -212,110 +214,110 @@
 
                 <!-- Restaurants Tab -->
                 <div class="tab-content" id="restaurants">
-                    <h2 class="section-title">Best Restaurants</h2>
+                    <h2 class="section-title" data-i18n="sections.best_restaurants">Best Restaurants</h2>
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Cetate Restaurant</h3>
-                                <p class="card-description">Traditional Romanian cuisine in the heart of the fortress. Try their famous sarmale and mici with polenta.</p>
+                                <h3 class="card-title" data-i18n="restaurants.cetate.title">Cetate Restaurant</h3>
+                                <p class="card-description" data-i18n="restaurants.cetate.desc">Traditional Romanian cuisine in the heart of the fortress. Try their famous sarmale and mici with polenta.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Romanian</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.cetate.cuisine">Romanian</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
                                     <span><i class="fas fa-star"></i> 4.6</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('cetate')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('cetate')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">La Ceaun</h3>
-                                <p class="card-description">Cozy tavern serving hearty mountain dishes. Their ciorbă (sour soup) and grilled trout are must-tries.</p>
+                                <h3 class="card-title" data-i18n="restaurants.ceaun.title">La Ceaun</h3>
+                                <p class="card-description" data-i18n="restaurants.ceaun.desc">Cozy tavern serving hearty mountain dishes. Their ciorbă (sour soup) and grilled trout are must-tries.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Traditional</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.ceaun.cuisine">Traditional</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
                                     <span><i class="fas fa-star"></i> 4.5</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('ceaun')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('ceaun')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Pizzeria Castello</h3>
-                                <p class="card-description">Italian pizzeria with a Romanian twist. Wood-fired pizzas and pasta dishes with local ingredients.</p>
+                                <h3 class="card-title" data-i18n="restaurants.pizzeria.title">Pizzeria Castello</h3>
+                                <p class="card-description" data-i18n="restaurants.pizzeria.desc">Italian pizzeria with a Romanian twist. Wood-fired pizzas and pasta dishes with local ingredients.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Italian</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.pizzeria.cuisine">Italian</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €</span>
                                     <span><i class="fas fa-star"></i> 4.4</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('pizzeria')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('pizzeria')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Cafe Central</h3>
-                                <p class="card-description">Modern cafe with excellent coffee, pastries, and light meals. Perfect for breakfast or afternoon break.</p>
+                                <h3 class="card-title" data-i18n="restaurants.cafe.title">Cafe Central</h3>
+                                <p class="card-description" data-i18n="restaurants.cafe.desc">Modern cafe with excellent coffee, pastries, and light meals. Perfect for breakfast or afternoon break.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Cafe</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.cafe.cuisine">Cafe</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €</span>
                                     <span><i class="fas fa-star"></i> 4.7</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('cafe')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('cafe')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Belvedere Terrace</h3>
-                                <p class="card-description">Restaurant with panoramic terrace. International cuisine with spectacular mountain views and sunset dining.</p>
+                                <h3 class="card-title" data-i18n="restaurants.belvedere_terrace.title">Belvedere Terrace</h3>
+                                <p class="card-description" data-i18n="restaurants.belvedere_terrace.desc">Restaurant with panoramic terrace. International cuisine with spectacular mountain views and sunset dining.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> International</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.belvedere_terrace.cuisine">International</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €€€</span>
                                     <span><i class="fas fa-star"></i> 4.8</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('belvedere-terrace')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('belvedere-terrace')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Grill House Rasnov</h3>
-                                <p class="card-description">BBQ specialist with outdoor grill. Famous for mixed grills, fresh salads, and local wines.</p>
+                                <h3 class="card-title" data-i18n="restaurants.grill_house.title">Grill House Rasnov</h3>
+                                <p class="card-description" data-i18n="restaurants.grill_house.desc">BBQ specialist with outdoor grill. Famous for mixed grills, fresh salads, and local wines.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> BBQ/Grill</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.grill_house.cuisine">BBQ/Grill</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
                                     <span><i class="fas fa-star"></i> 4.5</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('grill-house')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('grill-house')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Bistro Rasnoveana</h3>
-                                <p class="card-description">Casual bistro in town center. Daily specials, homemade desserts, and friendly atmosphere.</p>
+                                <h3 class="card-title" data-i18n="restaurants.bistro.title">Bistro Rasnoveana</h3>
+                                <p class="card-description" data-i18n="restaurants.bistro.desc">Casual bistro in town center. Daily specials, homemade desserts, and friendly atmosphere.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Bistro</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.bistro.cuisine">Bistro</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €</span>
                                     <span><i class="fas fa-star"></i> 4.3</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('bistro')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('bistro')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Vegetarian Haven</h3>
-                                <p class="card-description">Plant-based restaurant with creative dishes. Vegan options, organic ingredients, and healthy bowls.</p>
+                                <h3 class="card-title" data-i18n="restaurants.vegetarian.title">Vegetarian Haven</h3>
+                                <p class="card-description" data-i18n="restaurants.vegetarian.desc">Plant-based restaurant with creative dishes. Vegan options, organic ingredients, and healthy bowls.</p>
                                 <div class="card-meta">
-                                    <span><i class="fas fa-utensils"></i> Vegetarian</span>
+                                    <span><i class="fas fa-utensils"></i> <span data-i18n="restaurants.vegetarian.cuisine">Vegetarian</span></span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
                                     <span><i class="fas fa-star"></i> 4.6</span>
                                 </div>
-                                <button class="card-button" onclick="showRestaurantDetails('vegetarian')">View Menu</button>
+                                <button class="card-button" onclick="showRestaurantDetails('vegetarian')" data-i18n="common.view_menu">View Menu</button>
                             </div>
                         </div>
                     </div>
@@ -323,110 +325,110 @@
 
                 <!-- Accommodations Tab -->
                 <div class="tab-content" id="accommodations">
-                    <h2 class="section-title">Places to Stay</h2>
+                    <h2 class="section-title" data-i18n="sections.places_to_stay">Places to Stay</h2>
                     <div class="card-grid">
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Hotel Ambient</h3>
-                                <p class="card-description">Modern 4-star hotel with spa facilities, mountain views, and excellent breakfast. Close to fortress.</p>
+                                <h3 class="card-title" data-i18n="accommodations.ambient.title">Hotel Ambient</h3>
+                                <p class="card-description" data-i18n="accommodations.ambient.desc">Modern 4-star hotel with spa facilities, mountain views, and excellent breakfast. Close to fortress.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-star"></i> 4 stars</span>
                                     <span><i class="fas fa-euro-sign"></i> €€€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('ambient')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('ambient')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Pension Belvedere</h3>
-                                <p class="card-description">Family-run guesthouse with traditional Romanian hospitality. Homemade breakfast and stunning views.</p>
+                                <h3 class="card-title" data-i18n="accommodations.belvedere.title">Pension Belvedere</h3>
+                                <p class="card-description" data-i18n="accommodations.belvedere.desc">Family-run guesthouse with traditional Romanian hospitality. Homemade breakfast and stunning views.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-star"></i> 3 stars</span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('belvedere')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('belvedere')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1587271636175-90d58cdad458?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Casa Petre</h3>
-                                <p class="card-description">Charming apartments in the old town. Fully equipped kitchens and authentic Romanian decor.</p>
+                                <h3 class="card-title" data-i18n="accommodations.petre.title">Casa Petre</h3>
+                                <p class="card-description" data-i18n="accommodations.petre.desc">Charming apartments in the old town. Fully equipped kitchens and authentic Romanian decor.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-home"></i> Apartment</span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('petre')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('petre')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Mountain Hostel</h3>
-                                <p class="card-description">Budget-friendly hostel perfect for backpackers. Shared kitchen, common area, and organized hiking trips.</p>
+                                <h3 class="card-title" data-i18n="accommodations.hostel.title">Mountain Hostel</h3>
+                                <p class="card-description" data-i18n="accommodations.hostel.desc">Budget-friendly hostel perfect for backpackers. Shared kitchen, common area, and organized hiking trips.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-bed"></i> Hostel</span>
                                     <span><i class="fas fa-euro-sign"></i> €</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('hostel')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('hostel')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Villa Carpathia</h3>
-                                <p class="card-description">Luxury villa with private garden and pool. Perfect for families or groups seeking privacy and comfort.</p>
+                                <h3 class="card-title" data-i18n="accommodations.villa.title">Villa Carpathia</h3>
+                                <p class="card-description" data-i18n="accommodations.villa.desc">Luxury villa with private garden and pool. Perfect for families or groups seeking privacy and comfort.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-home"></i> Villa</span>
                                     <span><i class="fas fa-euro-sign"></i> €€€€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('villa')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('villa')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Boutique Hotel Residence</h3>
-                                <p class="card-description">Stylish boutique hotel with modern amenities. Rooftop bar, gym, and contemporary design throughout.</p>
+                                <h3 class="card-title" data-i18n="accommodations.boutique.title">Boutique Hotel Residence</h3>
+                                <p class="card-description" data-i18n="accommodations.boutique.desc">Stylish boutique hotel with modern amenities. Rooftop bar, gym, and contemporary design throughout.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-star"></i> 4 stars</span>
                                     <span><i class="fas fa-euro-sign"></i> €€€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('boutique')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('boutique')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Mountain Cabins</h3>
-                                <p class="card-description">Cozy wooden cabins in nature. Perfect for romantic getaways with fireplace and private terrace.</p>
+                                <h3 class="card-title" data-i18n="accommodations.cabins.title">Mountain Cabins</h3>
+                                <p class="card-description" data-i18n="accommodations.cabins.desc">Cozy wooden cabins in nature. Perfect for romantic getaways with fireplace and private terrace.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-home"></i> Cabin</span>
                                     <span><i class="fas fa-euro-sign"></i> €€</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('cabins')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('cabins')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=800')"></div>
                             <div class="card-body">
-                                <h3 class="card-title">Casa Maria B&B</h3>
-                                <p class="card-description">Traditional bed and breakfast with local charm. Hearty homemade meals and personal service.</p>
+                                <h3 class="card-title" data-i18n="accommodations.casa_maria.title">Casa Maria B&B</h3>
+                                <p class="card-description" data-i18n="accommodations.casa_maria.desc">Traditional bed and breakfast with local charm. Hearty homemade meals and personal service.</p>
                                 <div class="card-meta">
                                     <span><i class="fas fa-bed"></i> B&B</span>
                                     <span><i class="fas fa-euro-sign"></i> €</span>
-                                    <span><i class="fas fa-wifi"></i> Free WiFi</span>
+                                    <span><i class="fas fa-wifi"></i> <span data-i18n="common.free_wifi">Free WiFi</span></span>
                                 </div>
-                                <button class="card-button" onclick="showAccommodationDetails('casa-maria')">Check Availability</button>
+                                <button class="card-button" onclick="showAccommodationDetails('casa-maria')" data-i18n="common.check_availability">Check Availability</button>
                             </div>
                         </div>
                     </div>
@@ -435,13 +437,13 @@
 
                         <!-- Interactive Map Section -->
             <section class="map-section" id="map">
-                <h2 class="section-title">Interactive Map</h2>
+                <h2 class="section-title" data-i18n="map.title">Interactive Map</h2>
                 <div class="map-container">
                     <div id="interactive-map" class="map-placeholder">
                         <div class="map-info">
                             <i class="fas fa-map-marked-alt"></i>
-                            <p>Interactive map showing all locations, restaurants, and accommodations</p>
-                            <button class="cta-button" onclick="loadMap()">Load Map</button>
+                            <p data-i18n="map.description">Interactive map showing all locations, restaurants, and accommodations</p>
+                            <button class="cta-button" onclick="loadMap()" data-i18n="map.load_cta">Load Map</button>
                         </div>
                     </div>
                 </div>
@@ -449,49 +451,49 @@
 
             <!-- Tourist Info Section -->
             <section class="info-section" id="info">
-                <h2 class="section-title">Essential Information</h2>
+                <h2 class="section-title" data-i18n="info.title">Essential Information</h2>
                 <div class="info-grid">
                     <div class="info-card">
                         <i class="fas fa-phone-alt"></i>
-                        <h3>Emergency</h3>
-                        <p><strong>Police:</strong> 112</p>
-                        <p><strong>Medical:</strong> 112</p>
-                        <p><strong>Tourist Info:</strong> +40 268 234 567</p>
+                        <h3 data-i18n="info.emergency.title">Emergency</h3>
+                        <p><strong data-i18n="info.emergency.police">Police</strong>: <span data-i18n="info.emergency.police_value">112</span></p>
+                        <p><strong data-i18n="info.emergency.medical">Medical</strong>: <span data-i18n="info.emergency.medical_value">112</span></p>
+                        <p><strong data-i18n="info.emergency.tourist_info">Tourist Info</strong>: <span data-i18n="info.emergency.tourist_info_value">+40 268 234 567</span></p>
                     </div>
                     <div class="info-card">
                         <i class="fas fa-bus"></i>
-                        <h3>Transportation</h3>
-                        <p><strong>Bus to Brasov:</strong> Every 30 min</p>
-                        <p><strong>Taxi:</strong> +40 268 111 222</p>
-                        <p><strong>Car Rental:</strong> Available in town</p>
+                        <h3 data-i18n="info.transport.title">Transportation</h3>
+                        <p><strong data-i18n="info.transport.bus_to_brasov">Bus to Brasov</strong>: <span data-i18n="info.transport.bus_to_brasov_value">Every 30 min</span></p>
+                        <p><strong data-i18n="info.transport.taxi">Taxi</strong>: <span data-i18n="info.transport.taxi_value">+40 268 111 222</span></p>
+                        <p><strong data-i18n="info.transport.car_rental">Car Rental</strong>: <span data-i18n="info.transport.car_rental_value">Available in town</span></p>
                     </div>
                     <div class="info-card">
                         <i class="fas fa-language"></i>
-                        <h3>Language</h3>
-                        <p><strong>Main:</strong> Romanian</p>
-                        <p><strong>Common:</strong> English, German</p>
-                        <p><strong>Tip:</strong> Learn basic phrases</p>
+                        <h3 data-i18n="info.language.title">Language</h3>
+                        <p><strong data-i18n="info.language.main">Main</strong>: <span data-i18n="info.language.main_value">Romanian</span></p>
+                        <p><strong data-i18n="info.language.common">Common</strong>: <span data-i18n="info.language.common_value">English, German</span></p>
+                        <p><strong data-i18n="info.language.tip">Tip</strong>: <span data-i18n="info.language.tip_value">Learn basic phrases</span></p>
                     </div>
                     <div class="info-card">
                         <i class="fas fa-money-bill-wave"></i>
-                        <h3>Currency</h3>
-                        <p><strong>Currency:</strong> Romanian Leu (RON)</p>
-                        <p><strong>ATMs:</strong> Available in town</p>
-                        <p><strong>Cards:</strong> Widely accepted</p>
+                        <h3 data-i18n="info.currency.title">Currency</h3>
+                        <p><strong data-i18n="info.currency.currency">Currency</strong>: <span data-i18n="info.currency.currency_value">Romanian Leu (RON)</span></p>
+                        <p><strong data-i18n="info.currency.atms">ATMs</strong>: <span data-i18n="info.currency.atms_value">Available in town</span></p>
+                        <p><strong data-i18n="info.currency.cards">Cards</strong>: <span data-i18n="info.currency.cards_value">Widely accepted</span></p>
                     </div>
                     <div class="info-card">
                         <i class="fas fa-clock"></i>
-                        <h3>Opening Hours</h3>
-                        <p><strong>Fortress:</strong> 9:00 - 18:00</p>
-                        <p><strong>Shops:</strong> 10:00 - 20:00</p>
-                        <p><strong>Restaurants:</strong> 11:00 - 23:00</p>
+                        <h3 data-i18n="info.hours.title">Opening Hours</h3>
+                        <p><strong data-i18n="info.hours.fortress">Fortress</strong>: <span data-i18n="info.hours.fortress_value">9:00 - 18:00</span></p>
+                        <p><strong data-i18n="info.hours.shops">Shops</strong>: <span data-i18n="info.hours.shops_value">10:00 - 20:00</span></p>
+                        <p><strong data-i18n="info.hours.restaurants">Restaurants</strong>: <span data-i18n="info.hours.restaurants_value">11:00 - 23:00</span></p>
                     </div>
                     <div class="info-card">
                         <i class="fas fa-calendar-alt"></i>
-                        <h3>Best Time to Visit</h3>
-                        <p><strong>Peak:</strong> June - August</p>
-                        <p><strong>Shoulder:</strong> May, September</p>
-                        <p><strong>Winter:</strong> Skiing nearby</p>
+                        <h3 data-i18n="info.visit_time.title">Best Time to Visit</h3>
+                        <p><strong data-i18n="info.visit_time.peak">Peak</strong>: <span data-i18n="info.visit_time.peak_value">June - August</span></p>
+                        <p><strong data-i18n="info.visit_time.shoulder">Shoulder</strong>: <span data-i18n="info.visit_time.shoulder_value">May, September</span></p>
+                        <p><strong data-i18n="info.visit_time.winter">Winter</strong>: <span data-i18n="info.visit_time.winter_value">Skiing nearby</span></p>
                     </div>
                 </div>
             </section>
@@ -503,20 +505,20 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About Rasnov</h4>
-                    <p>Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.</p>
+                    <h4 data-i18n="footer.about_title">About Rasnov</h4>
+                    <p data-i18n="footer.about_text">Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
+                    <h4 data-i18n="footer.quick_links">Quick Links</h4>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="hunt.html">Treasure Hunt</a></li>
-                        <li><a href="#map">Map</a></li>
-                        <li><a href="#info">Info</a></li>
+                        <li><a href="#home" data-i18n="footer.home">Home</a></li>
+                        <li><a href="hunt.html" data-i18n="footer.treasure_hunt">Treasure Hunt</a></li>
+                        <li><a href="#map" data-i18n="footer.map">Map</a></li>
+                        <li><a href="#info" data-i18n="footer.info">Info</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Contact</h4>
+                    <h4 data-i18n="footer.contact">Contact</h4>
                     <p><i class="fas fa-envelope"></i> info@discoverrasnov.ro</p>
                     <p><i class="fas fa-phone"></i> +40 268 234 567</p>
                     <div class="social-links">
@@ -527,13 +529,14 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Discover Rasnov. Made with <i class="fas fa-heart"></i> for tourists.</p>
+                <p data-i18n="footer.copyright">© 2026 Discover Rasnov. Made with ❤️ for tourists.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="script.js"></script>
 </body>

@@ -8,6 +8,8 @@
     <link rel="icon" type="image/png" href="images/icon.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/i18next@23.11.5/i18next.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.2/i18nextHttpBackend.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -16,28 +18,28 @@
             <div class="nav-wrapper">
                 <div class="logo">
                     <i class="fas fa-mountain"></i>
-                    <h1>Discover Rasnov</h1>
+                    <h1 data-i18n="logo">Discover Rasnov</h1>
                 </div>
                 <nav class="nav-menu">
-                    <button class="nav-toggle" aria-label="Toggle navigation">
+                    <button class="nav-toggle" data-i18n="[aria-label]header.nav_toggle_label" aria-label="Toggle navigation">
                         <i class="fas fa-bars"></i>
                     </button>
                     <ul class="nav-list">
-                        <li><a href="index.html" class="nav-link">Discover Rasnov</a></li>
-                        <li><a href="hunt.html" class="nav-link">Treasure Hunt</a></li>
-                        <li><a href="index.html#map" class="nav-link">Map</a></li>
-                        <li><a href="index.html#info" class="nav-link">Info</a></li>
+                        <li><a href="index.html" class="nav-link" data-i18n="nav.discover_rasnov">Discover Rasnov</a></li>
+                        <li><a href="hunt.html" class="nav-link" data-i18n="nav.treasure_hunt">Treasure Hunt</a></li>
+                        <li><a href="index.html#map" class="nav-link" data-i18n="nav.map">Map</a></li>
+                        <li><a href="index.html#info" class="nav-link" data-i18n="nav.info">Info</a></li>
                     </ul>
                 </nav>
                 <div class="header-actions">
-                    <button class="user-profile-btn" id="user-profile-btn" onclick="showUserProfile()" title="View profile and points">
+                    <button class="user-profile-btn" id="user-profile-btn" onclick="showUserProfile()" data-i18n="[title]header.profile_title" title="View profile and points">
                         <i class="fas fa-user-circle"></i>
                         <span id="user-points-display" class="user-points-badge">
-                            <span class="user-name">Guest</span>
+                            <span class="user-name" data-i18n="header.guest">Guest</span>
                             <span class="user-points">⭐ 0 pts</span>
                         </span>
                     </button>
-                    <button class="lang-toggle" aria-label="Change language">
+                    <button class="lang-toggle" data-i18n="[aria-label]header.lang_toggle_label" aria-label="Change language">
                         <i class="fas fa-globe"></i> EN
                     </button>
                     <button class="weather-widget" id="weather-btn">
@@ -52,8 +54,8 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h2 class="hero-title">Treasure Hunt</h2>
-            <p class="hero-subtitle">Scan QR codes at 8 historic Rasnov locations to earn points!</p>
+            <h2 class="hero-title" data-i18n="hunt_hero.title">Treasure Hunt</h2>
+            <p class="hero-subtitle" data-i18n="hunt_hero.subtitle">Scan QR codes at 8 historic Rasnov locations to earn points!</p>
         </div>
         <div class="hero-overlay"></div>
     </section>
@@ -61,7 +63,7 @@
     <!-- Next Site Banner (shown after discovering a location) -->
     <div class="next-site-banner" id="next-site-banner" style="display:none;">
         <i class="fas fa-arrow-right next-site-arrow"></i>
-        <span class="next-site-label">Next Site: </span><strong class="next-site-name"></strong>
+        <span class="next-site-label" data-i18n="hunt.next_site_label">Next Site: </span><strong class="next-site-name"></strong>
     </div>
 
     <!-- Main Content - Hunt Only -->
@@ -69,19 +71,19 @@
         <div class="container">
             <section class="ar-section" id="ar-mode">
                 <div class="section-header">
-                    <h2 class="section-title">Treasure Hunt</h2>
-                    <p class="section-subtitle">Explore Rasnov in a fun, interactive way!</p>
+                    <h2 class="section-title" data-i18n="hunt.section_title">Treasure Hunt</h2>
+                    <p class="section-subtitle" data-i18n="hunt.section_subtitle">Explore Rasnov in a fun, interactive way!</p>
                 </div>
 
                 <div class="ar-controls">
                     <button class="ar-button primary" id="start-hunt">
-                        <i class="fas fa-play"></i> Start Hunt
+                        <i class="fas fa-play"></i> <span data-i18n="hunt.start_btn">Start Hunt</span>
                     </button>
                     <button class="ar-button reset-hunt-btn" id="reset-hunt" style="display:none;">
                         <i class="fas fa-redo"></i> Reset Hunt
                     </button>
                     <button class="ar-button" id="scan-qr">
-                        <i class="fas fa-qrcode"></i> Scan QR Code
+                        <i class="fas fa-qrcode"></i> <span data-i18n="hunt.scan_qr_btn">Scan QR Code</span>
                     </button>
                     <!-- Location-based discovery is reserved for future reimplementation.
                          The button below is intentionally hidden; see script.js for commented-out code. -->
@@ -103,22 +105,22 @@
                     <div class="hunt-tab-header">
                         <button class="hunt-tab-btn active" data-hunt-tab="hunt-pane">
                             <i class="fas fa-search"></i>
-                            <span>Hunt</span>
+                            <span data-i18n="hunt.tab_hunt">Hunt</span>
                         </button>
                         <button class="hunt-tab-btn" data-hunt-tab="leaderboard-pane">
                             <i class="fas fa-trophy"></i>
-                            <span>Leaderboard</span>
+                            <span data-i18n="hunt.tab_leaderboard">Leaderboard</span>
                         </button>
                         <button class="hunt-tab-btn" data-hunt-tab="unlocks-pane">
                             <i class="fas fa-gift"></i>
-                            <span>Rewards</span>
+                            <span data-i18n="hunt.tab_rewards">Rewards</span>
                         </button>
                     </div>
 
                     <div class="hunt-tab-pane active" id="hunt-pane">
                         <div class="hunt-status" id="hunt-status">
                             <div class="progress-container">
-                                <h3>Your Progress</h3>
+                                <h3 data-i18n="hunt.progress_title">Your Progress</h3>
                                 <div class="progress-bar">
                                     <div class="progress-fill" id="progress-fill"></div>
                                 </div>
@@ -128,56 +130,56 @@
                             <div class="hunt-items">
                                 <div class="hunt-item" data-location="fortress">
                                     <i class="fas fa-lock"></i>
-                                    <span>Rasnov Fortress Gate</span>
+                                    <span data-i18n="hunt.items.fortress">Rasnov Fortress Gate</span>
                                 </div>
                                 <div class="hunt-item" data-location="well">
                                     <i class="fas fa-lock"></i>
-                                    <span>Ancient Well</span>
+                                    <span data-i18n="hunt.items.well">Ancient Well</span>
                                 </div>
                                 <div class="hunt-item" data-location="tower">
                                     <i class="fas fa-lock"></i>
-                                    <span>Watch Tower</span>
+                                    <span data-i18n="hunt.items.tower">Watch Tower</span>
                                 </div>
                                 <div class="hunt-item" data-location="church">
                                     <i class="fas fa-lock"></i>
-                                    <span>Old Church</span>
+                                    <span data-i18n="hunt.items.church">Old Church</span>
                                 </div>
                                 <div class="hunt-item" data-location="museum">
                                     <i class="fas fa-lock"></i>
-                                    <span>Village Museum</span>
+                                    <span data-i18n="hunt.items.museum">Village Museum</span>
                                 </div>
                                 <div class="hunt-item" data-location="peak">
                                     <i class="fas fa-lock"></i>
-                                    <span>Mountain Peak</span>
+                                    <span data-i18n="hunt.items.peak">Mountain Peak</span>
                                 </div>
                                 <div class="hunt-item" data-location="square">
                                     <i class="fas fa-lock"></i>
-                                    <span>Town Square</span>
+                                    <span data-i18n="hunt.items.square">Town Square</span>
                                 </div>
                                 <div class="hunt-item" data-location="dino">
                                     <i class="fas fa-lock"></i>
-                                    <span>Dino Park Entrance</span>
+                                    <span data-i18n="hunt.items.dino">Dino Park Entrance</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="hunt-tab-pane" id="leaderboard-pane">
-                        <h2 class="section-title">🏆 Leaderboard</h2>
-                        <p class="leaderboard-subtitle">Top Rasnov Explorers - Ranked by Points</p>
+                        <h2 class="section-title" data-i18n="leaderboard.title">🏆 Leaderboard</h2>
+                        <p class="leaderboard-subtitle" data-i18n="leaderboard.subtitle">Top Rasnov Explorers - Ranked by Points</p>
 
                         <div class="leaderboard-container">
                             <div class="leaderboard-info">
                                 <div class="info-item">
-                                    <span class="info-label">Your Rank:</span>
+                                    <span class="info-label" data-i18n="leaderboard.your_rank">Your Rank:</span>
                                     <span class="info-value" id="user-rank">-</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Your Points:</span>
+                                    <span class="info-label" data-i18n="leaderboard.your_points">Your Points:</span>
                                     <span class="info-value" id="user-leaderboard-points">-</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Total Players:</span>
+                                    <span class="info-label" data-i18n="leaderboard.total_players">Total Players:</span>
                                     <span class="info-value" id="total-players">-</span>
                                 </div>
                             </div>
@@ -186,17 +188,17 @@
                                 <table class="leaderboard-table">
                                     <thead>
                                         <tr>
-                                            <th class="rank-col">#</th>
-                                            <th class="name-col">Player</th>
-                                            <th class="points-col">Points</th>
-                                            <th class="locations-col">Locations</th>
-                                            <th class="status-col">Status</th>
+                                            <th class="rank-col" data-i18n="leaderboard.col_rank">#</th>
+                                            <th class="name-col" data-i18n="leaderboard.col_player">Player</th>
+                                            <th class="points-col" data-i18n="leaderboard.col_points">Points</th>
+                                            <th class="locations-col" data-i18n="leaderboard.col_locations">Locations</th>
+                                            <th class="status-col" data-i18n="leaderboard.col_status">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="leaderboard-body">
                                         <tr class="loading-row">
                                             <td colspan="5" style="text-align: center; padding: 2rem;">
-                                                <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
+                                                <i class="fas fa-spinner fa-spin"></i> <span data-i18n="leaderboard.loading">Loading leaderboard...</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -205,7 +207,7 @@
 
                             <div class="leaderboard-actions">
                                 <button class="card-button" onclick="loadLeaderboard()" title="Refresh the leaderboard">
-                                    <i class="fas fa-sync-alt"></i> Refresh
+                                    <i class="fas fa-sync-alt"></i> <span data-i18n="leaderboard.refresh">Refresh</span>
                                 </button>
                             </div>
                         </div>
@@ -224,14 +226,14 @@
                         <button class="modal-close" onclick="closeModal('qr-modal')">
                             <i class="fas fa-times"></i>
                         </button>
-                        <h3>Scan QR Code</h3>
+                        <h3 data-i18n="modal.qr_scan.title">Scan QR Code</h3>
                         <div id="qr-scanner">
                             <video id="qr-video" autoplay></video>
                             <div class="scanner-overlay">
                                 <div class="scanner-frame"></div>
                             </div>
                         </div>
-                        <p class="help-text">Point your camera at a QR code at any treasure hunt location</p>
+                        <p class="help-text" data-i18n="modal.qr_scan.help">Point your camera at a QR code at any treasure hunt location</p>
                     </div>
                 </div>
 
@@ -241,15 +243,8 @@
                         <div class="discovery-icon">
                             <i class="fas fa-map-marked-alt" style="color: #27ae60;"></i>
                         </div>
-                        <h3 id="welcome-title">Welcome to Rasnov!</h3>
-                        <p id="welcome-message-en" class="welcome-lang-block">
-                            You found your first treasure hunt location!<br>
-                            To continue the hunt, visit <strong id="welcome-next-en"></strong> next and scan the code!
-                        </p>
-                        <p id="welcome-message-ro" class="welcome-lang-block welcome-ro">
-                            Ați găsit prima locație a vânătorii!<br>
-                            Pentru a continua, vizitați <strong id="welcome-next-ro"></strong> și scanați codul!
-                        </p>
+                        <h3 id="welcome-title" data-i18n="modal.welcome.title">Welcome to Rasnov!</h3>
+                        <p id="welcome-message" class="welcome-lang-block"></p>
                         <button class="cta-button" onclick="closeModal('welcome-modal'); onWelcomeModalClose()">
                             <i class="fas fa-arrow-right"></i> Continue Hunt
                         </button>
@@ -265,11 +260,11 @@
                         <div class="discovery-icon">
                             <i class="fas fa-trophy"></i>
                         </div>
-                        <h3 id="discovery-title">Location Found!</h3>
+                        <h3 id="discovery-title" data-i18n="modal.discovery.title">Location Found!</h3>
                         <p id="discovery-message"></p>
                         <div id="discovery-fact" class="fact-box"></div>
                         <div id="discovery-photo-section"></div>
-                        <button class="cta-button" onclick="onDiscoveryModalContinue()">Continue Hunt</button>
+                        <button class="cta-button" onclick="onDiscoveryModalContinue()" data-i18n="modal.discovery.continue">Continue Hunt</button>
                     </div>
                 </div>
 
@@ -279,8 +274,8 @@
                         <button class="modal-close" onclick="closePhotoCapture()">
                             <i class="fas fa-times"></i>
                         </button>
-                        <h3 id="photo-capture-title">📸 Capture This Location</h3>
-                        <p class="help-text">Take a photo to add to your Rasnov collage!</p>
+                        <h3 id="photo-capture-title" data-i18n="modal.photo.title">📸 Capture This Location</h3>
+                        <p class="help-text" data-i18n="modal.photo.help">Take a photo to add to your Rasnov collage!</p>
                         <div class="photo-capture-container" id="photo-capture-container">
                             <video id="photo-capture-video" autoplay playsinline muted></video>
                             <div class="ar-flash" id="photo-capture-flash"></div>
@@ -288,7 +283,7 @@
                                 <i class="fas fa-camera"></i>
                             </button>
                         </div>
-                        <button class="skip-btn" onclick="closePhotoCapture()">Skip for now</button>
+                        <button class="skip-btn" onclick="closePhotoCapture()" data-i18n="modal.photo.skip">Skip for now</button>
                     </div>
                 </div>
 
@@ -298,15 +293,15 @@
                         <div class="discovery-icon">
                             <i class="fas fa-trophy" style="color: #f39c12;"></i>
                         </div>
-                        <h3>🎉 Congratulations!</h3>
-                        <p>You found your first location! Add your name to appear on the leaderboard.</p>
+                        <h3 data-i18n="modal.first_discovery.title">🎉 Congratulations!</h3>
+                        <p data-i18n="modal.first_discovery.message">You found your first location! Add your name to appear on the leaderboard.</p>
                         <div class="name-entry-group">
-                            <input type="text" id="first-discovery-name" placeholder="Your name" maxlength="30" autocomplete="name">
+                            <input type="text" id="first-discovery-name" data-i18n="[placeholder]modal.first_discovery.placeholder" placeholder="Your name" maxlength="30" autocomplete="name">
                             <button class="cta-button" onclick="submitFirstDiscoveryName()">
-                                <i class="fas fa-check"></i> Save Name
+                                <i class="fas fa-check"></i> <span data-i18n="modal.first_discovery.save">Save Name</span>
                             </button>
                         </div>
-                        <button class="skip-btn" onclick="skipFirstDiscoveryName()">Skip for now</button>
+                        <button class="skip-btn" onclick="skipFirstDiscoveryName()" data-i18n="modal.first_discovery.skip">Skip for now</button>
                     </div>
                 </div>
 
@@ -337,12 +332,12 @@
                         <div class="discovery-icon">
                             <i class="fas fa-clipboard-list"></i>
                         </div>
-                        <h3 id="survey-modal-title">Quick Survey</h3>
-                        <p id="survey-modal-message">Would you like to take a quick survey about your time in Rasnov? We look over every response to improve the site!</p>
-                        <p id="survey-modal-reward" class="survey-reward-text">🎁 Unlock a special site theme as a thank you!</p>
+                        <h3 id="survey-modal-title" data-i18n="modal.survey.title">Quick Survey</h3>
+                        <p id="survey-modal-message" data-i18n="modal.survey.message">Would you like to take a quick survey about your time in Rasnov? We look over every response to improve the site!</p>
+                        <p id="survey-modal-reward" class="survey-reward-text" data-i18n="modal.survey.reward">🎁 Unlock a special site theme as a thank you!</p>
                         <div class="survey-btn-row">
-                            <button class="cta-button" id="survey-yes-btn" onclick="startSurvey()">Yes, take the survey!</button>
-                            <button class="skip-btn" id="survey-no-btn" onclick="dismissSurvey()">Maybe later</button>
+                            <button class="cta-button" id="survey-yes-btn" onclick="startSurvey()" data-i18n="modal.survey.yes">Yes, take the survey!</button>
+                            <button class="skip-btn" id="survey-no-btn" onclick="dismissSurvey()" data-i18n="modal.survey.no">Maybe later</button>
                         </div>
                     </div>
                 </div>
@@ -357,7 +352,7 @@
                             <div class="collage-modal-badge" id="collage-unlock-badge">🥈</div>
                             <h3 id="collage-unlock-title">Silver Collage Unlocked!</h3>
                             <p id="collage-unlock-msg"></p>
-                            <button class="ar-button primary" onclick="closeModal('collage-unlock-modal'); document.querySelector('[data-hunt-tab=unlocks-pane]').click()">View My Collage</button>
+                            <button class="ar-button primary" onclick="closeModal('collage-unlock-modal'); document.querySelector('[data-hunt-tab=unlocks-pane]').click()" data-i18n="modal.collage.view">View My Collage</button>
                         </div>
                     </div>
                 </div>
@@ -368,14 +363,14 @@
                         <button class="modal-close" onclick="closeSurveyForm()">
                             <i class="fas fa-times"></i>
                         </button>
-                        <h3 id="survey-form-title">Rasnov Survey</h3>
+                        <h3 id="survey-form-title" data-i18n="modal.survey_form.title">Rasnov Survey</h3>
                         <div class="survey-iframe-container">
                             <iframe src="https://forms.gle/78pqhoedThrKGmXH8"
                                     class="survey-iframe"
                                     title="Rasnov Survey">Loading form...</iframe>
                         </div>
                         <p class="survey-fallback-link">
-                            <a href="https://forms.gle/78pqhoedThrKGmXH8" target="_blank" rel="noopener noreferrer" id="survey-open-tab">Open in new tab ↗</a>
+                            <a href="https://forms.gle/78pqhoedThrKGmXH8" target="_blank" rel="noopener noreferrer" id="survey-open-tab" data-i18n="modal.survey_form.open_tab">Open in new tab ↗</a>
                         </p>
                     </div>
                 </div>
@@ -388,20 +383,20 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About Rasnov</h4>
-                    <p>Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.</p>
+                    <h4 data-i18n="footer.about_title">About Rasnov</h4>
+                    <p data-i18n="footer.about_text">Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
+                    <h4 data-i18n="footer.quick_links">Quick Links</h4>
                     <ul>
-                        <li><a href="index.html">Discover Rasnov</a></li>
-                        <li><a href="hunt.html">Treasure Hunt</a></li>
-                        <li><a href="index.html#map">Map</a></li>
-                        <li><a href="index.html#info">Info</a></li>
+                        <li><a href="index.html" data-i18n="nav.discover_rasnov">Discover Rasnov</a></li>
+                        <li><a href="hunt.html" data-i18n="footer.treasure_hunt">Treasure Hunt</a></li>
+                        <li><a href="index.html#map" data-i18n="footer.map">Map</a></li>
+                        <li><a href="index.html#info" data-i18n="footer.info">Info</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Contact</h4>
+                    <h4 data-i18n="footer.contact">Contact</h4>
                     <p><i class="fas fa-envelope"></i> info@discoverrasnov.ro</p>
                     <p><i class="fas fa-phone"></i> +40 268 234 567</p>
                     <div class="social-links">
@@ -412,7 +407,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Discover Rasnov. Made with <i class="fas fa-heart"></i> for tourists.</p>
+                <p data-i18n="footer.copyright">© 2026 Discover Rasnov. Made with ❤️ for tourists.</p>
             </div>
         </div>
     </footer>
@@ -421,7 +416,7 @@
     <div class="ar-modal" id="ar-modal">
         <div class="ar-loading" id="ar-loading">
             <div class="loading-spinner"></div>
-            <p>Initializing Camera...</p>
+            <p data-i18n="ar.loading">Initializing Camera...</p>
         </div>
         <button class="ar-close-btn" id="ar-close-btn" aria-label="Close Camera View">
             <i class="fas fa-times"></i>
@@ -432,19 +427,19 @@
         <!-- Hunt instruction banner -->
         <div class="ar-hunt-banner" id="ar-hunt-banner">
             <span class="ar-hunt-icon">🐻</span>
-            <span id="ar-hunt-text">Find Grizzly and take a picture!</span>
+            <span id="ar-hunt-text" data-i18n="ar.hunt_text">Find Grizzly and take a picture!</span>
         </div>
         <!-- Overlay text shown after photo taken -->
         <div class="ar-overlay-text hidden" id="ar-overlay-text">
             <div class="ar-success-message">
-                <h2 id="ar-location-name">You found me!</h2>
+                <h2 id="ar-location-name" data-i18n="ar.you_found">You found me!</h2>
                 <p id="ar-location-hint" class="ar-hint-text"></p>
             </div>
         </div>
         <!-- WebXR placement instruction (shown while surface is being detected) -->
         <div class="ar-xr-place-hint hidden" id="ar-xr-place-hint">
             <span class="ar-xr-place-icon">👇</span>
-            <span>Tap the glowing ring to place Grizzly</span>
+            <span data-i18n="ar.place_hint">Tap the glowing ring to place Grizzly</span>
         </div>
         <!-- Photo capture button -->
         <button class="ar-capture-btn" id="ar-capture-btn" aria-label="Take Photo">
@@ -453,7 +448,7 @@
         <!-- Photo flash overlay -->
         <div class="ar-flash" id="ar-flash"></div>
         <div class="ar-test-mode-indicator" id="ar-test-mode-indicator" style="display: none;">
-            <i class="fas fa-flask"></i> Test Mode Active
+            <i class="fas fa-flask"></i> <span data-i18n="ar.test_mode">Test Mode Active</span>
         </div>
     </div>
 
@@ -463,6 +458,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     <!-- GLTFLoader for loading .glb/.gltf bear model -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="script.js"></script>
 </body>
