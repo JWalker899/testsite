@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AR Scavenger Hunt - Discover 8 historic locations in Rasnov, Romania">
-    <title>Scavenger Hunt | Discover Rasnov</title>
+    <meta name="description" content="Treasure Hunt - Discover 8 historic locations in Rasnov, Romania">
+    <title>Treasure Hunt | Discover Rasnov</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
         <div class="container">
             <div class="nav-wrapper">
                 <div class="logo">
@@ -24,7 +23,7 @@
                     </button>
                     <ul class="nav-list">
                         <li><a href="index.html" class="nav-link">Discover Rasnov</a></li>
-                        <li><a href="hunt.html" class="nav-link">Scavenger Hunt</a></li>
+                        <li><a href="hunt.html" class="nav-link">Treasure Hunt</a></li>
                         <li><a href="index.html#map" class="nav-link">Map</a></li>
                         <li><a href="index.html#info" class="nav-link">Info</a></li>
                     </ul>
@@ -52,7 +51,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h2 class="hero-title">AR Scavenger Hunt</h2>
+            <h2 class="hero-title">Treasure Hunt</h2>
             <p class="hero-subtitle">Scan QR codes at 8 historic Rasnov locations to earn points!</p>
         </div>
         <div class="hero-overlay"></div>
@@ -69,7 +68,7 @@
         <div class="container">
             <section class="ar-section" id="ar-mode">
                 <div class="section-header">
-                    <h2 class="section-title">AR Scavenger Hunt</h2>
+                    <h2 class="section-title">Treasure Hunt</h2>
                     <p class="section-subtitle">Explore Rasnov in a fun, interactive way!</p>
                 </div>
 
@@ -231,7 +230,7 @@
                                 <div class="scanner-frame"></div>
                             </div>
                         </div>
-                        <p class="help-text">Point your camera at a QR code at any scavenger hunt location</p>
+                        <p class="help-text">Point your camera at a QR code at any treasure hunt location</p>
                     </div>
                 </div>
 
@@ -243,7 +242,7 @@
                         </div>
                         <h3 id="welcome-title">Welcome to Rasnov!</h3>
                         <p id="welcome-message-en" class="welcome-lang-block">
-                            You found your first scavenger location!<br>
+                            You found your first treasure hunt location!<br>
                             To continue the hunt, visit <strong id="welcome-next-en"></strong> next and scan the code!
                         </p>
                         <p id="welcome-message-ro" class="welcome-lang-block welcome-ro">
@@ -375,7 +374,7 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="index.html">Discover Rasnov</a></li>
-                        <li><a href="hunt.html">Scavenger Hunt</a></li>
+                        <li><a href="hunt.html">Treasure Hunt</a></li>
                         <li><a href="index.html#map">Map</a></li>
                         <li><a href="index.html#info">Info</a></li>
                     </ul>
@@ -397,13 +396,13 @@
         </div>
     </footer>
 
-    <!-- AR Camera Modal -->
+    <!-- Camera Modal -->
     <div class="ar-modal" id="ar-modal">
         <div class="ar-loading" id="ar-loading">
             <div class="loading-spinner"></div>
-            <p>Initializing AR Camera...</p>
+            <p>Initializing Camera...</p>
         </div>
-        <button class="ar-close-btn" id="ar-close-btn" aria-label="Close AR View">
+        <button class="ar-close-btn" id="ar-close-btn" aria-label="Close Camera View">
             <i class="fas fa-times"></i>
         </button>
         <div class="ar-scene-container" id="ar-scene-container">

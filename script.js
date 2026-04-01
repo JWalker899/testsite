@@ -51,6 +51,10 @@ let siteDomain = window.location.origin;
     } catch (e) { /* use fallback */ }
 })();
 
+// Timer state for treasure hunt
+let huntStartTime = null; // Absolute time when first location was found
+let lastDiscoveryTime = null; // Time when last location was found
+
 // Rasnov geographic coordinates (used for weather API)
 const RASNOV_LATITUDE = 45.59;
 const RASNOV_LONGITUDE = 25.46;
@@ -449,7 +453,11 @@ function resetProgress() {
     currentUser.totalPoints = 0;
     currentUser.completedAt = null;
     foundLocations.clear();
-    foundExtraLocations.clear();
+    
+    // Reset timer state
+    huntStartTime = null;
+    lastDiscoveryTime = null;
+    
     saveUserToLocalStorage();
     updateUserDisplayUI();
     updateProgress();
@@ -659,9 +667,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUser();
 });
 
-// ==================== Scavenger Hunt Locations ====================
+// ==================== Treasure Hunt Locations ====================
 
-// Scavenger Hunt Locations (for testing and location-based discovery)
+// Treasure Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
     fortress: { 
         lat: 45.5889, lng: 25.4631, 
@@ -719,12 +727,12 @@ const huntLocations = {
         qr: 'RASNOV_DINO', 
         fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
         fact_ro: 'Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.',
-        hint: 'Congratulations! You\'ve completed the entire Rasnov scavenger hunt! 🎉',
+        hint: 'Congratulations! You\'ve completed the entire Rasnov treasure hunt! 🎉',
         hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov! 🎉'
     }
 };
 
-// Circular hunt order: scanning any location points to the next one in this loop
+// Circular treasure hunt order: scanning any location points to the next one in this loop
 const huntOrder = ['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino'];
 
 // Returns the next unvisited location in the circular order after currentKey.
@@ -956,13 +964,13 @@ async function updateWeather() {
 updateWeather();
 setInterval(updateWeather, 300000); // Update every 5 minutes
 
-// AR Scavenger Hunt Functions
+// AR Treasure Hunt Functions
 if (startHuntBtn) startHuntBtn.addEventListener('click', () => {
     if (!huntActive) {
         huntActive = true;
         startHuntBtn.style.display = 'none';
         resetHuntBtn.style.display = '';
-        showNotification('Scavenger hunt started! Find all 8 locations.', 'success');
+        showNotification('Treasure hunt started! Find all 8 locations.', 'success');
         
         // Enable other buttons
         if (scanQrBtn) scanQrBtn.disabled = false;
@@ -1070,7 +1078,7 @@ if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
         return;
     }
     
-    showNotification(`Testing AR at ${huntLocations[targetLocation].name}...`, 'info');
+    showNotification(`Testing at ${huntLocations[targetLocation].name}...`, 'info');
     launchARExperience(targetLocation, true);
 });
 */
@@ -1242,7 +1250,7 @@ function processQRCode(qrData) {
             showNotification('You already found this location!', 'info');
         }
     } else {
-        showNotification('QR code not recognized. Make sure you\'re at a scavenger hunt location.', 'warning');
+        showNotification('QR code not recognized. Make sure you\'re at a treasure hunt location.', 'warning');
     }
 }
 
@@ -1407,6 +1415,25 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     // Update the "Next Site" banner with the next location in the circular order
     updateNextSiteBanner(locationKey);
     
+    // Handle timer logic
+    const currentTime = Date.now();
+    let timerText = '';
+    
+    if (foundLocations.size === 1) {
+        // First location found - start the hunt timer
+        huntStartTime = currentTime;
+        lastDiscoveryTime = currentTime;
+        timerText = `<br><br><strong>⏱️ ${currentLang === 'ro' ? 'Vânătoarea a început!' : 'Hunt Started!'}</strong>`;
+    } else {
+        // Subsequent locations - show time since last discovery
+        const timeSinceLast = Math.floor((currentTime - lastDiscoveryTime) / 1000); // seconds
+        const minutes = Math.floor(timeSinceLast / 60);
+        const seconds = timeSinceLast % 60;
+        const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        timerText = `<br><br><strong>⏱️ ${currentLang === 'ro' ? 'Timp pentru a găsi această locație' : 'Time to find this location'}: ${timeString}</strong>`;
+        lastDiscoveryTime = currentTime;
+    }
+    
     // Show discovery modal with points
     const localizedFact = localizedField(location, 'fact') || location.fact || '';
     const discoveryMsg = (currentLang === 'ro') ? 'Felicitări pentru explorare!' : 'Great job exploring Rasnov!';
@@ -1427,6 +1454,9 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
         }
         factHTML += pointsText;
     }
+    
+    // Add timer information
+    factHTML += timerText;
     
     // Show saved AR photo if available (validate it's a safe JPEG data URL)
     const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
@@ -1466,7 +1496,7 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
         setTimeout(() => {
             const celebrationMsg = (currentLang === 'ro') 
                 ? `🎉 Felicitări! Ai completat vânătoarea! Total puncte: ${currentUser.totalPoints}` 
-                : `🎉 Congratulations! You completed the scavenger hunt! Total points: ${currentUser.totalPoints}`;
+                : `🎉 Congratulations! You completed the treasure hunt! Total points: ${currentUser.totalPoints}`;
             showNotification(celebrationMsg, 'success');
             huntActive = false;
             if (startHuntBtn) {
@@ -1563,7 +1593,7 @@ async function launchARExperience(locationKey, isTestMode = false) {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
     if (!isSecure && !isLocalhost) {
-        showNotification('AR camera requires HTTPS. Please access the site via https:// to use AR features.', 'error');
+        showNotification('Camera requires HTTPS. Please access the site via https://.', 'error');
         // Fallback to regular discovery for non-HTTPS production
         setTimeout(() => {
             discoverLocation(locationKey);
@@ -1641,7 +1671,7 @@ async function launchARExperience(locationKey, isTestMode = false) {
         // Show user-friendly error message
         let errorMessage = 'Unable to access camera. ';
         if (error.name === 'NotAllowedError') {
-            errorMessage += 'Please allow camera access to use AR features.';
+            errorMessage += 'Please allow camera access to proceed.';
         } else if (error.name === 'NotFoundError') {
             errorMessage += 'No camera found on this device.';
         } else if (error.name === 'NotSupportedError') {
@@ -2253,7 +2283,7 @@ function setupARScene(locationKey) {
 //   https://quaternius.com/packs/ultimateanimals.html (free CC0)
 // place it at /assets/bear.glb and change the URL below.
 const BEAR_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bear/model.gltf';
-const AR_WATERMARK_TEXT = '📍 Rasnov AR Scavenger Hunt';
+const AR_WATERMARK_TEXT = '📍 Rasnov Treasure Hunt';
 
 function setupBearAR(locationKey) {
     // Try Three.js 3D bear first.
@@ -2657,7 +2687,7 @@ function discoverLocationQuietly(locationKey) {
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
+            showNotification('🎉 Congratulations! You completed the treasure hunt!', 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
@@ -3469,7 +3499,7 @@ const I18N = {
         logo: 'Descoperă Râșnov',
         nav: {
             '#home': 'Acasă',
-            '#ar-mode': 'Vânătoare AR',
+            '#ar-mode': 'Vânătoare Comori',
             '#map': 'Hartă',
             '#info': 'Info'
         },
@@ -3484,7 +3514,7 @@ const I18N = {
             unlocks: 'Recompense'
         },
         ar: {
-            title: 'Vânătoare AR',
+            title: 'Vânătoare Comori',
             subtitle: 'Explorează Râșnov într-un mod distractiv și interactiv!',
             startHunt: '<i class="fas fa-play"></i> Începe Vânătoarea',
             scanQr: '<i class="fas fa-qrcode"></i> Scanează QR',
@@ -3575,21 +3605,21 @@ const MESSAGE_MAP = {
         'Could not access camera. Testing mode allows manual selection.': 'Nu se poate accesa camera. Modul testare permite selecție manuală.',
         'QR Code scanned successfully!': 'Cod QR scanat cu succes!',
         'You already found this location!': 'Ai găsit deja această locație!',
-        "QR code not recognized. Make sure you\'re at a scavenger hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
+        "QR code not recognized. Make sure you\'re at a treasure hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
         'No locations nearby. Keep exploring!': 'Nicio locație în apropiere. Continuați explorarea!',
         'Unable to access camera. ': 'Imposibil de accesat camera. ',
-        'Please allow camera access to use AR features.': 'Permiteți accesul la cameră pentru a folosi funcțiile AR.',
+        'Please allow camera access to proceed.': 'Permiteți accesul la cameră pentru a continua.',
         'No camera found on this device.': 'Nu s-a găsit nicio cameră pe acest dispozitiv.',
         'Camera not supported on this browser. Please use HTTPS.': 'Camera nu este acceptată de acest browser. Folosiți HTTPS.',
         'Please check your camera settings.': 'Verificați setările camerei.',
-        'AR camera requires HTTPS. Please access the site via https:// to use AR features.': 'Camera AR necesită HTTPS. Accesați site-ul prin https:// pentru a folosi funcțiile AR.',
+        'Camera requires HTTPS. Please access the site via https://.': 'Camera necesită HTTPS. Accesați site-ul prin https://.',
         'Map loaded with all locations!': 'Harta încărcată cu toate locațiile!',
         'Map loaded successfully!': 'Harta a fost încărcată cu succes!',
         'Select a QR Code to Scan:': 'Selectați un cod QR pentru scanare:',
-        'Initializing AR Camera...': 'Se inițializează camera AR...',
-        'Scavenger hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
-        'Scavenger hunt stopped.': 'Vânătoarea a fost oprită.',
-        'Testing AR at ': 'Testare AR la ',
+        'Initializing Camera...': 'Se inițializează camera...',
+        'Treasure hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
+        'Treasure hunt stopped.': 'Vânătoarea a fost oprită.',
+        'Testing at ': 'Testare la ',
         'Interactive map showing all locations, restaurants, and accommodations': 'Hartă interactivă care afișează toate locațiile, restaurantele și cazări',
         'Open now': 'Deschis acum',
         '❌ Closed': '❌ Închis',
@@ -3652,7 +3682,7 @@ function applyTranslations(lang) {
         'Top Locations to Visit': 'Cele mai bune locații de vizitat',
         'Best Restaurants': 'Cele mai bune restaurante',
         'Places to Stay': 'Locuri de cazare',
-        'AR Scavenger Hunt': dict.ar.title,
+        'Treasure Hunt': dict.ar.title,
         'Interactive Map': 'Hartă Interactivă',
         'Essential Information': 'Informații esențiale',
         'Your Progress': 'Progresul tău'
@@ -3692,7 +3722,7 @@ function applyTranslations(lang) {
 
     // AR loading text
     const arLoadingP = document.querySelector('#ar-loading p');
-    if (arLoadingP) arLoadingP.textContent = translateMessage('Initializing AR Camera...');
+    if (arLoadingP) arLoadingP.textContent = translateMessage('Initializing Camera...');
 
     // Map CTA
     const mapCtaBtn = document.querySelector('#interactive-map .cta-button');
@@ -3739,7 +3769,7 @@ function applyTranslations(lang) {
     // Translate footer links
     const footerLinks = document.querySelectorAll('.footer-section:nth-child(2) a');
     const linkTranslations = {
-        en: ['Home', 'Scavenger Hunt', 'Map', 'Info'],
+        en: ['Home', 'Treasure Hunt', 'Map', 'Info'],
         ro: ['Acasă', 'Vânătoare', 'Hartă', 'Info']
     };
     footerLinks.forEach((link, idx) => {
@@ -4198,5 +4228,5 @@ if (isHuntPage) {
 document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
-console.log('Testing mode available for AR scavenger hunt');
+console.log('Testing mode available for treasure hunt');
 console.log('User Points System Active - Points saved to account');
