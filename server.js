@@ -560,7 +560,7 @@ app.get('/api/qrcode-extra', (req, res) => {
       return res.status(500).send('QR generation failed');
     }
     res.set('Content-Type', 'image/png');
-    res.set('Cache-Control', 'no-store');
+    res.set('Cache-Control', 'public, max-age=3600');
     res.send(buf);
   });
 });

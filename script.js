@@ -1261,8 +1261,10 @@ function showQRCodeOptions() {
 function addExtraHuntItem(info) {
     const huntItemsContainer = document.querySelector('.hunt-items');
     if (!huntItemsContainer) return;
-    // Avoid duplicates
-    if (huntItemsContainer.querySelector(`[data-extra-location="${CSS.escape(info.key)}"]`)) return;
+    // Avoid duplicates by comparing the data attribute via the DOM dataset property
+    const duplicate = Array.from(huntItemsContainer.querySelectorAll('.hunt-item.extra-location'))
+        .find(el => el.dataset.extraLocation === info.key);
+    if (duplicate) return;
     const item = document.createElement('div');
     item.className = 'hunt-item found extra-location';
     item.dataset.extraLocation = info.key;
