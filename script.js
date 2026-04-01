@@ -1026,7 +1026,7 @@ if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
         return;
     }
     
-    showNotification(`Testing AR at ${huntLocations[targetLocation].name}...`, 'info');
+    showNotification(`Testing at ${huntLocations[targetLocation].name}...`, 'info');
     launchARExperience(targetLocation, true);
 });
 */
@@ -1425,7 +1425,7 @@ async function launchARExperience(locationKey, isTestMode = false) {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
     if (!isSecure && !isLocalhost) {
-        showNotification('AR camera requires HTTPS. Please access the site via https:// to use AR features.', 'error');
+        showNotification('Camera requires HTTPS. Please access the site via https://.', 'error');
         // Fallback to regular discovery for non-HTTPS production
         setTimeout(() => {
             discoverLocation(locationKey);
@@ -1503,7 +1503,7 @@ async function launchARExperience(locationKey, isTestMode = false) {
         // Show user-friendly error message
         let errorMessage = 'Unable to access camera. ';
         if (error.name === 'NotAllowedError') {
-            errorMessage += 'Please allow camera access to use AR features.';
+            errorMessage += 'Please allow camera access to proceed.';
         } else if (error.name === 'NotFoundError') {
             errorMessage += 'No camera found on this device.';
         } else if (error.name === 'NotSupportedError') {
@@ -2115,7 +2115,7 @@ function setupARScene(locationKey) {
 //   https://quaternius.com/packs/ultimateanimals.html (free CC0)
 // place it at /assets/bear.glb and change the URL below.
 const BEAR_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bear/model.gltf';
-const AR_WATERMARK_TEXT = '📍 Rasnov AR Treasure Hunt';
+const AR_WATERMARK_TEXT = '📍 Rasnov Treasure Hunt';
 
 function setupBearAR(locationKey) {
     // Try Three.js 3D bear first.
@@ -3315,7 +3315,7 @@ const I18N = {
         logo: 'Descoperă Râșnov',
         nav: {
             '#home': 'Acasă',
-            '#ar-mode': 'Vânătoare AR',
+            '#ar-mode': 'Vânătoare Comori',
             '#map': 'Hartă',
             '#info': 'Info'
         },
@@ -3330,7 +3330,7 @@ const I18N = {
             unlocks: 'Recompense'
         },
         ar: {
-            title: 'Vânătoare AR',
+            title: 'Vânătoare Comori',
             subtitle: 'Explorează Râșnov într-un mod distractiv și interactiv!',
             startHunt: '<i class="fas fa-play"></i> Începe Vânătoarea',
             scanQr: '<i class="fas fa-qrcode"></i> Scanează QR',
@@ -3424,18 +3424,18 @@ const MESSAGE_MAP = {
         "QR code not recognized. Make sure you\'re at a treasure hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
         'No locations nearby. Keep exploring!': 'Nicio locație în apropiere. Continuați explorarea!',
         'Unable to access camera. ': 'Imposibil de accesat camera. ',
-        'Please allow camera access to use AR features.': 'Permiteți accesul la cameră pentru a folosi funcțiile AR.',
+        'Please allow camera access to proceed.': 'Permiteți accesul la cameră pentru a continua.',
         'No camera found on this device.': 'Nu s-a găsit nicio cameră pe acest dispozitiv.',
         'Camera not supported on this browser. Please use HTTPS.': 'Camera nu este acceptată de acest browser. Folosiți HTTPS.',
         'Please check your camera settings.': 'Verificați setările camerei.',
-        'AR camera requires HTTPS. Please access the site via https:// to use AR features.': 'Camera AR necesită HTTPS. Accesați site-ul prin https:// pentru a folosi funcțiile AR.',
+        'Camera requires HTTPS. Please access the site via https://.': 'Camera necesită HTTPS. Accesați site-ul prin https://.',
         'Map loaded with all locations!': 'Harta încărcată cu toate locațiile!',
         'Map loaded successfully!': 'Harta a fost încărcată cu succes!',
         'Select a QR Code to Scan:': 'Selectați un cod QR pentru scanare:',
-        'Initializing AR Camera...': 'Se inițializează camera AR...',
+        'Initializing Camera...': 'Se inițializează camera...',
         'Treasure hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
         'Treasure hunt stopped.': 'Vânătoarea a fost oprită.',
-        'Testing AR at ': 'Testare AR la ',
+        'Testing at ': 'Testare la ',
         'Interactive map showing all locations, restaurants, and accommodations': 'Hartă interactivă care afișează toate locațiile, restaurantele și cazări',
         'Open now': 'Deschis acum',
         '❌ Closed': '❌ Închis',
@@ -3498,7 +3498,7 @@ function applyTranslations(lang) {
         'Top Locations to Visit': 'Cele mai bune locații de vizitat',
         'Best Restaurants': 'Cele mai bune restaurante',
         'Places to Stay': 'Locuri de cazare',
-        'AR Treasure Hunt': dict.ar.title,
+        'Treasure Hunt': dict.ar.title,
         'Interactive Map': 'Hartă Interactivă',
         'Essential Information': 'Informații esențiale',
         'Your Progress': 'Progresul tău'
@@ -3538,7 +3538,7 @@ function applyTranslations(lang) {
 
     // AR loading text
     const arLoadingP = document.querySelector('#ar-loading p');
-    if (arLoadingP) arLoadingP.textContent = translateMessage('Initializing AR Camera...');
+    if (arLoadingP) arLoadingP.textContent = translateMessage('Initializing Camera...');
 
     // Map CTA
     const mapCtaBtn = document.querySelector('#interactive-map .cta-button');
@@ -3929,5 +3929,5 @@ if (isHuntPage) {
 document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
-console.log('Testing mode available for AR treasure hunt');
+console.log('Testing mode available for treasure hunt');
 console.log('User Points System Active - Points saved to account');
