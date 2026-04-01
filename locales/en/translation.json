@@ -1,0 +1,402 @@
+{
+  "logo": "Discover Rasnov",
+  "nav": {
+    "discover_rasnov": "Discover Rasnov",
+    "treasure_hunt": "Treasure Hunt",
+    "map": "Map",
+    "info": "Info"
+  },
+  "header": {
+    "guest": "Guest",
+    "points": "⭐ 0 pts",
+    "lang_toggle_label": "Change language",
+    "nav_toggle_label": "Toggle navigation",
+    "profile_title": "View profile and points"
+  },
+  "index_hero": {
+    "title": "Welcome to Rasnov",
+    "subtitle": "Explore Historic Fortress, Stunning Nature & Romanian Culture",
+    "cta": "Start Exploring"
+  },
+  "hunt_hero": {
+    "title": "Treasure Hunt",
+    "subtitle": "Scan QR codes at 8 historic Rasnov locations to earn points!"
+  },
+  "tabs": {
+    "locations": "Locations",
+    "restaurants": "Restaurants",
+    "accommodations": "Places to Stay"
+  },
+  "sections": {
+    "top_locations": "Top Locations to Visit",
+    "best_restaurants": "Best Restaurants",
+    "places_to_stay": "Places to Stay",
+    "interactive_map": "Interactive Map",
+    "essential_info": "Essential Information"
+  },
+  "common": {
+    "learn_more": "Learn More",
+    "view_menu": "View Menu",
+    "check_availability": "Check Availability",
+    "free_wifi": "Free WiFi",
+    "full_day": "Full day"
+  },
+  "locations": {
+    "fortress": {
+      "title": "Rasnov Fortress",
+      "desc": "A medieval citadel built by Teutonic Knights in the 13th century. Offers breathtaking panoramic views of the surrounding Carpathian Mountains.",
+      "time": "2-3 hours",
+      "price": "20 RON"
+    },
+    "dinoparc": {
+      "title": "Dino Parc",
+      "desc": "The largest dinosaur park in Southeast Europe with life-size animatronic dinosaurs. Perfect for families and children.",
+      "time": "1-2 hours",
+      "price": "40 RON"
+    },
+    "peak": {
+      "title": "Piatra Mica Peak",
+      "desc": "Hiking trail to a stunning mountain peak. Accessible via cable car or hiking trail, offering spectacular mountain views.",
+      "time": "3-4 hours",
+      "price": "Free (30 RON cable car)"
+    },
+    "museum": {
+      "title": "Village Museum",
+      "desc": "Explore traditional Romanian rural life with authentic houses, tools, and artifacts from the region's history.",
+      "time": "1 hour",
+      "price": "10 RON"
+    },
+    "bran": {
+      "title": "Bran Castle",
+      "desc": "Famous Dracula's Castle, just 15 minutes away. Gothic fortress with fascinating history and stunning architecture.",
+      "time": "2 hours",
+      "price": "45 RON"
+    },
+    "poiana": {
+      "title": "Poiana Brasov Ski Resort",
+      "desc": "Premier ski resort nearby with 23km of slopes. Great for winter sports enthusiasts and summer hiking.",
+      "time": "Full day",
+      "price": "150 RON/day"
+    },
+    "brasov": {
+      "title": "Brasov Old Town",
+      "desc": "Medieval city center with Council Square, Black Church, and charming cobblestone streets. Only 15km away.",
+      "time": "3-4 hours",
+      "price": "Free"
+    },
+    "peles": {
+      "title": "Peles Castle",
+      "desc": "Neo-Renaissance masterpiece in Sinaia. One of Europe's most beautiful castles with 160 lavishly decorated rooms.",
+      "time": "2-3 hours",
+      "price": "50 RON"
+    },
+    "national_park": {
+      "title": "Piatra Craiului National Park",
+      "desc": "Protected natural area with dramatic limestone ridge. Excellent hiking, wildlife watching, and pristine nature.",
+      "time": "Full day",
+      "price": "Free"
+    },
+    "bear_sanctuary": {
+      "title": "Libearty Bear Sanctuary",
+      "desc": "Europe's largest brown bear sanctuary. Home to rescued bears in natural habitat. Educational and ethical tourism.",
+      "time": "1-2 hours",
+      "price": "25 RON"
+    }
+  },
+  "restaurants": {
+    "cetate": {
+      "title": "Cetate Restaurant",
+      "desc": "Traditional Romanian cuisine in the heart of the fortress. Try their famous sarmale and mici with polenta.",
+      "cuisine": "Romanian"
+    },
+    "ceaun": {
+      "title": "La Ceaun",
+      "desc": "Cozy tavern serving hearty mountain dishes. Their ciorbă (sour soup) and grilled trout are must-tries.",
+      "cuisine": "Traditional"
+    },
+    "pizzeria": {
+      "title": "Pizzeria Castello",
+      "desc": "Italian pizzeria with a Romanian twist. Wood-fired pizzas and pasta dishes with local ingredients.",
+      "cuisine": "Italian"
+    },
+    "cafe": {
+      "title": "Cafe Central",
+      "desc": "Modern cafe with excellent coffee, pastries, and light meals. Perfect for breakfast or afternoon break.",
+      "cuisine": "Cafe"
+    },
+    "belvedere_terrace": {
+      "title": "Belvedere Terrace",
+      "desc": "Restaurant with panoramic terrace. International cuisine with spectacular mountain views and sunset dining.",
+      "cuisine": "International"
+    },
+    "grill_house": {
+      "title": "Grill House Rasnov",
+      "desc": "BBQ specialist with outdoor grill. Famous for mixed grills, fresh salads, and local wines.",
+      "cuisine": "BBQ/Grill"
+    },
+    "bistro": {
+      "title": "Bistro Rasnoveana",
+      "desc": "Casual bistro in town center. Daily specials, homemade desserts, and friendly atmosphere.",
+      "cuisine": "Bistro"
+    },
+    "vegetarian": {
+      "title": "Vegetarian Haven",
+      "desc": "Plant-based restaurant with creative dishes. Vegan options, organic ingredients, and healthy bowls.",
+      "cuisine": "Vegetarian"
+    }
+  },
+  "accommodations": {
+    "ambient": {
+      "title": "Hotel Ambient",
+      "desc": "Modern 4-star hotel with spa facilities, mountain views, and excellent breakfast. Close to fortress.",
+      "type": "4 stars"
+    },
+    "belvedere": {
+      "title": "Pension Belvedere",
+      "desc": "Family-run guesthouse with traditional Romanian hospitality. Homemade breakfast and stunning views.",
+      "type": "3 stars"
+    },
+    "petre": {
+      "title": "Casa Petre",
+      "desc": "Charming apartments in the old town. Fully equipped kitchens and authentic Romanian decor.",
+      "type": "Apartment"
+    },
+    "hostel": {
+      "title": "Mountain Hostel",
+      "desc": "Budget-friendly hostel perfect for backpackers. Shared kitchen, common area, and organized hiking trips.",
+      "type": "Hostel"
+    },
+    "villa": {
+      "title": "Villa Carpathia",
+      "desc": "Luxury villa with private garden and pool. Perfect for families or groups seeking privacy and comfort.",
+      "type": "Villa"
+    },
+    "boutique": {
+      "title": "Boutique Hotel Residence",
+      "desc": "Stylish boutique hotel with modern amenities. Rooftop bar, gym, and contemporary design throughout.",
+      "type": "4 stars"
+    },
+    "cabins": {
+      "title": "Mountain Cabins",
+      "desc": "Cozy wooden cabins in nature. Perfect for romantic getaways with fireplace and private terrace.",
+      "type": "Cabin"
+    },
+    "casa_maria": {
+      "title": "Casa Maria B&B",
+      "desc": "Traditional bed and breakfast with local charm. Hearty homemade meals and personal service.",
+      "type": "B&B"
+    }
+  },
+  "map": {
+    "title": "Interactive Map",
+    "description": "Interactive map showing all locations, restaurants, and accommodations",
+    "load_cta": "Load Map"
+  },
+  "info": {
+    "title": "Essential Information",
+    "emergency": {
+      "title": "Emergency",
+      "police": "Police",
+      "police_value": "112",
+      "medical": "Medical",
+      "medical_value": "112",
+      "tourist_info": "Tourist Info",
+      "tourist_info_value": "+40 268 234 567"
+    },
+    "transport": {
+      "title": "Transportation",
+      "bus_to_brasov": "Bus to Brasov",
+      "bus_to_brasov_value": "Every 30 min",
+      "taxi": "Taxi",
+      "taxi_value": "+40 268 111 222",
+      "car_rental": "Car Rental",
+      "car_rental_value": "Available in town"
+    },
+    "language": {
+      "title": "Language",
+      "main": "Main",
+      "main_value": "Romanian",
+      "common": "Common",
+      "common_value": "English, German",
+      "tip": "Tip",
+      "tip_value": "Learn basic phrases"
+    },
+    "currency": {
+      "title": "Currency",
+      "currency": "Currency",
+      "currency_value": "Romanian Leu (RON)",
+      "atms": "ATMs",
+      "atms_value": "Available in town",
+      "cards": "Cards",
+      "cards_value": "Widely accepted"
+    },
+    "hours": {
+      "title": "Opening Hours",
+      "fortress": "Fortress",
+      "fortress_value": "9:00 - 18:00",
+      "shops": "Shops",
+      "shops_value": "10:00 - 20:00",
+      "restaurants": "Restaurants",
+      "restaurants_value": "11:00 - 23:00"
+    },
+    "visit_time": {
+      "title": "Best Time to Visit",
+      "peak": "Peak",
+      "peak_value": "June - August",
+      "shoulder": "Shoulder",
+      "shoulder_value": "May, September",
+      "winter": "Winter",
+      "winter_value": "Skiing nearby"
+    }
+  },
+  "footer": {
+    "about_title": "About Rasnov",
+    "about_text": "Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.",
+    "quick_links": "Quick Links",
+    "contact": "Contact",
+    "home": "Home",
+    "treasure_hunt": "Treasure Hunt",
+    "map": "Map",
+    "info": "Info",
+    "copyright": "© 2026 Discover Rasnov. Made with ❤️ for tourists."
+  },
+  "hunt": {
+    "next_site_label": "Next Site:",
+    "section_title": "Treasure Hunt",
+    "section_subtitle": "Explore Rasnov in a fun, interactive way!",
+    "start_btn": "Start Hunt",
+    "reset_btn": "Reset Hunt",
+    "scan_qr_btn": "Scan QR Code",
+    "tab_hunt": "Hunt",
+    "tab_leaderboard": "Leaderboard",
+    "tab_rewards": "Rewards",
+    "progress_title": "Your Progress",
+    "progress_text": "{{found}} / {{total}} locations found",
+    "items": {
+      "fortress": "Rasnov Fortress Gate",
+      "well": "Ancient Well",
+      "tower": "Watch Tower",
+      "church": "Old Church",
+      "museum": "Village Museum",
+      "peak": "Mountain Peak",
+      "square": "Town Square",
+      "dino": "Dino Park Entrance"
+    },
+    "progress_suffix": "locations found"
+  },
+  "leaderboard": {
+    "title": "🏆 Leaderboard",
+    "subtitle": "Top Rasnov Explorers - Ranked by Points",
+    "your_rank": "Your Rank:",
+    "your_points": "Your Points:",
+    "total_players": "Total Players:",
+    "col_rank": "#",
+    "col_player": "Player",
+    "col_points": "Points",
+    "col_locations": "Locations",
+    "col_status": "Status",
+    "loading": "Loading leaderboard...",
+    "refresh": "Refresh"
+  },
+  "modal": {
+    "qr_scan": {
+      "title": "Scan QR Code",
+      "help": "Point your camera at a QR code at any treasure hunt location"
+    },
+    "welcome": {
+      "title": "Welcome to Rasnov!",
+      "message": "You found your first treasure hunt location! To continue the hunt, visit <strong>{{next}}</strong> next and scan the code!",
+      "continue": "Continue Hunt"
+    },
+    "discovery": {
+      "title": "Location Found!",
+      "continue": "Continue Hunt"
+    },
+    "photo": {
+      "title": "📸 Capture This Location",
+      "help": "Take a photo to add to your Rasnov collage!",
+      "skip": "Skip for now"
+    },
+    "first_discovery": {
+      "title": "🎉 Congratulations!",
+      "message": "You found your first location! Add your name to appear on the leaderboard.",
+      "placeholder": "Your name",
+      "save": "Save Name",
+      "skip": "Skip for now"
+    },
+    "survey": {
+      "title": "Quick Survey",
+      "message": "Would you like to take a quick survey about your time in Rasnov? We look over every response to improve the site!",
+      "reward": "🎁 Unlock a special site theme as a thank you!",
+      "yes": "Yes, take the survey!",
+      "no": "Maybe later"
+    },
+    "survey_form": {
+      "title": "Rasnov Survey",
+      "open_tab": "Open in new tab ↗"
+    },
+    "collage": {
+      "view": "View My Collage"
+    }
+  },
+  "ar": {
+    "loading": "Initializing Camera...",
+    "hunt_text": "Find Grizzly and take a picture!",
+    "place_hint": "Tap the glowing ring to place Grizzly",
+    "you_found": "You found me!",
+    "test_mode": "Test Mode Active"
+  },
+  "dynamic": {
+    "hunt_started": "Hunt Started!",
+    "time_to_find": "Time to find this location",
+    "discovery_msg": "Great job exploring Rasnov!",
+    "you_found_name": "You found {{name}}!",
+    "fun_fact": "Fun Fact",
+    "take_photo": "📸 Take a Photo Here",
+    "celebration_all": "🎉 Amazing! You've found all {{total}} locations and earned {{points}} points! You're a true Rasnov explorer!",
+    "celebration_progress": "📍 {{found}}/{{total}} locations found! Keep exploring Rasnov!",
+    "about": "About",
+    "hours": "Hours",
+    "price": "Price",
+    "tips": "Tips",
+    "menu_highlights": "Menu Highlights",
+    "note": "Note",
+    "description": "Description",
+    "amenities": "Amenities",
+    "book": "Book",
+    "please_start_hunt": "Please start the hunt first!",
+    "getting_location": "Getting your location...",
+    "location_error": "Could not get your location. Please enable location services.",
+    "geolocation_unsupported": "Geolocation is not supported by your browser.",
+    "testing_enabled": "Testing mode enabled! Click on any location to mark it as found.",
+    "testing_disabled": "Testing mode disabled.",
+    "camera_unsupported": "Camera access is not supported on this browser. Please use a modern browser with HTTPS.",
+    "camera_error": "Could not access camera. Testing mode allows manual selection.",
+    "qr_success": "QR Code scanned successfully!",
+    "already_found": "You already found this location!",
+    "qr_unrecognized": "QR code not recognized. Make sure you're at a treasure hunt location.",
+    "no_locations_nearby": "No locations nearby. Keep exploring!",
+    "camera_access_denied": "Unable to access camera. Please allow camera access to proceed.",
+    "no_camera": "No camera found on this device.",
+    "camera_browser_unsupported": "Camera not supported on this browser. Please use HTTPS.",
+    "camera_settings": "Please check your camera settings.",
+    "camera_https_required": "Camera requires HTTPS. Please access the site via https://.",
+    "map_loaded_all": "Map loaded with all locations!",
+    "map_loaded": "Map loaded successfully!",
+    "select_qr": "Select a QR Code to Scan:",
+    "hunt_started_msg": "Treasure hunt started! Find all 8 locations.",
+    "hunt_stopped": "Treasure hunt stopped.",
+    "testing_at": "Testing at ",
+    "map_description_full": "Interactive map showing all locations, restaurants, and accommodations",
+    "open_now": "✅ Open now",
+    "closed": "❌ Closed",
+    "unlocked_by_survey": "Unlocked by survey",
+    "take_survey_to_unlock": "Take the survey to unlock",
+    "lang_changed_en": "Language changed to English",
+    "lang_changed_ro": "Limba a fost schimbată în Română",
+    "ar_move_camera": "Move the camera around and find Grizzly!",
+    "ar_place_grizzly": "Point at the ground, then tap to place Grizzly!",
+    "ar_grizzly_walking": "🐻 Grizzly is walking toward you!",
+    "ar_grizzly_here": "🐻 Grizzly is here! Take a photo!"
+  }
+}
