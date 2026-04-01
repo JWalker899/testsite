@@ -2388,9 +2388,10 @@ body {
     flex-direction: column;
     align-items: center;
     position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, z-index 0s;
+    /* Use CSS variable for rotation so hover can override it without !important */
+    transform: rotate(var(--cell-rot, 0deg));
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: default;
-    /* individual rotation applied via inline style */
 }
 
 /* Decorative tape strip at the top of each cell */
@@ -2409,7 +2410,7 @@ body {
 }
 
 .collage-cell:hover {
-    transform: rotate(0deg) scale(1.08) !important;
+    transform: rotate(0deg) scale(1.08);
     box-shadow: 5px 8px 20px rgba(0,0,0,0.45);
     z-index: 10;
 }

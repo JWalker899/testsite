@@ -1588,7 +1588,9 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
             photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         } else {
             const takePicLabel = currentLang === 'ro' ? '📸 Fă o poză aici' : '📸 Take a Photo Here';
-            photoSection.innerHTML = `<button class="discovery-photo-btn" onclick="startPhotoCapture('${escapeHtml(locationKey)}')">${takePicLabel}</button>`;
+            photoSection.innerHTML = `<button class="discovery-photo-btn" id="discovery-photo-take-btn" data-location="${escapeHtml(locationKey)}">${takePicLabel}</button>`;
+            const takeBtn = document.getElementById('discovery-photo-take-btn');
+            if (takeBtn) takeBtn.addEventListener('click', function() { startPhotoCapture(this.dataset.location); });
         }
     }
 
@@ -4257,7 +4259,7 @@ function buildCollageHTML(totalFound) {
         const loc = huntLocations[key];
         const label = escapeHtml(localizedField(loc, 'name') || loc.name);
         const meta = cellMeta[i % cellMeta.length];
-        const style = `transform: rotate(${meta.rot}deg); --tape-color: ${meta.tape};`;
+        const style = `--cell-rot: ${meta.rot}deg; --tape-color: ${meta.tape};`;
         if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
             return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}"><span class="collage-cell-label">${label}</span></div>`;
         }
