@@ -629,9 +629,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUser();
 });
 
-// ==================== Scavenger Hunt Locations ====================
+// ==================== Treasure Hunt Locations ====================
 
-// Scavenger Hunt Locations (for testing and location-based discovery)
+// Treasure Hunt Locations (for testing and location-based discovery)
 const huntLocations = {
     fortress: { 
         lat: 45.5889, lng: 25.4631, 
@@ -689,12 +689,12 @@ const huntLocations = {
         qr: 'RASNOV_DINO', 
         fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
         fact_ro: 'Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.',
-        hint: 'Congratulations! You\'ve completed the entire Rasnov scavenger hunt! 🎉',
+        hint: 'Congratulations! You\'ve completed the entire Rasnov treasure hunt! 🎉',
         hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov! 🎉'
     }
 };
 
-// Circular hunt order: scanning any location points to the next one in this loop
+// Circular treasure hunt order: scanning any location points to the next one in this loop
 const huntOrder = ['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino'];
 
 // Returns the next unvisited location in the circular order after currentKey.
@@ -912,13 +912,13 @@ async function updateWeather() {
 updateWeather();
 setInterval(updateWeather, 300000); // Update every 5 minutes
 
-// AR Scavenger Hunt Functions
+// AR Treasure Hunt Functions
 if (startHuntBtn) startHuntBtn.addEventListener('click', () => {
     if (!huntActive) {
         huntActive = true;
         startHuntBtn.style.display = 'none';
         resetHuntBtn.style.display = '';
-        showNotification('Scavenger hunt started! Find all 8 locations.', 'success');
+        showNotification('Treasure hunt started! Find all 8 locations.', 'success');
         
         // Enable other buttons
         if (scanQrBtn) scanQrBtn.disabled = false;
@@ -1167,7 +1167,7 @@ function processQRCode(qrData) {
             showNotification('You already found this location!', 'info');
         }
     } else {
-        showNotification('QR code not recognized. Make sure you\'re at a scavenger hunt location.', 'warning');
+        showNotification('QR code not recognized. Make sure you\'re at a treasure hunt location.', 'warning');
     }
 }
 
@@ -1328,7 +1328,7 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
         setTimeout(() => {
             const celebrationMsg = (currentLang === 'ro') 
                 ? `🎉 Felicitări! Ai completat vânătoarea! Total puncte: ${currentUser.totalPoints}` 
-                : `🎉 Congratulations! You completed the scavenger hunt! Total points: ${currentUser.totalPoints}`;
+                : `🎉 Congratulations! You completed the treasure hunt! Total points: ${currentUser.totalPoints}`;
             showNotification(celebrationMsg, 'success');
             huntActive = false;
             if (startHuntBtn) {
@@ -2115,7 +2115,7 @@ function setupARScene(locationKey) {
 //   https://quaternius.com/packs/ultimateanimals.html (free CC0)
 // place it at /assets/bear.glb and change the URL below.
 const BEAR_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/bear/model.gltf';
-const AR_WATERMARK_TEXT = '📍 Rasnov AR Scavenger Hunt';
+const AR_WATERMARK_TEXT = '📍 Rasnov AR Treasure Hunt';
 
 function setupBearAR(locationKey) {
     // Try Three.js 3D bear first.
@@ -2519,7 +2519,7 @@ function discoverLocationQuietly(locationKey) {
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('🎉 Congratulations! You completed the scavenger hunt!', 'success');
+            showNotification('🎉 Congratulations! You completed the treasure hunt!', 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
@@ -3421,7 +3421,7 @@ const MESSAGE_MAP = {
         'Could not access camera. Testing mode allows manual selection.': 'Nu se poate accesa camera. Modul testare permite selecție manuală.',
         'QR Code scanned successfully!': 'Cod QR scanat cu succes!',
         'You already found this location!': 'Ai găsit deja această locație!',
-        "QR code not recognized. Make sure you\'re at a scavenger hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
+        "QR code not recognized. Make sure you\'re at a treasure hunt location.": 'Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.',
         'No locations nearby. Keep exploring!': 'Nicio locație în apropiere. Continuați explorarea!',
         'Unable to access camera. ': 'Imposibil de accesat camera. ',
         'Please allow camera access to use AR features.': 'Permiteți accesul la cameră pentru a folosi funcțiile AR.',
@@ -3433,8 +3433,8 @@ const MESSAGE_MAP = {
         'Map loaded successfully!': 'Harta a fost încărcată cu succes!',
         'Select a QR Code to Scan:': 'Selectați un cod QR pentru scanare:',
         'Initializing AR Camera...': 'Se inițializează camera AR...',
-        'Scavenger hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
-        'Scavenger hunt stopped.': 'Vânătoarea a fost oprită.',
+        'Treasure hunt started! Find all 8 locations.': 'Vânătoarea a început! Găsiți toate cele 8 locații.',
+        'Treasure hunt stopped.': 'Vânătoarea a fost oprită.',
         'Testing AR at ': 'Testare AR la ',
         'Interactive map showing all locations, restaurants, and accommodations': 'Hartă interactivă care afișează toate locațiile, restaurantele și cazări',
         'Open now': 'Deschis acum',
@@ -3498,7 +3498,7 @@ function applyTranslations(lang) {
         'Top Locations to Visit': 'Cele mai bune locații de vizitat',
         'Best Restaurants': 'Cele mai bune restaurante',
         'Places to Stay': 'Locuri de cazare',
-        'AR Scavenger Hunt': dict.ar.title,
+        'AR Treasure Hunt': dict.ar.title,
         'Interactive Map': 'Hartă Interactivă',
         'Essential Information': 'Informații esențiale',
         'Your Progress': 'Progresul tău'
@@ -3585,7 +3585,7 @@ function applyTranslations(lang) {
     // Translate footer links
     const footerLinks = document.querySelectorAll('.footer-section:nth-child(2) a');
     const linkTranslations = {
-        en: ['Home', 'Scavenger Hunt', 'Map', 'Info'],
+        en: ['Home', 'Treasure Hunt', 'Map', 'Info'],
         ro: ['Acasă', 'Vânătoare', 'Hartă', 'Info']
     };
     footerLinks.forEach((link, idx) => {
@@ -3875,7 +3875,7 @@ function renderUnlocksTab() {
     const surveyStarted = localStorage.getItem('rasnov_survey_started') === '1';
     container.innerHTML = `
         <h2 class="section-title">🎨 Theme Unlocks</h2>
-        <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the scavenger hunt to unlock new site themes.</p>
+        <p class="section-subtitle" style="margin-bottom:1.5rem;">Earn points in the treasure hunt to unlock new site themes.</p>
         <div class="theme-cards">
             ${THEMES.map(theme => {
                 const unlocked = theme.surveyRequired ? surveyStarted : userPoints >= theme.pointsRequired;
@@ -3929,5 +3929,5 @@ if (isHuntPage) {
 document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
-console.log('Testing mode available for AR scavenger hunt');
+console.log('Testing mode available for AR treasure hunt');
 console.log('User Points System Active - Points saved to account');
