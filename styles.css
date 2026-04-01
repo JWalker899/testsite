@@ -750,6 +750,27 @@ body {
     color: var(--success-color);
 }
 
+/* Extra (bonus) hunt items – off-track locations */
+.hunt-item.extra-location {
+    background: #fffbf0;
+    border: 2px solid #f0b429;
+}
+
+.hunt-item.extra-location i {
+    color: #f0b429;
+}
+
+.extra-pts-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #c97d00;
+    background: #fff3cd;
+    border: 1px solid #f0b429;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: auto;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
