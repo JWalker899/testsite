@@ -39,6 +39,10 @@ let testingMode = false;
 let foundLocations = new Set();
 let foundExtraLocations = new Set(); // keys of found bonus (off-track) locations
 
+// Quiz state for multiple choice
+let pendingQuizCorrectAnswer = null;
+let selectedQuizAnswer = null;
+
 // Site configuration – loaded from /api/config on startup; falls back to current origin
 let siteDomain = window.location.origin;
 (async function loadSiteConfig() {
@@ -363,6 +367,370 @@ function showPointsNotification(points, bonusPoints = 0, locationName = '') {
         notificationEl.classList.remove('show');
         setTimeout(() => notificationEl.remove(), 300);
     }, 3000);
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function getQuizOptions(correctName) {
+    const allNames = Object.values(huntLocations)
+        .map(loc => (localizedField(loc, 'name') || loc.name || '').trim())
+        .filter(name => name && name !== correctName);
+
+    const uniqueDistractors = Array.from(new Set(allNames));
+    const distractors = [];
+    while (distractors.length < 3 && uniqueDistractors.length > 0) {
+        const idx = Math.floor(Math.random() * uniqueDistractors.length);
+        distractors.push(uniqueDistractors.splice(idx, 1)[0]);
+    }
+
+    const options = [...distractors, correctName];
+    return shuffleArray(options);
+}
+
+function renderQuizOptions(options) {
+    const optionsContainer = document.getElementById('quiz-options');
+    if (!optionsContainer) return;
+    optionsContainer.innerHTML = options.map(option => {
+        const escaped = escapeHtml(option);
+        return `<button type="button" class="quiz-option-btn" data-answer="${escaped}" onclick="handleQuizOptionClick(this)">${escaped}</button>`;
+    }).join('');
+}
+
+function handleQuizOptionClick(button) {
+    if (!button) return;
+
+    selectedQuizAnswer = button.dataset.answer || button.textContent || '';
+
+    document.querySelectorAll('.quiz-option-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn === button);
+    });
+    if (selectedQuizAnswer) {
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+function normalizeText(str) {
+    return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function resetQuizState() {
+    pendingQuizLocationKey = null;
+    pendingQuizExtraInfo = null;
+    pendingQuizIsExtra = false;
+    pendingQuizIsFirstVisit = false;
+    pendingQuizAttempts = 0;
+    pendingQuizCorrectAnswer = null;
+    selectedQuizAnswer = null;
+
+    const optionsContainer = document.getElementById('quiz-options');
+    if (optionsContainer) optionsContainer.innerHTML = '';
+
+    const questionEl = document.getElementById('quiz-question');
+    if (questionEl) questionEl.textContent = 'Please answer this question before you can earn points.';
+
+    const submitBtn = document.querySelector('#quiz-modal .cta-button');
+    if (submitBtn) submitBtn.disabled = true;
+}
+
+function showQuizModalForScannedLocation(locationKey, isFirstVisit = false) {
+    if (!locationKey || !huntLocations[locationKey]) return;
+    pendingQuizLocationKey = locationKey;
+    pendingQuizIsExtra = false;
+    pendingQuizIsFirstVisit = isFirstVisit;
+    pendingQuizAttempts = 0;
+
+    const location = huntLocations[locationKey];
+
+    const questionEl = document.getElementById('quiz-question');
+
+    if (locationKey === 'fortress') {
+        // Special custom question for Rasnov Fortress Gate
+        pendingQuizCorrectAnswer = 'Gabriel Báthory';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'Who captured the Citadel?';
+        }
+
+        const options = shuffleArray([
+            'Gabriel Báthory',
+            'Petre Ancuța',
+            'Florentina Felician',
+            'Gheorghiță Dorel'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'peak') {
+        // Special custom question for Mountain Peak
+        pendingQuizCorrectAnswer = 'Knights of the Teutonic Order';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'Who built the Citadel?';
+        }
+
+        const options = shuffleArray([
+            'Knights of the Teutonic Order',
+            'Lord of Râșnov',
+            'King of Romania',
+            'Unknown'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'square') {
+        // Special custom question for Town Square
+        pendingQuizCorrectAnswer = 'Rose Meadow';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'What is Râșnov named after?';
+        }
+
+        const options = shuffleArray([
+            'Rose Meadow',
+            'A river',
+            'The lord',
+            'Another fortress'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'dino') {
+        // Special custom question for Dino Park Entrance
+        pendingQuizCorrectAnswer = '120';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'How many dinosaurs?';
+        }
+
+        const options = shuffleArray([
+            '120',
+            '111',
+            '127',
+            '77'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'well') {
+        // Special custom question for Ancient Well
+        pendingQuizCorrectAnswer = 'A flood';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'What caused the cave to be discovered?';
+        }
+
+        const options = shuffleArray([
+            'A flood',
+            'An earthquake',
+            'Hikers',
+            'Explosives'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'tower') {
+        // Special custom question for Watch Tower
+        pendingQuizCorrectAnswer = 'A popular play area for children';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'What was Schleif used for in the Middle Ages?';
+        }
+
+        const options = shuffleArray([
+            'A popular play area for children',
+            'A campsite',
+            'A farm',
+            'Nothing Schleif is new'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'church') {
+        // Special custom question for Old Church
+        pendingQuizCorrectAnswer = 'Mioritics Association';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'The Schubz Center is a part of what group?';
+        }
+
+        const options = shuffleArray([
+            'Mioritics Association',
+            'Nexora Labs',
+            'Veridian Core',
+            'Aurelix Group'
+        ]);
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    if (locationKey === 'museum') {
+        // Special custom question for Village Museum
+        pendingQuizCorrectAnswer = 'September 2009';
+        selectedQuizAnswer = null;
+
+        if (questionEl) {
+            questionEl.textContent = 'When was the first Film and History Festival?';
+        }
+
+        const options = [
+            'September 2009',
+            'February 2009',
+            'May 2009',
+            'December 2009'
+        ];
+        renderQuizOptions(options);
+
+        const submitBtn = document.querySelector('#quiz-modal .cta-button');
+        if (submitBtn) submitBtn.disabled = true;
+
+        openModal('quiz-modal');
+        return;
+    }
+
+    const expectedName = localizedField(location, 'name') || location.name;
+    pendingQuizCorrectAnswer = expectedName;
+    selectedQuizAnswer = null;
+
+    if (questionEl) {
+        questionEl.textContent = `Which of the following is this location?`;
+    }
+
+    const options = getQuizOptions(expectedName);
+    renderQuizOptions(options);
+
+    const submitBtn = document.querySelector('#quiz-modal .cta-button');
+    if (submitBtn) submitBtn.disabled = true;
+
+    openModal('quiz-modal');
+}
+
+function showQuizModalForExtraLocation(extraInfo) {
+    if (!extraInfo || !extraInfo.name) return;
+    pendingQuizExtraInfo = extraInfo;
+    pendingQuizIsExtra = true;
+    pendingQuizIsFirstVisit = false;
+    pendingQuizAttempts = 0;
+
+    pendingQuizCorrectAnswer = extraInfo.name;
+    selectedQuizAnswer = null;
+
+    const questionEl = document.getElementById('quiz-question');
+    if (questionEl) {
+        questionEl.textContent = `Which of the following is the bonus location?`;
+    }
+
+    const options = getQuizOptions(extraInfo.name);
+    renderQuizOptions(options);
+
+    const submitBtn = document.querySelector('#quiz-modal .cta-button');
+    if (submitBtn) submitBtn.disabled = true;
+
+    openModal('quiz-modal');
+}
+
+function submitQuizAnswer() {
+    const answer = selectedQuizAnswer ? selectedQuizAnswer.trim() : '';
+    if (!answer) {
+        showNotification('Please select an answer to continue.', 'warning');
+        return;
+    }
+
+    const expected = pendingQuizCorrectAnswer || (pendingQuizIsExtra
+        ? (pendingQuizExtraInfo ? pendingQuizExtraInfo.name : '')
+        : (pendingQuizLocationKey ? (localizedField(huntLocations[pendingQuizLocationKey], 'name') || huntLocations[pendingQuizLocationKey].name) : ''));
+
+    const normalizedAnswer = normalizeText(answer);
+    const normalizedExpected = normalizeText(expected);
+
+    pendingQuizAttempts += 1;
+
+    if (normalizedAnswer === normalizedExpected) {
+        closeModal('quiz-modal');
+        showNotification('Correct answer! Points are now awarded.', 'success');
+
+        if (pendingQuizIsExtra && pendingQuizExtraInfo) {
+            discoverExtraLocation(pendingQuizExtraInfo);
+        } else if (pendingQuizLocationKey) {
+            discoverLocation(pendingQuizLocationKey, pendingQuizIsFirstVisit);
+        }
+
+        resetQuizState();
+        return;
+    }
+
+    if (pendingQuizAttempts < MAX_QUIZ_ATTEMPTS) {
+        const remaining = MAX_QUIZ_ATTEMPTS - pendingQuizAttempts;
+        showNotification(`That answer is not correct. Please try again. (${remaining} attempts left)`, 'warning');
+        return;
+    }
+
+    // Max attempts reached: abort awarding points for this scan
+    closeModal('quiz-modal');
+    showNotification('Maximum attempts reached. No points awarded for this scan.', 'error');
+    resetQuizState();
+}
+
+function skipQuizQuestion() {
+    closeModal('quiz-modal');
+    showNotification('Quiz skipped. No points awarded yet. Scan the QR code again when ready.', 'info');
+    resetQuizState();
 }
 
 // Show user profile modal
@@ -1132,6 +1500,14 @@ let qrScannerActive = false;
 let qrScannerCanvas = null;
 let qrScannerContext = null;
 
+// Quiz gating state: require a question answer before awarding points
+let pendingQuizLocationKey = null;
+let pendingQuizExtraInfo = null;
+let pendingQuizIsExtra = false;
+let pendingQuizIsFirstVisit = false;
+let pendingQuizAttempts = 0;
+const MAX_QUIZ_ATTEMPTS = 3;
+
 // Simple photo capture (no AR) — used after QR code discovery
 let photoCaptureStream = null;
 let photoCaptureLocationKey = null;
@@ -1403,18 +1779,18 @@ function processQRCode(qrData) {
         if (!foundLocations.has(foundLocationKey)) {
             qrScannerActive = false;
             const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
-            discoverLocation(foundLocationKey, isFirstVisit);
             closeModal('qr-modal');
-            showNotification('QR Code scanned successfully!', 'success');
+            showNotification('QR Code scanned successfully! Answer a quick question to earn points.', 'success');
+            showQuizModalForScannedLocation(foundLocationKey, isFirstVisit);
         } else {
             showNotification('You already found this location!', 'info');
         }
     } else if (extraLocationInfo) {
         if (!foundExtraLocations.has(extraLocationInfo.key)) {
             qrScannerActive = false;
-            discoverExtraLocation(extraLocationInfo);
             closeModal('qr-modal');
-            showNotification('QR Code scanned successfully!', 'success');
+            showNotification('QR Code scanned successfully! Answer a quick question to earn points.', 'success');
+            showQuizModalForExtraLocation(extraLocationInfo);
         } else {
             showNotification('You already found this location!', 'info');
         }
@@ -1501,8 +1877,9 @@ async function discoverExtraLocation(info) {
 function simulateQRScan(locationKey) {
     if (huntLocations[locationKey] && !foundLocations.has(locationKey)) {
         const isFirstVisit = foundLocations.size === 0;
-        discoverLocation(locationKey, isFirstVisit);
         closeModal('qr-modal');
+        showNotification('Simulated QR scan successful! Answer a quick question to earn points.', 'success');
+        showQuizModalForScannedLocation(locationKey, isFirstVisit);
     } else if (foundLocations.has(locationKey)) {
         showNotification('You already found this location!', 'info');
     }
@@ -2973,6 +3350,11 @@ function closeModal(modalId) {
                 video.srcObject.getTracks().forEach(track => track.stop());
                 video.srcObject = null;
             }
+        }
+
+        // Reset quiz state if quiz modal is closed
+        if (modalId === 'quiz-modal') {
+            resetQuizState();
         }
 
         // Clear reset-progress confirmation timer if profile modal is closed
