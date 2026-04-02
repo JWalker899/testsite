@@ -1,0 +1,112 @@
+{
+  "order": ["fortress", "well", "tower", "church", "museum", "peak", "square", "dino"],
+  "locations": {
+    "fortress": {
+      "name": "Rasnov Fortress Gate",
+      "qrWord": "RASNOV_FORTRESS",
+      "lat": 45.5889,
+      "lng": 25.4631,
+      "fact": "The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.",
+      "hint": "Next, discover the legendary source of water that saved the fortress during sieges - the Ancient Well!",
+      "quiz": {
+        "question": "Who captured the Citadel?",
+        "answer": "Gabriel Báthory",
+        "options": ["Gabriel Báthory", "Petre Ancuța", "Florentina Felician", "Gheorghiță Dorel"]
+      }
+    },
+    "well": {
+      "name": "Ancient Well",
+      "qrWord": "RASNOV_WELL",
+      "lat": 45.5892,
+      "lng": 25.4635,
+      "fact": "This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.",
+      "hint": "Now climb high to the Watch Tower where guards kept lookout for approaching enemies!",
+      "quiz": {
+        "question": "What caused the cave to be discovered?",
+        "answer": "A flood",
+        "options": ["A flood", "An earthquake", "Hikers", "Explosives"]
+      }
+    },
+    "tower": {
+      "name": "Watch Tower",
+      "qrWord": "RASNOV_TOWER",
+      "lat": 45.5885,
+      "lng": 25.4640,
+      "fact": "The watch tower provided 360-degree views to spot approaching enemies from miles away.",
+      "hint": "Seek the Old Church where villagers found sanctuary and spiritual guidance for centuries!",
+      "quiz": {
+        "question": "What was Schleif used for in the Middle Ages?",
+        "answer": "A popular play area for children",
+        "options": ["A popular play area for children", "A campsite", "A farm", "Nothing Schleif is new"]
+      }
+    },
+    "church": {
+      "name": "Old Church",
+      "qrWord": "RASNOV_CHURCH",
+      "lat": 45.5890,
+      "lng": 25.4638,
+      "fact": "This Gothic church dates back to the 14th century and still holds services today.",
+      "hint": "Journey to the Village Museum to explore authentic Romanian traditions and artifacts!",
+      "quiz": {
+        "question": "The Schubz Center is a part of what group?",
+        "answer": "Mioritics Association",
+        "options": ["Mioritics Association", "Nexora Labs", "Veridian Core", "Aurelix Group"]
+      }
+    },
+    "museum": {
+      "name": "Village Museum",
+      "qrWord": "RASNOV_MUSEUM",
+      "lat": 45.5850,
+      "lng": 25.4600,
+      "fact": "The museum houses over 300 artifacts showcasing traditional Romanian village life.",
+      "hint": "Adventure awaits at the Mountain Peak - breathtaking views from 1650m elevation!",
+      "quiz": {
+        "question": "When was the first Film and History Festival?",
+        "answer": "September 2009",
+        "options": ["September 2009", "February 2009", "May 2009", "December 2009"]
+      }
+    },
+    "peak": {
+      "name": "Mountain Peak",
+      "qrWord": "RASNOV_PEAK",
+      "lat": 45.5700,
+      "lng": 25.4500,
+      "fact": "At 1650m elevation, this peak offers views of the entire Barsa region on clear days.",
+      "hint": "Head down to the historic Town Square where markets and festivals have thrived for 600 years!",
+      "quiz": {
+        "question": "Who built the Citadel?",
+        "answer": "Knights of the Teutonic Order",
+        "options": ["Knights of the Teutonic Order", "Lord of Râșnov", "King of Romania", "Unknown"]
+      }
+    },
+    "square": {
+      "name": "Town Square",
+      "qrWord": "RASNOV_SQUARE",
+      "lat": 45.5880,
+      "lng": 25.4620,
+      "fact": "The town square has been a gathering place for markets and festivals for over 600 years.",
+      "hint": "One more adventure awaits - visit the amazing Dino Park with life-size dinosaur replicas!",
+      "quiz": {
+        "question": "What is Râșnov named after?",
+        "answer": "Rose Meadow",
+        "options": ["Rose Meadow", "A river", "The lord", "Another fortress"]
+      }
+    },
+    "dino": {
+      "name": "Dino Park Entrance",
+      "name_ro": "Intrarea Dino Parc",
+      "qrWord": "RASNOV_DINO",
+      "lat": 45.5895,
+      "lng": 25.4625,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    }
+  }
+}

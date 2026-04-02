@@ -449,192 +449,17 @@ function showQuizModalForScannedLocation(locationKey, isFirstVisit = false) {
     pendingQuizAttempts = 0;
 
     const location = huntLocations[locationKey];
-
     const questionEl = document.getElementById('quiz-question');
 
-    if (locationKey === 'fortress') {
-        // Special custom question for Rasnov Fortress Gate
-        pendingQuizCorrectAnswer = 'Gabriel Báthory';
+    if (location.quiz && location.quiz.question) {
+        pendingQuizCorrectAnswer = location.quiz.answer;
         selectedQuizAnswer = null;
 
         if (questionEl) {
-            questionEl.textContent = 'Who captured the Citadel?';
+            questionEl.textContent = location.quiz.question;
         }
 
-        const options = shuffleArray([
-            'Gabriel Báthory',
-            'Petre Ancuța',
-            'Florentina Felician',
-            'Gheorghiță Dorel'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'peak') {
-        // Special custom question for Mountain Peak
-        pendingQuizCorrectAnswer = 'Knights of the Teutonic Order';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'Who built the Citadel?';
-        }
-
-        const options = shuffleArray([
-            'Knights of the Teutonic Order',
-            'Lord of Râșnov',
-            'King of Romania',
-            'Unknown'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'square') {
-        // Special custom question for Town Square
-        pendingQuizCorrectAnswer = 'Rose Meadow';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'What is Râșnov named after?';
-        }
-
-        const options = shuffleArray([
-            'Rose Meadow',
-            'A river',
-            'The lord',
-            'Another fortress'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'dino') {
-        // Special custom question for Dino Park Entrance
-        pendingQuizCorrectAnswer = '120';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'How many dinosaurs?';
-        }
-
-        const options = shuffleArray([
-            '120',
-            '111',
-            '127',
-            '77'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'well') {
-        // Special custom question for Ancient Well
-        pendingQuizCorrectAnswer = 'A flood';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'What caused the cave to be discovered?';
-        }
-
-        const options = shuffleArray([
-            'A flood',
-            'An earthquake',
-            'Hikers',
-            'Explosives'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'tower') {
-        // Special custom question for Watch Tower
-        pendingQuizCorrectAnswer = 'A popular play area for children';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'What was Schleif used for in the Middle Ages?';
-        }
-
-        const options = shuffleArray([
-            'A popular play area for children',
-            'A campsite',
-            'A farm',
-            'Nothing Schleif is new'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'church') {
-        // Special custom question for Old Church
-        pendingQuizCorrectAnswer = 'Mioritics Association';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'The Schubz Center is a part of what group?';
-        }
-
-        const options = shuffleArray([
-            'Mioritics Association',
-            'Nexora Labs',
-            'Veridian Core',
-            'Aurelix Group'
-        ]);
-        renderQuizOptions(options);
-
-        const submitBtn = document.querySelector('#quiz-modal .cta-button');
-        if (submitBtn) submitBtn.disabled = true;
-
-        openModal('quiz-modal');
-        return;
-    }
-
-    if (locationKey === 'museum') {
-        // Special custom question for Village Museum
-        pendingQuizCorrectAnswer = 'September 2009';
-        selectedQuizAnswer = null;
-
-        if (questionEl) {
-            questionEl.textContent = 'When was the first Film and History Festival?';
-        }
-
-        const options = [
-            'September 2009',
-            'February 2009',
-            'May 2009',
-            'December 2009'
-        ];
+        const options = shuffleArray([...location.quiz.options]);
         renderQuizOptions(options);
 
         const submitBtn = document.querySelector('#quiz-modal .cta-button');
@@ -1060,71 +885,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ==================== Treasure Hunt Locations ====================
 
-// Treasure Hunt Locations (for testing and location-based discovery)
-const huntLocations = {
-    fortress: { 
-        lat: 45.5889, lng: 25.4631, 
-        name: 'Rasnov Fortress Gate', 
-        qr: 'RASNOV_FORTRESS', 
-        fact: 'The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.',
-        hint: 'Next, discover the legendary source of water that saved the fortress during sieges - the Ancient Well!'
-    },
-    well: { 
-        lat: 45.5892, lng: 25.4635, 
-        name: 'Ancient Well', 
-        qr: 'RASNOV_WELL', 
-        fact: 'This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.',
-        hint: 'Now climb high to the Watch Tower where guards kept lookout for approaching enemies!'
-    },
-    tower: { 
-        lat: 45.5885, lng: 25.4640, 
-        name: 'Watch Tower', 
-        qr: 'RASNOV_TOWER', 
-        fact: 'The watch tower provided 360-degree views to spot approaching enemies from miles away.',
-        hint: 'Seek the Old Church where villagers found sanctuary and spiritual guidance for centuries!'
-    },
-    church: { 
-        lat: 45.5890, lng: 25.4638, 
-        name: 'Old Church', 
-        qr: 'RASNOV_CHURCH', 
-        fact: 'This Gothic church dates back to the 14th century and still holds services today.',
-        hint: 'Journey to the Village Museum to explore authentic Romanian traditions and artifacts!'
-    },
-    museum: { 
-        lat: 45.5850, lng: 25.4600, 
-        name: 'Village Museum', 
-        qr: 'RASNOV_MUSEUM', 
-        fact: 'The museum houses over 300 artifacts showcasing traditional Romanian village life.',
-        hint: 'Adventure awaits at the Mountain Peak - breathtaking views from 1650m elevation!'
-    },
-    peak: { 
-        lat: 45.5700, lng: 25.4500, 
-        name: 'Mountain Peak', 
-        qr: 'RASNOV_PEAK', 
-        fact: 'At 1650m elevation, this peak offers views of the entire Barsa region on clear days.',
-        hint: 'Head down to the historic Town Square where markets and festivals have thrived for 600 years!'
-    },
-    square: { 
-        lat: 45.5880, lng: 25.4620, 
-        name: 'Town Square', 
-        qr: 'RASNOV_SQUARE', 
-        fact: 'The town square has been a gathering place for markets and festivals for over 600 years.',
-        hint: 'One more adventure awaits - visit the amazing Dino Park with life-size dinosaur replicas!'
-    },
-    dino: { 
-        lat: 45.5895, lng: 25.4625, 
-        name: 'Dino Park Entrance', 
-        name_ro: 'Intrarea Dino Parc',
-        qr: 'RASNOV_DINO', 
-        fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
-        fact_ro: 'Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.',
-        hint: 'Congratulations! You\'ve completed the entire Rasnov treasure hunt!',
-        hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov!'
-    }
-};
+// Hunt data loaded from data/scavenger-data.json at startup
+let huntLocations = {};
+let huntOrder = [];
 
-// Circular treasure hunt order: scanning any location points to the next one in this loop
-const huntOrder = ['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino'];
+async function loadScavengerData() {
+    try {
+        const response = await fetch('./data/scavenger-data.json');
+        if (!response.ok) throw new Error('Failed to fetch scavenger-data.json');
+        const data = await response.json();
+        huntLocations = data.locations || {};
+        huntOrder = data.order || [];
+        console.log('✅ Loaded scavenger data from scavenger-data.json');
+    } catch (e) {
+        console.error('❌ Could not load scavenger data:', e.message);
+    }
+}
 
 // Returns the next unvisited location in the circular order after currentKey.
 // Returns null if all locations have been found.
@@ -4728,20 +4504,23 @@ initializeUser();
     if (saved && saved !== 'default') applyTheme(saved);
 })();
 
-// Hunt-page-only initialization
-if (isHuntPage) {
-    // Initialize button states (before restoreHuntState which may re-enable them)
-    if (scanQrBtn) scanQrBtn.disabled = true;
+// Load scavenger data, then finish hunt-page initialization
+loadScavengerData().then(() => {
+    // Hunt-page-only initialization
+    if (isHuntPage) {
+        // Initialize button states (before restoreHuntState which may re-enable them)
+        if (scanQrBtn) scanQrBtn.disabled = true;
 
-    // Restore hunt state (found locations, photos, button states) from saved data
-    restoreHuntState();
+        // Restore hunt state (found locations, photos, button states) from saved data
+        restoreHuntState();
 
-    // Initialize progress display
-    updateProgress();
+        // Initialize progress display
+        updateProgress();
 
-    // Handle QR code URL parameters (?location=...) from scanned QR codes
-    handleURLParameters();
-}
+        // Handle QR code URL parameters (?location=...) from scanned QR codes
+        handleURLParameters();
+    }
+});
 
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';

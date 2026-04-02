@@ -98,6 +98,18 @@ const COMPLETION_BONUS = 50;
 const PHOTOS_DIR = path.join(__dirname, 'assets', 'place-photos');
 const PLACES_DATA_FILE = path.join(__dirname, 'data', 'places-data.json');
 const SAMPLE_DATA_FILE = path.join(__dirname, 'data', 'sample-places-data.json');
+const SCAVENGER_DATA_FILE = path.join(__dirname, 'data', 'scavenger-data.json');
+
+// Load valid QR location keys from scavenger-data.json (falls back to empty set on error)
+function loadValidQRLocations() {
+  try {
+    const data = JSON.parse(fs.readFileSync(SCAVENGER_DATA_FILE, 'utf8'));
+    return new Set(Object.keys(data.locations || {}));
+  } catch (e) {
+    console.warn('Could not load scavenger data for QR validation:', e.message);
+    return new Set();
+  }
+}
 
 /**
  * Load places data, reloading from disk whenever the source file changes.
@@ -529,7 +541,7 @@ app.get('/api/config', (req, res) => {
 
 // QR code image endpoint – used by the /qrcodes debug page.
 // Generates a PNG QR code for the given absolute URL query parameter.
-const VALID_QR_LOCATIONS = new Set(['fortress', 'well', 'tower', 'church', 'museum', 'peak', 'square', 'dino']);
+const VALID_QR_LOCATIONS = loadValidQRLocations();
 app.get('/api/qrcode', (req, res) => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
   if (isRateLimited(ip)) {
