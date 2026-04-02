@@ -1042,6 +1042,20 @@ function displayLeaderboard(leaderboard) {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize user session and other startup tasks
     initializeUser();
+
+    // Auto-load the map when the map section scrolls into view
+    const mapSection = document.getElementById('map');
+    if (mapSection) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    loadMap();
+                    observer.disconnect();
+                }
+            });
+        }, { threshold: 0.1 });
+        observer.observe(mapSection);
+    }
 });
 
 // ==================== Treasure Hunt Locations ====================
@@ -3801,6 +3815,10 @@ let map = null;
 
 function loadMap() {
     const mapDiv = document.getElementById('interactive-map');
+    if (!mapDiv) return;
+    
+    // Prevent double-initialization
+    if (window.map || document.getElementById('map-display')) return;
     
     // Check if Leaflet library is available
     if (typeof L === 'undefined') {
