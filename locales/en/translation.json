@@ -241,7 +241,7 @@
     "colPlayer": "Player",
     "colPoints": "Points",
     "colLocations": "Locations",
-    "colStatus": "Status",
+    "colTime": "Time",
     "loading": "Loading leaderboard...",
     "refresh": "Refresh"
   },

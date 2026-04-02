@@ -355,6 +355,7 @@ app.post('/api/user/create', (req, res) => {
     totalPoints: 0,
     locationsFound: [],
     completedAt: null,
+    firstScanAt: null,
     createdAt: new Date().toISOString()
   };
 
@@ -431,7 +432,9 @@ app.post('/api/user/:uuid/location-found', (req, res) => {
   // Award points
   const points = POINTS_PER_LOCATION;
   user.totalPoints += points;
-  user.lastLocationAt = new Date().toISOString();
+  const now = new Date().toISOString();
+  if (!user.firstScanAt) user.firstScanAt = now;
+  user.lastLocationAt = now;
 
   // Award completion bonus if hunt is complete
   if (isCompletion) {
@@ -482,7 +485,9 @@ app.post('/api/user/:uuid/extra-found', (req, res) => {
 
   user.locationsFound.push(locationKey);
   user.totalPoints += points;
-  user.lastLocationAt = new Date().toISOString();
+  const now = new Date().toISOString();
+  if (!user.firstScanAt) user.firstScanAt = now;
+  user.lastLocationAt = now;
 
   saveLeaderboardData();
 
@@ -507,6 +512,7 @@ app.post('/api/user/:uuid/reset', (req, res) => {
   user.locationsFound = [];
   user.totalPoints = 0;
   user.completedAt = null;
+  user.firstScanAt = null;
   user.lastLocationAt = null;
 
   saveLeaderboardData();
@@ -518,7 +524,13 @@ app.post('/api/user/:uuid/reset', (req, res) => {
 app.get('/api/leaderboard', (req, res) => {
   const leaderboard = Object.values(userAccounts)
     .filter(u => u.totalPoints > 0 || u.locationsFound.length > 0)
-    .sort((a, b) => b.totalPoints - a.totalPoints)
+    .sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      // Tie-break: faster elapsed time ranks higher; no-time ranks last
+      const elapsedA = a.firstScanAt && a.lastLocationAt ? new Date(a.lastLocationAt) - new Date(a.firstScanAt) : Infinity;
+      const elapsedB = b.firstScanAt && b.lastLocationAt ? new Date(b.lastLocationAt) - new Date(b.firstScanAt) : Infinity;
+      return elapsedA - elapsedB;
+    })
     .slice(0, 50)
     .map((user, index) => ({
       rank: index + 1,
@@ -526,7 +538,9 @@ app.get('/api/leaderboard', (req, res) => {
       username: user.displayName || `Explorer_${user.uuid.substring(0, 6)}`,
       totalPoints: user.totalPoints,
       locationsFound: user.locationsFound.length,
-      completedAt: user.completedAt
+      completedAt: user.completedAt,
+      firstScanAt: user.firstScanAt || null,
+      lastLocationAt: user.lastLocationAt || null
     }));
 
   res.json(leaderboard);

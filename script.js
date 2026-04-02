@@ -761,6 +761,20 @@ function restoreHuntState() {
 
 // ==================== Leaderboard System ====================
 
+// Format elapsed hunt time (first scan to last scan) as a human-readable string
+function formatHuntTime(firstScanAt, lastLocationAt) {
+    if (!firstScanAt || !lastLocationAt) return '-';
+    const elapsedMs = new Date(lastLocationAt) - new Date(firstScanAt);
+    if (elapsedMs < 0) return '-';
+    const totalSeconds = Math.floor(elapsedMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+}
+
 // Load and display leaderboard
 async function loadLeaderboard() {
     try {
@@ -805,10 +819,9 @@ function displayLeaderboard(leaderboard) {
         const topClass = rank <= 3 ? `top-3 rank-${rank}` : '';
         const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
         
-        const statusClass = player.completedAt ? 'completed' : 'in-progress';
-        const statusIcon = player.completedAt ? '✅' : '🔄';
-        const statusText = player.completedAt ? 'Completed' : 'In Progress';
-        
+        const timeDisplay = formatHuntTime(player.firstScanAt, player.lastLocationAt);
+        const timeClass = player.completedAt ? 'finish-time' : 'hunt-time';
+
         const highlightClass = isCurrentUser ? ' style="background: #e3f2fd; font-weight: 600;"' : '';
         
         return `
@@ -828,10 +841,8 @@ function displayLeaderboard(leaderboard) {
                 <td class="locations-col">
                     ${player.locationsFound} / 8
                 </td>
-                <td class="status-col">
-                    <span class="completion-status ${statusClass}">
-                        ${statusIcon} ${statusText}
-                    </span>
+                <td class="time-col">
+                    <span class="${timeClass}">⏱️ ${timeDisplay}</span>
                 </td>
             </tr>
         `;

@@ -418,7 +418,7 @@ body {
     text-align: center;
 }
 
-.status-col {
+.time-col {
     width: 120px;
     text-align: center;
 }
@@ -508,7 +508,7 @@ body {
     font-size: 1.1rem;
 }
 
-.completion-status {
+.hunt-time, .finish-time {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -518,14 +518,14 @@ body {
     font-weight: 600;
 }
 
-.completion-status.completed {
-    background: #d4edda;
-    color: #155724;
+.finish-time {
+    color: #b8860b;
+    background: #fff8e1;
 }
 
-.completion-status.in-progress {
-    background: #fff3cd;
-    color: #856404;
+.hunt-time {
+    color: #555;
+    background: #f5f5f5;
 }
 
 .loading-row {
