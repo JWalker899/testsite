@@ -1043,19 +1043,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize user session and other startup tasks
     initializeUser();
 
-    // Auto-load the map when the map section scrolls into view
-    const mapSection = document.getElementById('map');
-    if (mapSection) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    loadMap();
-                    observer.disconnect();
-                }
-            });
-        }, { threshold: 0.1 });
-        observer.observe(mapSection);
-    }
+    // Auto-load the map immediately when the page loads
+    loadMap();
 });
 
 // ==================== Treasure Hunt Locations ====================
