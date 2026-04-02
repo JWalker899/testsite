@@ -500,6 +500,14 @@ function resetProgress() {
 
     closeModal('user-profile-modal');
     showNotification('Progress reset successfully', 'info');
+
+    // Sync reset to server to remove user from leaderboard
+    if (currentUser && currentUser.uuid) {
+        fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/reset`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).catch(e => console.log('Could not sync reset to server:', e.message));
+    }
 }
 
 // Add a saved photo thumbnail to a hunt item element
