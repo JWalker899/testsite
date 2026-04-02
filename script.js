@@ -3779,7 +3779,10 @@ function showCollageUnlockModal(tier) {
     const badgeEl = document.getElementById('collage-unlock-badge');
     const titleEl = document.getElementById('collage-unlock-title');
     const msgEl = document.getElementById('collage-unlock-msg');
-    if (badgeEl) badgeEl.textContent = isGold ? '🥇' : '🥈';
+    if (badgeEl) {
+        badgeEl.textContent = isGold ? 'Gold' : 'Silver';
+        badgeEl.className = `collage-modal-badge ${tier}`;
+    }
     if (titleEl) titleEl.textContent = isGold ? 'Gold Collage Unlocked!' : 'Silver Collage Unlocked!';
     if (msgEl) msgEl.textContent = isGold
         ? "You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!"
@@ -3797,7 +3800,7 @@ function buildCollageHTML(totalFound) {
     const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
     const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
     const tierLabelHTML = tier
-        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? '🥇 Gold Collage' : '🥈 Silver Collage'}</div>`
+        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? 'Gold Collage' : 'Silver Collage'}</div>`
         : '';
 
     const collageStyle = localStorage.getItem('rasnov_collage_style') || 'polaroid';
@@ -3830,14 +3833,33 @@ function buildCollageHTML(totalFound) {
         </div>`;
     }
 
-    const cells = photoKeys.map((key, i) => {
-        const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
-        const loc = huntLocations[key];
-        const label = escapeHtml(localizedField(loc, 'name') || loc.name);
-        const meta = cellMeta[i % cellMeta.length];
-        const style = `--cell-rot: ${meta.rot}deg; --tape-color: ${meta.tape};`;
-        return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}" loading="lazy"><span class="collage-cell-label">${label}</span></div>`;
-    }).join('');
+    // Build grid cells – hexagon uses explicit rows for proper tiling
+    let cells;
+    if (collageStyle === 'hexagon') {
+        const hexPerRow = 3;
+        const hexRows = [];
+        for (let rowIdx = 0; rowIdx * hexPerRow < photoKeys.length; rowIdx++) {
+            const rowKeys = photoKeys.slice(rowIdx * hexPerRow, (rowIdx + 1) * hexPerRow);
+            const rowCells = rowKeys.map(key => {
+                const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
+                const loc = huntLocations[key];
+                const label = escapeHtml(localizedField(loc, 'name') || loc.name);
+                return `<div class="collage-cell"><img src="${savedPhoto}" alt="${label}" loading="lazy"><span class="collage-cell-label">${label}</span></div>`;
+            }).join('');
+            const oddClass = rowIdx % 2 === 1 ? 'hex-row-odd' : '';
+            hexRows.push(`<div class="hex-row ${oddClass}">${rowCells}</div>`);
+        }
+        cells = hexRows.join('');
+    } else {
+        cells = photoKeys.map((key, i) => {
+            const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
+            const loc = huntLocations[key];
+            const label = escapeHtml(localizedField(loc, 'name') || loc.name);
+            const meta = cellMeta[i % cellMeta.length];
+            const style = `--cell-rot: ${meta.rot}deg; --tape-color: ${meta.tape};`;
+            return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}" loading="lazy"><span class="collage-cell-label">${label}</span></div>`;
+        }).join('');
+    }
 
     const styleButtons = `
         <div class="collage-style-switcher">
@@ -3862,17 +3884,12 @@ function buildCollageHTML(totalFound) {
     })();
     const dateHTML = tripDate ? `<span class="collage-date">${tripDate}</span>` : '';
 
-    const shareText = encodeURIComponent('Check out my Rasnov exploration! #discoverrasnov');
-    const shareUrl = encodeURIComponent('https://discoverrasnov.com');
-    const shareHTML = tier ? `
-        <div class="social-share-row">
-            <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn twitter"><i class="fab fa-twitter"></i> X / Twitter</a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${shareText}" target="_blank" rel="noopener noreferrer" class="share-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
-            <a href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener noreferrer" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-            <span class="share-btn instagram" title="Open Instagram and post manually with #discoverrasnov"><i class="fab fa-instagram"></i> Instagram*</span>
+    const shareHTML = `
+        <div class="collage-action-row">
+            <button class="collage-download-btn" onclick="downloadCollage()">📥 Download</button>
+            <button class="collage-share-btn" onclick="shareCollageNative()">📤 Share</button>
         </div>
-        <p class="collage-instagram-note">*Instagram does not support direct web sharing. Open Instagram and post with <strong>#discoverrasnov</strong>.</p>
-    ` : '';
+    `;
 
     return `<div class="collage-wrapper ${borderClass} collage-style-${collageStyle}">
         <div class="collage-header">
@@ -3885,6 +3902,175 @@ function buildCollageHTML(totalFound) {
         <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
         ${shareHTML}
     </div>`;
+}
+
+// Build an off-screen canvas with the collage photos arranged in a grid
+async function buildCollageCanvas() {
+    const locationKeys = Object.keys(huntLocations);
+    const photoKeys = locationKeys.filter(key => {
+        const photo = localStorage.getItem(`ar_photo_${key}`);
+        return photo && photo.startsWith('data:image/jpeg;base64,');
+    });
+    if (photoKeys.length === 0) return null;
+
+    const totalFound = foundLocations.size + foundExtraLocations.size;
+    const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
+
+    const COLS = 3;
+    const CELL = 220;
+    const GAP = 6;
+    const PAD = 20;
+    const BORDER = tier ? 10 : 0;
+    const HEADER_H = 52;
+    const FOOTER_H = 32;
+
+    const rows = Math.ceil(photoKeys.length / COLS);
+    const innerW = COLS * CELL + (COLS - 1) * GAP;
+    const innerH = rows * CELL + (rows - 1) * GAP;
+    const totalW = innerW + 2 * PAD + 2 * BORDER;
+    const totalH = innerH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = totalW;
+    canvas.height = totalH;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    const bg = ctx.createLinearGradient(0, 0, totalW, totalH);
+    bg.addColorStop(0, '#c8a87a');
+    bg.addColorStop(1, '#b08050');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, totalW, totalH);
+
+    // Tier border
+    if (tier) {
+        const borderColor = tier === 'gold' ? '#c9a227' : '#b0aeb7';
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = BORDER * 2;
+        ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+    }
+
+    // Header
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
+
+    if (tier) {
+        const label = tier === 'gold' ? 'GOLD' : 'SILVER';
+        const labelW = 60;
+        const lx = totalW - PAD - BORDER - labelW;
+        const ly = BORDER + (HEADER_H - 20) / 2;
+        const grad = ctx.createLinearGradient(lx, ly, lx + labelW, ly + 20);
+        if (tier === 'gold') {
+            grad.addColorStop(0, '#ffe066'); grad.addColorStop(0.5, '#c9a227'); grad.addColorStop(1, '#ffe57a');
+        } else {
+            grad.addColorStop(0, '#e8e8ee'); grad.addColorStop(0.5, '#b0aeb7'); grad.addColorStop(1, '#f0f0f4');
+        }
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(lx, ly, labelW, 20, 10);
+        } else {
+            ctx.rect(lx, ly, labelW, 20);
+        }
+        ctx.fill();
+        ctx.fillStyle = tier === 'gold' ? '#3a2800' : '#1a1a2e';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, lx + labelW / 2, ly + 10);
+        ctx.textAlign = 'left';
+    }
+
+    // Photos
+    const loadImage = src => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+
+    for (let i = 0; i < photoKeys.length; i++) {
+        const col = i % COLS;
+        const row = Math.floor(i / COLS);
+        const x = BORDER + PAD + col * (CELL + GAP);
+        const y = BORDER + PAD + HEADER_H + row * (CELL + GAP);
+        const photoData = localStorage.getItem(`ar_photo_${photoKeys[i]}`);
+        if (photoData) {
+            try {
+                const img = await loadImage(photoData);
+                ctx.fillStyle = 'rgba(0,0,0,0.08)';
+                ctx.fillRect(x + 3, y + 3, CELL, CELL);
+                ctx.drawImage(img, x, y, CELL, CELL);
+            } catch (e) {
+                ctx.fillStyle = '#999';
+                ctx.fillRect(x, y, CELL, CELL);
+            }
+        }
+    }
+
+    // Footer
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.font = '13px sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(
+        `${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} \u00b7 ${totalFound}/${locationKeys.length} places \u00b7 #discoverrasnov`,
+        PAD + BORDER,
+        totalH - BORDER - FOOTER_H / 2
+    );
+
+    return canvas;
+}
+
+async function downloadCollage() {
+    const btn = document.querySelector('.collage-download-btn');
+    const origText = btn ? btn.textContent : null;
+    if (btn) btn.textContent = '⏳ Preparing…';
+    try {
+        const canvas = await buildCollageCanvas();
+        if (!canvas) return;
+        const link = document.createElement('a');
+        link.download = 'rasnov-collage.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.92);
+        link.click();
+    } finally {
+        if (btn && origText) btn.textContent = origText;
+    }
+}
+
+async function shareCollageNative() {
+    const btn = document.querySelector('.collage-share-btn');
+    const origText = btn ? btn.textContent : null;
+    if (btn) btn.textContent = '⏳ Preparing…';
+    try {
+        const canvas = await buildCollageCanvas();
+        if (!canvas) return;
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+        const file = new File([blob], 'rasnov-collage.jpg', { type: 'image/jpeg' });
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'My Rasnov Journey',
+                    text: 'Check out my exploration of Rasnov! #discoverrasnov'
+                });
+                return;
+            } catch (e) {
+                if (e.name === 'AbortError') return;
+                console.warn('Native share failed, falling back to download:', e);
+            }
+        }
+
+        // Fallback: download
+        const link = document.createElement('a');
+        link.download = 'rasnov-collage.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.92);
+        link.click();
+    } finally {
+        if (btn && origText) btn.textContent = origText;
+    }
 }
 
 function renderUnlocksTab() {
