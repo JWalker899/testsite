@@ -3836,10 +3836,10 @@ function buildCollageHTML(totalFound) {
     // Build grid cells – hexagon uses explicit rows for proper tiling
     let cells;
     if (collageStyle === 'hexagon') {
-        const hexPerRow = 3;
+        const HEX_PER_ROW = 3;
         const hexRows = [];
-        for (let rowIdx = 0; rowIdx * hexPerRow < photoKeys.length; rowIdx++) {
-            const rowKeys = photoKeys.slice(rowIdx * hexPerRow, (rowIdx + 1) * hexPerRow);
+        for (let rowIdx = 0; rowIdx * HEX_PER_ROW < photoKeys.length; rowIdx++) {
+            const rowKeys = photoKeys.slice(rowIdx * HEX_PER_ROW, (rowIdx + 1) * HEX_PER_ROW);
             const rowCells = rowKeys.map(key => {
                 const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
                 const loc = huntLocations[key];
@@ -4047,27 +4047,34 @@ async function shareCollageNative() {
         if (!canvas) return;
 
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-        const file = new File([blob], 'rasnov-collage.jpg', { type: 'image/jpeg' });
 
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: 'My Rasnov Journey',
-                    text: 'Check out my exploration of Rasnov! #discoverrasnov'
-                });
-                return;
-            } catch (e) {
-                if (e.name === 'AbortError') return;
-                console.warn('Native share failed, falling back to download:', e);
+        let shared = false;
+        try {
+            const file = new File([blob], 'rasnov-collage.jpg', { type: 'image/jpeg' });
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'My Rasnov Journey',
+                        text: 'Check out my exploration of Rasnov! #discoverrasnov'
+                    });
+                    shared = true;
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                    console.warn('Native share failed, falling back to download:', e);
+                }
             }
+        } catch (e) {
+            // File constructor or canShare not supported; fall through to download
         }
 
-        // Fallback: download
-        const link = document.createElement('a');
-        link.download = 'rasnov-collage.jpg';
-        link.href = canvas.toDataURL('image/jpeg', 0.92);
-        link.click();
+        if (!shared) {
+            // Fallback: download
+            const link = document.createElement('a');
+            link.download = 'rasnov-collage.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.92);
+            link.click();
+        }
     } finally {
         if (btn && origText) btn.textContent = origText;
     }
