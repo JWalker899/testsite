@@ -482,6 +482,7 @@ function resetProgress() {
     // Clear collage unlock milestone flags so popups show again on replay
     localStorage.removeItem('rasnov_collage_silver_shown');
     localStorage.removeItem('rasnov_collage_gold_shown');
+    localStorage.removeItem('rasnov_first_discovery_date');
 
     // Reset hunt buttons
     huntActive = false;
@@ -789,9 +790,17 @@ function showWelcomeModal(currentLocationKey) {
 let welcomeModalPendingKey = null;
 function onWelcomeModalClose() {
     if (welcomeModalPendingKey) {
+        const key = welcomeModalPendingKey;
         welcomeModalPendingKey = null;
-        // Show the discovery modal after the welcome modal closes
-        setTimeout(() => openModal('discovery-modal'), 200);
+        const existingPhoto = localStorage.getItem(`ar_photo_${key}`);
+        if (!existingPhoto) {
+            // Open camera first so user can capture the moment
+            photoCaptureDiscoveryPending = true;
+            startPhotoCapture(key);
+        } else {
+            // Photo already taken, show discovery modal directly
+            setTimeout(() => openModal('discovery-modal'), 200);
+        }
     }
 }
 
@@ -1109,6 +1118,7 @@ let qrScannerContext = null;
 // Simple photo capture (no AR) — used after QR code discovery
 let photoCaptureStream = null;
 let photoCaptureLocationKey = null;
+let photoCaptureDiscoveryPending = false; // true when camera was auto-opened on discovery
 
 function startPhotoCapture(locationKey) {
     photoCaptureLocationKey = locationKey;
@@ -1116,6 +1126,8 @@ function startPhotoCapture(locationKey) {
     const localizedName = loc ? (localizedField(loc, 'name') || loc.name) : 'Location';
     const titleEl = document.getElementById('photo-capture-title');
     if (titleEl) titleEl.textContent = `📸 ${localizedName}`;
+    const helpEl = document.getElementById('photo-capture-help');
+    if (helpEl) helpEl.textContent = 'Now take a picture of this site!';
 
     // Reset capture button state
     const btn = document.getElementById('photo-capture-btn');
@@ -1224,6 +1236,26 @@ function closePhotoCapture() {
     const video = document.getElementById('photo-capture-video');
     if (video) video.srcObject = null;
     closeModal('photo-capture-modal');
+
+    if (photoCaptureDiscoveryPending) {
+        photoCaptureDiscoveryPending = false;
+        // Refresh the discovery photo section with the newly taken photo (if any)
+        const key = photoCaptureLocationKey;
+        if (key) {
+            const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
+            const loc = huntLocations[key];
+            const localizedName = loc ? (localizedField(loc, 'name') || loc.name) : 'Location';
+            const photoSection = document.getElementById('discovery-photo-section');
+            if (photoSection) {
+                if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
+                    photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
+                } else {
+                    photoSection.innerHTML = '';
+                }
+            }
+        }
+        setTimeout(() => openModal('discovery-modal'), 200);
+    }
 }
 
 function startQRScanner() {
@@ -1540,9 +1572,12 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     let timerText = '';
     
     if (foundLocations.size === 1) {
-        // First location found - start the hunt timer
+        // First location found - start the hunt timer and record date for collage
         huntStartTime = currentTime;
         lastDiscoveryTime = currentTime;
+        if (!localStorage.getItem('rasnov_first_discovery_date')) {
+            localStorage.setItem('rasnov_first_discovery_date', String(currentTime));
+        }
         timerText = `<br><br><strong>⏱️ ${t('messages.huntStartedTimer')}</strong>`;
     } else {
         // Subsequent locations - show time since last discovery
@@ -1580,17 +1615,14 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     
     if (discoveryFactEl) discoveryFactEl.innerHTML = factHTML;
 
-    // Show saved photo or offer to take one
+    // Show saved photo or prepare to show it after camera
     const savedPhoto = localStorage.getItem(`ar_photo_${locationKey}`);
     const photoSection = document.getElementById('discovery-photo-section');
     if (photoSection) {
         if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
             photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         } else {
-            const takePicLabel = t('messages.takePhoto');
-            photoSection.innerHTML = `<button class="discovery-photo-btn" id="discovery-photo-take-btn" data-location="${escapeHtml(locationKey)}">${takePicLabel}</button>`;
-            const takeBtn = document.getElementById('discovery-photo-take-btn');
-            if (takeBtn) takeBtn.addEventListener('click', function() { startPhotoCapture(this.dataset.location); });
+            photoSection.innerHTML = '';
         }
     }
 
@@ -1604,11 +1636,15 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
         surveyPromptPending = true;
     }
 
-    // Show welcome modal for first-time QR scan, then chain to discovery/name modals
+    // Show welcome modal for first-time QR scan, then chain to camera/discovery/name modals
     if (isFirstVisit) {
         welcomeModalPendingKey = locationKey;
         showWelcomeModal(locationKey);
-        // discovery modal will be shown after welcome modal is closed (via onWelcomeModalClose)
+        // camera (if no photo) or discovery modal will be shown after welcome modal closes
+    } else if (!savedPhoto) {
+        // Auto-open camera immediately so user can capture the moment
+        photoCaptureDiscoveryPending = true;
+        startPhotoCapture(locationKey);
     } else {
         openModal('discovery-modal');
     }
@@ -3743,6 +3779,11 @@ function showCollageUnlockModal(tier) {
     openModal('collage-unlock-modal');
 }
 
+function setCollageStyle(style) {
+    localStorage.setItem('rasnov_collage_style', style);
+    renderUnlocksTab();
+}
+
 function buildCollageHTML(totalFound) {
     const locationKeys = Object.keys(huntLocations);
     const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
@@ -3750,6 +3791,8 @@ function buildCollageHTML(totalFound) {
     const tierLabelHTML = tier
         ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? '🥇 Gold Collage' : '🥈 Silver Collage'}</div>`
         : '';
+
+    const collageStyle = localStorage.getItem('rasnov_collage_style') || 'polaroid';
 
     // Pre-defined rotations and tape colours for a natural scattered/polaroid look
     const cellMeta = [
@@ -3763,17 +3806,48 @@ function buildCollageHTML(totalFound) {
         { rot: -4, tape: '#9fc5e8' },
     ];
 
-    const cells = locationKeys.map((key, i) => {
+    // Only include locations that have photos (dynamic — no empty spaces)
+    const photoKeys = locationKeys.filter(key => {
+        const photo = localStorage.getItem(`ar_photo_${key}`);
+        return photo && photo.startsWith('data:image/jpeg;base64,');
+    });
+
+    if (photoKeys.length === 0) {
+        return `<div class="collage-wrapper ${borderClass}">
+            <div class="collage-empty-state">
+                <span class="collage-empty-icon">📷</span>
+                <p>Scan a location QR code and take your first photo to start building your collage!</p>
+            </div>
+            <div class="collage-footer">${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        </div>`;
+    }
+
+    const cells = photoKeys.map((key, i) => {
         const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
         const loc = huntLocations[key];
         const label = escapeHtml(localizedField(loc, 'name') || loc.name);
         const meta = cellMeta[i % cellMeta.length];
         const style = `--cell-rot: ${meta.rot}deg; --tape-color: ${meta.tape};`;
-        if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
-            return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}"><span class="collage-cell-label">${label}</span></div>`;
-        }
-        return `<div class="collage-cell collage-cell-empty" style="${style}"><span class="collage-placeholder">📍</span><span class="collage-cell-label">${label}</span></div>`;
+        return `<div class="collage-cell" style="${style}"><img src="${savedPhoto}" alt="${label}" loading="lazy"><span class="collage-cell-label">${label}</span></div>`;
     }).join('');
+
+    const styleButtons = `
+        <div class="collage-style-switcher">
+            <button class="collage-style-btn ${collageStyle === 'polaroid' ? 'active' : ''}" onclick="setCollageStyle('polaroid')" title="Polaroid">📌 Polaroid</button>
+            <button class="collage-style-btn ${collageStyle === 'hexagon' ? 'active' : ''}" onclick="setCollageStyle('hexagon')" title="Hexagon">⬡ Hexagon</button>
+            <button class="collage-style-btn ${collageStyle === 'grid' ? 'active' : ''}" onclick="setCollageStyle('grid')" title="Grid">▦ Grid</button>
+        </div>`;
+
+    const tripDate = (() => {
+        const raw = localStorage.getItem('rasnov_first_discovery_date');
+        if (raw) {
+            try {
+                return new Date(parseInt(raw, 10)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch(e) { return ''; }
+        }
+        return '';
+    })();
+    const dateHTML = tripDate ? `<span class="collage-date">${tripDate}</span>` : '';
 
     const shareText = encodeURIComponent('Check out my Rasnov exploration! #discoverrasnov');
     const shareUrl = encodeURIComponent('https://discoverrasnov.com');
@@ -3787,10 +3861,15 @@ function buildCollageHTML(totalFound) {
         <p class="collage-instagram-note">*Instagram does not support direct web sharing. Open Instagram and post with <strong>#discoverrasnov</strong>.</p>
     ` : '';
 
-    return `<div class="collage-wrapper ${borderClass}">
+    return `<div class="collage-wrapper ${borderClass} collage-style-${collageStyle}">
+        <div class="collage-header">
+            <span class="collage-title">🗺️ My Rasnov Journey</span>
+            ${dateHTML}
+        </div>
         ${tierLabelHTML}
+        ${styleButtons}
         <div class="collage-grid">${cells}</div>
-        <div class="collage-footer">${totalFound} / 10 places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver frame, 10 for gold'}</div>
         ${shareHTML}
     </div>`;
 }
