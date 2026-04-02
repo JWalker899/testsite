@@ -276,6 +276,25 @@
                     </div>
                 </div>
 
+                <!-- QR Quiz Modal -->
+                <div class="modal" id="quiz-modal">
+                    <div class="modal-content quiz-content">
+                        <button class="modal-close" onclick="closeModal('quiz-modal'); resetQuizState()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="discovery-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3>Quick Question</h3>
+                        <p id="quiz-question">Please answer this question before you can earn points.</p>
+                        <div id="quiz-options" class="quiz-options" style="margin-top: 1rem; display: grid; gap: 0.75rem;"></div>
+                        <div class="quiz-actions" style="margin-top: 1rem; display:flex; gap:0.75rem; justify-content:center;">
+                            <button class="cta-button" onclick="submitQuizAnswer()">Submit Answer</button>
+                            <button class="skip-btn" onclick="skipQuizQuestion()">Skip (no points)</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Photo Capture Modal -->
                 <div class="modal" id="photo-capture-modal">
                     <div class="modal-content photo-capture-content">
