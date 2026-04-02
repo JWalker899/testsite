@@ -3838,7 +3838,7 @@ if (langToggle) {
 
 document.addEventListener('languageChanged', (e) => {
     currentLang = e.detail.lang;
-    langToggle.innerHTML = `<i class="fas fa-globe"></i> ${getCurrentLang().toUpperCase()}`;
+    langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${getCurrentLang().toUpperCase()}</span>`;
 });
 // ==================== Initialization ====================
 
