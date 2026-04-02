@@ -525,22 +525,26 @@ function submitQuizAnswer() {
     const normalizedExpected = normalizeText(expected);
 
     if (normalizedAnswer === normalizedExpected) {
+        // Capture state before closeModal clears it via resetQuizState()
+        const locationKey = pendingQuizLocationKey;
+        const isExtra = pendingQuizIsExtra;
+        const extraInfo = pendingQuizExtraInfo;
+        const isFirstVisit = pendingQuizIsFirstVisit;
+
         closeModal('quiz-modal');
 
-        if (pendingQuizIsExtra && pendingQuizExtraInfo) {
-            discoverExtraLocation(pendingQuizExtraInfo);
-        } else if (pendingQuizLocationKey) {
-            discoverLocation(pendingQuizLocationKey, pendingQuizIsFirstVisit);
+        if (isExtra && extraInfo) {
+            discoverExtraLocation(extraInfo);
+        } else if (locationKey) {
+            discoverLocation(locationKey, isFirstVisit);
         }
 
-        resetQuizState();
         return;
     }
 
     // Wrong answer: close modal and require rescan
     closeModal('quiz-modal');
     showNotification('Whoops! Scan the QR code to try again!', 'error');
-    resetQuizState();
 }
 
 function skipQuizQuestion() {
