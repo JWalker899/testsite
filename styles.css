@@ -1003,6 +1003,12 @@ body {
     background: none;
 }
 
+/* Keep Leaflet controls below the sticky header */
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 900;
+}
+
 /* Info Section */
 .info-section {
     margin-bottom: 3rem;
@@ -1805,6 +1811,10 @@ body {
 
     .hero-title {
         font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+        padding: 0 1.5rem;
     }
 
     .section-title {
@@ -2681,11 +2691,11 @@ body {
     gap: var(--hex-gap, 3px);
 }
 
-/* Vertical overlap adjusted so the perpendicular gap between row edges
-   equals the horizontal gap (--hex-gap) — giving equal spacing on all sides.
-   Formula: overlap = hex-size/4 + hex-gap × (1+2√5)/4, where (1+2√5)/4 ≈ 1.368 */
+/* Vertical spacing uses center-based formula for equal perpendicular gaps on all sides.
+   ΔY (center-to-center row distance) = hex-size×¾ + hex-gap×(2√5−1)/4 ≈ hex-size×0.75 + hex-gap×0.868
+   So overlap = hex-size − ΔY = hex-size×¼ − hex-gap×0.868 */
 .hex-row + .hex-row {
-    margin-top: calc(-1 * (var(--hex-size, 90px) * 0.25 + var(--hex-gap, 3px) * 1.368));
+    margin-top: calc(-1 * (var(--hex-size, 90px) * 0.25 - var(--hex-gap, 3px) * 0.868));
 }
 
 /* Odd rows (0-indexed) shift right by half a hex + half a gap */
