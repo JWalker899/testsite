@@ -3583,7 +3583,7 @@ function loadMap() {
     if (!mapDiv) return;
     
     // Prevent double-initialization
-    if (window.map || document.getElementById('map-display')) return;
+    if (window.leafletMap || document.getElementById('map-display')) return;
     
     // Check if Leaflet library is available
     if (typeof L === 'undefined') {
@@ -3629,13 +3629,13 @@ function loadMap() {
     mapDiv.innerHTML = '<div id="map-display" style="width: 100%; height: 100%;"></div>';
     
     // Initialize Leaflet map
-    window.map = L.map('map-display').setView([45.5889, 25.4631], 14);
+    window.leafletMap = L.map('map-display').setView([45.5889, 25.4631], 14);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
-    }).addTo(window.map);
+    }).addTo(window.leafletMap);
     
     // Define custom icons
     const locationIcon = L.icon({
@@ -3741,7 +3741,7 @@ async function waitForPlacesData(maxAttempts = 10, delayMs = 500) {
  * Add a marker to the map
  */
 function addMarkerToMap(place, type, icon) {
-    if (!window.map || !place.coordinates) return;
+    if (!window.leafletMap || !place.coordinates) return;
     
     const { lat, lng } = place.coordinates;
     
@@ -3776,7 +3776,7 @@ function addMarkerToMap(place, type, icon) {
     `;
     
     const marker = L.marker([lat, lng], { icon: icon })
-        .addTo(window.map)
+        .addTo(window.leafletMap)
         .bindPopup(popupContent);
     
     // Add click handler to marker to show details

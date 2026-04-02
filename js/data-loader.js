@@ -470,11 +470,11 @@
       
       // If map is loaded, pan to location
       setTimeout(() => {
-        if (window.map) {
-          window.map.setView([lat, lng], 15);
+        if (window.leafletMap) {
+          window.leafletMap.setView([lat, lng], 15);
           
           // Open popup for this location
-          window.map.eachLayer(layer => {
+          window.leafletMap.eachLayer(layer => {
             if (layer instanceof L.Marker) {
               const popup = layer.getPopup();
               if (popup && popup.getContent().includes(name)) {
