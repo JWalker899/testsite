@@ -948,10 +948,19 @@ navLinks.forEach(link => {
 
 // Mobile Menu Toggle
 if (navToggle) {
-    navToggle.addEventListener('click', () => {
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
         navList.classList.toggle('active');
     });
 }
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (navList && navList.classList.contains('active') &&
+        !navList.contains(e.target) && e.target !== navToggle) {
+        navList.classList.remove('active');
+    }
+});
 
 // Scroll to Section Function
 function scrollToSection(sectionId) {
@@ -3904,8 +3913,44 @@ function buildCollageHTML(totalFound) {
     </div>`;
 }
 
-// Build an off-screen canvas with the collage photos arranged in a grid
+// Shared helper: load an image from a data-URL
+function _loadCanvasImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+// Shared helper: draw tier badge in the header area
+function _drawTierBadge(ctx, tier, totalW, headerH, border, pad) {
+    if (!tier) return;
+    const label = tier === 'gold' ? 'GOLD' : 'SILVER';
+    const labelW = 60;
+    const lx = totalW - pad - border - labelW;
+    const ly = border + (headerH - 20) / 2;
+    const grad = ctx.createLinearGradient(lx, ly, lx + labelW, ly + 20);
+    if (tier === 'gold') {
+        grad.addColorStop(0, '#ffe066'); grad.addColorStop(0.5, '#c9a227'); grad.addColorStop(1, '#ffe57a');
+    } else {
+        grad.addColorStop(0, '#e8e8ee'); grad.addColorStop(0.5, '#b0aeb7'); grad.addColorStop(1, '#f0f0f4');
+    }
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(lx, ly, labelW, 20, 10);
+    else ctx.rect(lx, ly, labelW, 20);
+    ctx.fill();
+    ctx.fillStyle = tier === 'gold' ? '#3a2800' : '#1a1a2e';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, lx + labelW / 2, ly + 10);
+    ctx.textAlign = 'left';
+}
+
+// Build an off-screen canvas with the collage photos, respecting the selected style
 async function buildCollageCanvas() {
+    const style = localStorage.getItem('rasnov_collage_style') || 'polaroid';
     const locationKeys = Object.keys(huntLocations);
     const photoKeys = locationKeys.filter(key => {
         const photo = localStorage.getItem(`ar_photo_${key}`);
@@ -3915,7 +3960,181 @@ async function buildCollageCanvas() {
 
     const totalFound = foundLocations.size + foundExtraLocations.size;
     const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
+    const footerText = `${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} \u00b7 ${totalFound}/${locationKeys.length} places \u00b7 #discoverrasnov`;
 
+    // ── Hexagon style ──────────────────────────────────────────────────────────
+    if (style === 'hexagon') {
+        const HEX = 130;
+        const GAP = 4;
+        const HEX_PER_ROW = 3;
+        // Equal-gap overlap formula: overlap = HEX/4 + GAP*(1+2√5)/4 ≈ HEX/4 + GAP*1.368
+        // ensures the perpendicular gap between slanted hex edges equals the horizontal GAP
+        const OVERLAP = HEX * 0.25 + GAP * 1.368;
+        const ROW_STEP = HEX - OVERLAP;
+        const PAD = 16;
+        const BORDER = tier ? 10 : 0;
+        const HEADER_H = 52;
+        const FOOTER_H = 32;
+
+        const rows = Math.ceil(photoKeys.length / HEX_PER_ROW);
+        // Extra width for odd-row offset
+        const gridW = HEX_PER_ROW * HEX + (HEX_PER_ROW - 1) * GAP + (HEX + GAP) * 0.5;
+        const gridH = HEX + (rows - 1) * ROW_STEP;
+        const totalW = Math.ceil(gridW + 2 * PAD + 2 * BORDER);
+        const totalH = Math.ceil(gridH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = totalW;
+        canvas.height = totalH;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, totalW, totalH);
+
+        if (tier) {
+            ctx.strokeStyle = tier === 'gold' ? '#c9a227' : '#b0aeb7';
+            ctx.lineWidth = BORDER * 2;
+            ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+        }
+
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
+        if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
+
+        // Hexagon clip-path points (matching CSS polygon)
+        const hexPts = [[0.5, 0], [1, 0.25], [1, 0.75], [0.5, 1], [0, 0.75], [0, 0.25]];
+
+        for (let i = 0; i < photoKeys.length; i++) {
+            const rowIdx = Math.floor(i / HEX_PER_ROW);
+            const colIdx = i % HEX_PER_ROW;
+            const isOdd = rowIdx % 2 === 1;
+            const x = BORDER + PAD + colIdx * (HEX + GAP) + (isOdd ? (HEX + GAP) * 0.5 : 0);
+            const y = BORDER + PAD + HEADER_H + rowIdx * ROW_STEP;
+            const photoData = localStorage.getItem(`ar_photo_${photoKeys[i]}`);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x + hexPts[0][0] * HEX, y + hexPts[0][1] * HEX);
+            for (let j = 1; j < hexPts.length; j++) {
+                ctx.lineTo(x + hexPts[j][0] * HEX, y + hexPts[j][1] * HEX);
+            }
+            ctx.closePath();
+            ctx.clip();
+            if (photoData) {
+                try {
+                    const img = await _loadCanvasImage(photoData);
+                    ctx.drawImage(img, x, y, HEX, HEX);
+                } catch (e) {
+                    ctx.fillStyle = '#555';
+                    ctx.fillRect(x, y, HEX, HEX);
+                }
+            } else {
+                ctx.fillStyle = '#555';
+                ctx.fillRect(x, y, HEX, HEX);
+            }
+            ctx.restore();
+        }
+
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '13px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(footerText, PAD + BORDER, totalH - BORDER - FOOTER_H / 2);
+
+        return canvas;
+    }
+
+    // ── Polaroid style ─────────────────────────────────────────────────────────
+    if (style === 'polaroid') {
+        const COLS = 3;
+        const IMG = 150;
+        const CARD_PAD = 8;
+        const LABEL_H = 28;
+        const CARD_W = IMG + CARD_PAD * 2;
+        const CARD_H = CARD_PAD + IMG + LABEL_H;
+        const GAP = 16;
+        const PAD = 20;
+        const BORDER = tier ? 10 : 0;
+        const HEADER_H = 52;
+        const FOOTER_H = 32;
+
+        const rows = Math.ceil(photoKeys.length / COLS);
+        const innerW = COLS * CARD_W + (COLS - 1) * GAP;
+        const innerH = rows * CARD_H + (rows - 1) * GAP;
+        const totalW = innerW + 2 * PAD + 2 * BORDER;
+        const totalH = innerH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = totalW;
+        canvas.height = totalH;
+        const ctx = canvas.getContext('2d');
+
+        const bg = ctx.createLinearGradient(0, 0, totalW, totalH);
+        bg.addColorStop(0, '#f5e6c8');
+        bg.addColorStop(1, '#e8d0a8');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, totalW, totalH);
+
+        if (tier) {
+            ctx.strokeStyle = tier === 'gold' ? '#c9a227' : '#b0aeb7';
+            ctx.lineWidth = BORDER * 2;
+            ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+        }
+
+        ctx.fillStyle = 'rgba(50,30,0,0.85)';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
+        if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
+
+        for (let i = 0; i < photoKeys.length; i++) {
+            const col = i % COLS;
+            const row = Math.floor(i / COLS);
+            const cardX = BORDER + PAD + col * (CARD_W + GAP);
+            const cardY = BORDER + PAD + HEADER_H + row * (CARD_H + GAP);
+
+            // Drop shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.18)';
+            ctx.fillRect(cardX + 3, cardY + 4, CARD_W, CARD_H);
+
+            // White card
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(cardX, cardY, CARD_W, CARD_H);
+
+            // Photo
+            const photoData = localStorage.getItem(`ar_photo_${photoKeys[i]}`);
+            if (photoData) {
+                try {
+                    const img = await _loadCanvasImage(photoData);
+                    ctx.drawImage(img, cardX + CARD_PAD, cardY + CARD_PAD, IMG, IMG);
+                } catch (e) {
+                    ctx.fillStyle = '#ddd';
+                    ctx.fillRect(cardX + CARD_PAD, cardY + CARD_PAD, IMG, IMG);
+                }
+            }
+
+            // Label — truncated to fit inside the card width (~166px at 11px font)
+            const MAX_LABEL_LEN = 22;
+            const loc = huntLocations[photoKeys[i]];
+            const label = (localizedField(loc, 'name') || loc.name || '').slice(0, MAX_LABEL_LEN);
+            ctx.fillStyle = '#555';
+            ctx.font = 'italic 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, cardX + CARD_W / 2, cardY + CARD_PAD + IMG + LABEL_H / 2);
+            ctx.textAlign = 'left';
+        }
+
+        ctx.fillStyle = 'rgba(50,30,0,0.6)';
+        ctx.font = '13px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(footerText, PAD + BORDER, totalH - BORDER - FOOTER_H / 2);
+
+        return canvas;
+    }
+
+    // ── Grid style (default) ───────────────────────────────────────────────────
     const COLS = 3;
     const CELL = 220;
     const GAP = 6;
@@ -3955,41 +4174,9 @@ async function buildCollageCanvas() {
     ctx.font = 'bold 20px sans-serif';
     ctx.textBaseline = 'middle';
     ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
-
-    if (tier) {
-        const label = tier === 'gold' ? 'GOLD' : 'SILVER';
-        const labelW = 60;
-        const lx = totalW - PAD - BORDER - labelW;
-        const ly = BORDER + (HEADER_H - 20) / 2;
-        const grad = ctx.createLinearGradient(lx, ly, lx + labelW, ly + 20);
-        if (tier === 'gold') {
-            grad.addColorStop(0, '#ffe066'); grad.addColorStop(0.5, '#c9a227'); grad.addColorStop(1, '#ffe57a');
-        } else {
-            grad.addColorStop(0, '#e8e8ee'); grad.addColorStop(0.5, '#b0aeb7'); grad.addColorStop(1, '#f0f0f4');
-        }
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        if (ctx.roundRect) {
-            ctx.roundRect(lx, ly, labelW, 20, 10);
-        } else {
-            ctx.rect(lx, ly, labelW, 20);
-        }
-        ctx.fill();
-        ctx.fillStyle = tier === 'gold' ? '#3a2800' : '#1a1a2e';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, lx + labelW / 2, ly + 10);
-        ctx.textAlign = 'left';
-    }
+    if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
 
     // Photos
-    const loadImage = src => new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
-    });
-
     for (let i = 0; i < photoKeys.length; i++) {
         const col = i % COLS;
         const row = Math.floor(i / COLS);
@@ -3998,7 +4185,7 @@ async function buildCollageCanvas() {
         const photoData = localStorage.getItem(`ar_photo_${photoKeys[i]}`);
         if (photoData) {
             try {
-                const img = await loadImage(photoData);
+                const img = await _loadCanvasImage(photoData);
                 ctx.fillStyle = 'rgba(0,0,0,0.08)';
                 ctx.fillRect(x + 3, y + 3, CELL, CELL);
                 ctx.drawImage(img, x, y, CELL, CELL);
@@ -4013,11 +4200,7 @@ async function buildCollageCanvas() {
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.font = '13px sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.fillText(
-        `${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} \u00b7 ${totalFound}/${locationKeys.length} places \u00b7 #discoverrasnov`,
-        PAD + BORDER,
-        totalH - BORDER - FOOTER_H / 2
-    );
+    ctx.fillText(footerText, PAD + BORDER, totalH - BORDER - FOOTER_H / 2);
 
     return canvas;
 }
