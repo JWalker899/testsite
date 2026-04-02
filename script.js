@@ -347,7 +347,7 @@ function showPointsNotification(points, bonusPoints = 0, locationName = '') {
         message = `<strong>${locationName}</strong><br>+${points} points`;
     }
     if (bonusPoints > 0) {
-        message += `<br><strong>🎉 +${bonusPoints} completion bonus!</strong>`;
+        message += `<br><strong>+${bonusPoints} completion bonus!</strong>`;
     }
     
     const notificationEl = document.createElement('div');
@@ -736,8 +736,8 @@ const huntLocations = {
         qr: 'RASNOV_DINO', 
         fact: 'Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.',
         fact_ro: 'Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.',
-        hint: 'Congratulations! You\'ve completed the entire Rasnov treasure hunt! 🎉',
-        hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov! 🎉'
+        hint: 'Congratulations! You\'ve completed the entire Rasnov treasure hunt!',
+        hint_ro: 'Felicitări! Ai terminat întreaga vânătoare în Râșnov!'
     }
 };
 
@@ -1142,7 +1142,7 @@ function startPhotoCapture(locationKey) {
     const loc = huntLocations[locationKey];
     const localizedName = loc ? (localizedField(loc, 'name') || loc.name) : 'Location';
     const titleEl = document.getElementById('photo-capture-title');
-    if (titleEl) titleEl.textContent = `📸 ${localizedName}`;
+    if (titleEl) titleEl.textContent = localizedName;
     const helpEl = document.getElementById('photo-capture-help');
     if (helpEl) helpEl.textContent = t('modals.photoCapture.help');
 
@@ -1217,7 +1217,7 @@ function captureLocationPhoto() {
         localStorage.setItem(`ar_photo_${photoCaptureLocationKey}`, dataUrl);
     } catch (e) {
         console.warn('Could not save photo to localStorage:', e);
-        showNotification('📸 Photo taken! (Could not save – storage full)', 'warning');
+        showNotification('Photo taken! (Could not save – storage full)', 'warning');
         setTimeout(() => closePhotoCapture(), 600);
         return;
     }
@@ -1236,11 +1236,11 @@ function captureLocationPhoto() {
         // Update discovery modal photo section if still open
         const photoSection = document.getElementById('discovery-photo-section');
         if (photoSection) {
-            photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p>
+            photoSection.innerHTML = `<p class="ar-photo-label">Your photo:</p>
                 <img src="${dataUrl}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         }
 
-        showNotification('📸 Photo saved to your collage!', 'success');
+        showNotification('Photo saved to your collage!', 'success');
         renderUnlocksTab();
     }, 600);
 }
@@ -1265,7 +1265,7 @@ function closePhotoCapture() {
             const photoSection = document.getElementById('discovery-photo-section');
             if (photoSection) {
                 if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
-                    photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
+                    photoSection.innerHTML = `<p class="ar-photo-label">Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
                 } else {
                     photoSection.innerHTML = '';
                 }
@@ -1621,7 +1621,7 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     if (pointsResult) {
         let pointsText = `<br><br><strong>Points Earned: +${pointsResult.pointsAwarded}</strong>`;
         if (pointsResult.bonusPoints > 0) {
-            pointsText += `<br><strong>🎉 Completion Bonus: +${pointsResult.bonusPoints}</strong>`;
+            pointsText += `<br><strong>Completion Bonus: +${pointsResult.bonusPoints}</strong>`;
             pointsText += `<br><strong>Total Points: ${pointsResult.totalPoints}</strong>`;
         }
         factHTML += pointsText;
@@ -1637,7 +1637,7 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     const photoSection = document.getElementById('discovery-photo-section');
     if (photoSection) {
         if (savedPhoto && savedPhoto.startsWith('data:image/jpeg;base64,')) {
-            photoSection.innerHTML = `<p class="ar-photo-label">📸 Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
+            photoSection.innerHTML = `<p class="ar-photo-label">Your photo:</p><img src="${savedPhoto}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         } else {
             photoSection.innerHTML = '';
         }
@@ -2818,7 +2818,7 @@ function _processCapture(dataUrl) {
         localStorage.setItem(`ar_photo_${currentARLocation}`, dataUrl);
     } catch (e) {
         console.warn('Could not save photo to localStorage (storage full?)', e);
-        showNotification('📸 Photo taken! (Could not save – storage full)', 'warning');
+        showNotification('Photo taken! (Could not save – storage full)', 'warning');
     }
 
     // Flash effect (WebXR path already triggered it, but adding class again is harmless)
@@ -2836,7 +2836,7 @@ function _processCapture(dataUrl) {
         if (!foundLocations.has(locKey)) {
             discoverLocation(locKey);
         } else {
-            showNotification('📸 Photo saved! You already found this location.', 'info');
+            showNotification('Photo saved! You already found this location.', 'info');
         }
     }, 600);
 }
@@ -2858,7 +2858,7 @@ function discoverLocationQuietly(locationKey) {
     // Check if hunt is complete
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('🎉 Congratulations! You completed the treasure hunt!', 'success');
+            showNotification('Congratulations! You completed the treasure hunt!', 'success');
             huntActive = false;
             startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
             startHuntBtn.classList.remove('active-hunt');
@@ -4282,7 +4282,6 @@ function renderUnlocksTab() {
             ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">Apply</button>`
             : '';
         return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
-            <span class="theme-badge-emoji">${theme.emoji}</span>
             <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
             <span class="theme-badge-pts">${ptsLabel}</span>
             ${applyBtn}
@@ -4301,20 +4300,20 @@ function renderUnlocksTab() {
     }).join('');
 
     container.innerHTML = `
-        <h2 class="section-title">🎁 Rewards</h2>
+        <h2 class="section-title">Rewards</h2>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">🎨 Theme Unlocks</div>
+            <div class="rewards-section-title">Theme Unlocks</div>
             <div class="theme-unlocks-row">${themeBadgesHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">🏷️ Discounts</div>
+            <div class="rewards-section-title">Discounts</div>
             <div class="discounts-grid">${discountsHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">🖼️ Your Rasnov Collage</div>
+            <div class="rewards-section-title">Your Rasnov Collage</div>
             <p class="collage-intro">Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.</p>
             ${buildCollageHTML(totalFound)}
         </div>`;
