@@ -1114,23 +1114,68 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Keep header as a single horizontal row: logo | actions | hamburger */
+    .nav-wrapper {
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+    }
+
     .nav-toggle {
         display: block;
     }
 
+    .logo {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .logo h1 {
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .header-actions {
+        gap: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    /* Hide the verbose user-points text on small screens */
+    .user-points-badge {
+        display: none;
+    }
+
+    /* Full-width dropdown, anchored to bottom of the sticky header */
     .nav-list {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         flex-direction: column;
-        width: 100%;
         gap: 0;
+        background: linear-gradient(135deg, var(--primary-color), #1e4a6f);
+        padding: 0.25rem 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 100;
     }
 
     .nav-list.active {
         display: flex;
     }
 
-    .nav-wrapper {
-        flex-direction: column;
+    .nav-list li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-list li:last-child {
+        border-bottom: none;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 0.75rem 1.5rem;
     }
 
     .hero-title {
@@ -2597,9 +2642,11 @@ body {
     gap: var(--hex-gap, 3px);
 }
 
-/* Vertical overlap so rows tile correctly (25% of hex height) */
+/* Vertical overlap adjusted so the perpendicular gap between row edges
+   equals the same horizontal gap (--hex-gap).
+   Formula: overlap = hex-size/4 + hex-gap * (1 + 2√5)/4 ≈ hex-size/4 + hex-gap * 1.368 */
 .hex-row + .hex-row {
-    margin-top: calc(var(--hex-size, 90px) * -0.25);
+    margin-top: calc(-1 * (var(--hex-size, 90px) * 0.25 + var(--hex-gap, 3px) * 1.368));
 }
 
 /* Odd rows (0-indexed) shift right by half a hex + half a gap */
