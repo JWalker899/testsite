@@ -435,7 +435,7 @@ function resetQuizState() {
     if (optionsContainer) optionsContainer.innerHTML = '';
 
     const questionEl = document.getElementById('quiz-question');
-    if (questionEl) questionEl.textContent = 'Please answer this question before you can earn points.';
+    if (questionEl) questionEl.textContent = '';
 
     const submitBtn = document.querySelector('#quiz-modal .cta-button');
     if (submitBtn) submitBtn.disabled = true;
@@ -524,11 +524,8 @@ function submitQuizAnswer() {
     const normalizedAnswer = normalizeText(answer);
     const normalizedExpected = normalizeText(expected);
 
-    pendingQuizAttempts += 1;
-
     if (normalizedAnswer === normalizedExpected) {
         closeModal('quiz-modal');
-        showNotification('Correct answer! Points are now awarded.', 'success');
 
         if (pendingQuizIsExtra && pendingQuizExtraInfo) {
             discoverExtraLocation(pendingQuizExtraInfo);
@@ -540,21 +537,14 @@ function submitQuizAnswer() {
         return;
     }
 
-    if (pendingQuizAttempts < MAX_QUIZ_ATTEMPTS) {
-        const remaining = MAX_QUIZ_ATTEMPTS - pendingQuizAttempts;
-        showNotification(`That answer is not correct. Please try again. (${remaining} attempts left)`, 'warning');
-        return;
-    }
-
-    // Max attempts reached: abort awarding points for this scan
+    // Wrong answer: close modal and require rescan
     closeModal('quiz-modal');
-    showNotification('Maximum attempts reached. No points awarded for this scan.', 'error');
+    showNotification('Whoops! Scan the QR code to try again!', 'error');
     resetQuizState();
 }
 
 function skipQuizQuestion() {
     closeModal('quiz-modal');
-    showNotification('Quiz skipped. No points awarded yet. Scan the QR code again when ready.', 'info');
     resetQuizState();
 }
 
@@ -977,9 +967,9 @@ function handleURLParameters() {
         const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
 
         if (!foundLocations.has(locationParam)) {
-            // Small delay to allow page to finish rendering before showing modal
+            // Show quiz before awarding points — delay to let page finish rendering
             setTimeout(() => {
-                discoverLocation(locationParam, isFirstVisit);
+                showQuizModalForScannedLocation(locationParam, isFirstVisit);
             }, 600);
         } else {
             // Already found this location — just update the Next Site banner
@@ -992,7 +982,7 @@ function handleURLParameters() {
         if (extraInfo) {
             if (!foundExtraLocations.has(extraInfo.key)) {
                 setTimeout(() => {
-                    discoverExtraLocation(extraInfo);
+                    showQuizModalForExtraLocation(extraInfo);
                 }, 600);
             } else {
                 showNotification(`You've already found ${extraInfo.name}!`, 'info');
@@ -1559,7 +1549,6 @@ function processQRCode(qrData) {
             qrScannerActive = false;
             const isFirstVisit = foundLocations.size === 0 && foundExtraLocations.size === 0;
             closeModal('qr-modal');
-            showNotification('QR Code scanned successfully! Answer a quick question to earn points.', 'success');
             showQuizModalForScannedLocation(foundLocationKey, isFirstVisit);
         } else {
             showNotification('You already found this location!', 'info');
@@ -1568,7 +1557,6 @@ function processQRCode(qrData) {
         if (!foundExtraLocations.has(extraLocationInfo.key)) {
             qrScannerActive = false;
             closeModal('qr-modal');
-            showNotification('QR Code scanned successfully! Answer a quick question to earn points.', 'success');
             showQuizModalForExtraLocation(extraLocationInfo);
         } else {
             showNotification('You already found this location!', 'info');
@@ -1657,7 +1645,6 @@ function simulateQRScan(locationKey) {
     if (huntLocations[locationKey] && !foundLocations.has(locationKey)) {
         const isFirstVisit = foundLocations.size === 0;
         closeModal('qr-modal');
-        showNotification('Simulated QR scan successful! Answer a quick question to earn points.', 'success');
         showQuizModalForScannedLocation(locationKey, isFirstVisit);
     } else if (foundLocations.has(locationKey)) {
         showNotification('You already found this location!', 'info');
