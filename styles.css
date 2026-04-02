@@ -951,6 +951,10 @@ body {
     justify-content: center;
 }
 
+#interactive-map {
+    height: 100%;
+}
+
 .map-info {
     text-align: center;
     padding: 2rem;
