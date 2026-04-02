@@ -3621,7 +3621,6 @@ function loadMap() {
             </div>
         `;
         mapDiv.classList.add('loaded');
-        showNotification('Map loaded with all locations!', 'success');
         return;
     }
     
@@ -3674,7 +3673,6 @@ function loadMap() {
     loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon);
     
     mapDiv.classList.add('loaded');
-    showNotification('Map loaded successfully!', 'success');
 }
 
 /**
@@ -4115,6 +4113,22 @@ function _drawTierBadge(ctx, tier, totalW, headerH, border, pad) {
     ctx.textAlign = 'left';
 }
 
+// Shared helper: draw a metallic gradient border (replaces plain solid stroke)
+function _drawMetallicBorder(ctx, tier, totalW, totalH, border) {
+    if (!tier || !border) return;
+    const grad = ctx.createLinearGradient(0, 0, totalW, totalH);
+    if (tier === 'gold') {
+        grad.addColorStop(0, '#ffe066'); grad.addColorStop(0.35, '#c9a227');
+        grad.addColorStop(0.65, '#ffe57a'); grad.addColorStop(1, '#b8880e');
+    } else {
+        grad.addColorStop(0, '#e8e8ee'); grad.addColorStop(0.35, '#b0aeb7');
+        grad.addColorStop(0.65, '#f0f0f4'); grad.addColorStop(1, '#a0a0aa');
+    }
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = border * 2;
+    ctx.strokeRect(border, border, totalW - border * 2, totalH - border * 2);
+}
+
 // Build an off-screen canvas with the collage photos, respecting the selected style
 async function buildCollageCanvas() {
     const style = localStorage.getItem('rasnov_collage_style') || 'polaroid';
@@ -4134,10 +4148,9 @@ async function buildCollageCanvas() {
         const HEX = 130;
         const GAP = 4;
         const HEX_PER_ROW = 3;
-        // Equal-gap overlap formula: overlap = HEX/4 + GAP*(1+2√5)/4 ≈ HEX/4 + GAP*1.368
+        // Center-based equal-gap formula: ΔY = HEX*0.75 + GAP*(2√5−1)/4 ≈ HEX*0.75 + GAP*0.868
         // ensures the perpendicular gap between slanted hex edges equals the horizontal GAP
-        const OVERLAP = HEX * 0.25 + GAP * 1.368;
-        const ROW_STEP = HEX - OVERLAP;
+        const ROW_STEP = HEX * 0.75 + GAP * 0.868;
         const PAD = 16;
         const BORDER = tier ? 10 : 0;
         const HEADER_H = 52;
@@ -4159,16 +4172,13 @@ async function buildCollageCanvas() {
         ctx.fillRect(0, 0, totalW, totalH);
 
         if (tier) {
-            ctx.strokeStyle = tier === 'gold' ? '#c9a227' : '#b0aeb7';
-            ctx.lineWidth = BORDER * 2;
-            ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+            _drawMetallicBorder(ctx, tier, totalW, totalH, BORDER);
         }
 
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
         ctx.font = 'bold 20px sans-serif';
         ctx.textBaseline = 'middle';
         ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
-        if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
 
         // Hexagon clip-path points (matching CSS polygon)
         const hexPts = [[0.5, 0], [1, 0.25], [1, 0.75], [0.5, 1], [0, 0.75], [0, 0.25]];
@@ -4244,16 +4254,13 @@ async function buildCollageCanvas() {
         ctx.fillRect(0, 0, totalW, totalH);
 
         if (tier) {
-            ctx.strokeStyle = tier === 'gold' ? '#c9a227' : '#b0aeb7';
-            ctx.lineWidth = BORDER * 2;
-            ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+            _drawMetallicBorder(ctx, tier, totalW, totalH, BORDER);
         }
 
         ctx.fillStyle = 'rgba(50,30,0,0.85)';
         ctx.font = 'bold 20px sans-serif';
         ctx.textBaseline = 'middle';
         ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
-        if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
 
         for (let i = 0; i < photoKeys.length; i++) {
             const col = i % COLS;
@@ -4330,10 +4337,7 @@ async function buildCollageCanvas() {
 
     // Tier border
     if (tier) {
-        const borderColor = tier === 'gold' ? '#c9a227' : '#b0aeb7';
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = BORDER * 2;
-        ctx.strokeRect(BORDER, BORDER, totalW - BORDER * 2, totalH - BORDER * 2);
+        _drawMetallicBorder(ctx, tier, totalW, totalH, BORDER);
     }
 
     // Header
@@ -4341,7 +4345,6 @@ async function buildCollageCanvas() {
     ctx.font = 'bold 20px sans-serif';
     ctx.textBaseline = 'middle';
     ctx.fillText('My Rasnov Journey', PAD + BORDER, BORDER + HEADER_H / 2);
-    if (tier) _drawTierBadge(ctx, tier, totalW, HEADER_H, BORDER, PAD);
 
     // Photos
     for (let i = 0; i < photoKeys.length; i++) {
