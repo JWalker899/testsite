@@ -3,7 +3,7 @@
   "locations": {
     "fortress": {
       "name": "Rasnov Fortress Gate",
-      "qrWord": "RASNOV_FORTRESS",
+      "qr": "RASNOV_FORTRESS",
       "lat": 45.5889,
       "lng": 25.4631,
       "fact": "The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.",
@@ -16,7 +16,7 @@
     },
     "well": {
       "name": "Ancient Well",
-      "qrWord": "RASNOV_WELL",
+      "qr": "RASNOV_WELL",
       "lat": 45.5892,
       "lng": 25.4635,
       "fact": "This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.",
@@ -29,7 +29,7 @@
     },
     "tower": {
       "name": "Watch Tower",
-      "qrWord": "RASNOV_TOWER",
+      "qr": "RASNOV_TOWER",
       "lat": 45.5885,
       "lng": 25.4640,
       "fact": "The watch tower provided 360-degree views to spot approaching enemies from miles away.",
@@ -42,7 +42,7 @@
     },
     "church": {
       "name": "Old Church",
-      "qrWord": "RASNOV_CHURCH",
+      "qr": "RASNOV_CHURCH",
       "lat": 45.5890,
       "lng": 25.4638,
       "fact": "This Gothic church dates back to the 14th century and still holds services today.",
@@ -55,7 +55,7 @@
     },
     "museum": {
       "name": "Village Museum",
-      "qrWord": "RASNOV_MUSEUM",
+      "qr": "RASNOV_MUSEUM",
       "lat": 45.5850,
       "lng": 25.4600,
       "fact": "The museum houses over 300 artifacts showcasing traditional Romanian village life.",
@@ -68,7 +68,7 @@
     },
     "peak": {
       "name": "Mountain Peak",
-      "qrWord": "RASNOV_PEAK",
+      "qr": "RASNOV_PEAK",
       "lat": 45.5700,
       "lng": 25.4500,
       "fact": "At 1650m elevation, this peak offers views of the entire Barsa region on clear days.",
@@ -81,7 +81,7 @@
     },
     "square": {
       "name": "Town Square",
-      "qrWord": "RASNOV_SQUARE",
+      "qr": "RASNOV_SQUARE",
       "lat": 45.5880,
       "lng": 25.4620,
       "fact": "The town square has been a gathering place for markets and festivals for over 600 years.",
@@ -95,7 +95,7 @@
     "dino": {
       "name": "Dino Park Entrance",
       "name_ro": "Intrarea Dino Parc",
-      "qrWord": "RASNOV_DINO",
+      "qr": "RASNOV_DINO",
       "lat": 45.5895,
       "lng": 25.4625,
       "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",

@@ -4520,6 +4520,11 @@ loadScavengerData().then(() => {
         // Handle QR code URL parameters (?location=...) from scanned QR codes
         handleURLParameters();
     }
+}).catch(e => {
+    console.error('Hunt initialization failed: scavenger data could not be loaded.', e);
+    if (isHuntPage) {
+        showNotification('Could not load hunt data. Please refresh the page.', 'error');
+    }
 });
 
 // Add smooth scroll behavior
