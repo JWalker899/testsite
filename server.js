@@ -477,6 +477,31 @@ app.post('/api/user/:uuid/extra-found', (req, res) => {
   res.json({ success: true, pointsAwarded: points, user });
 });
 
+// Reset a user's hunt progress (clears all found locations and points)
+app.post('/api/user/:uuid/reset', (req, res) => {
+  const { uuid } = req.params;
+
+  if (!isValidUUID(uuid)) {
+    return res.status(400).json({ error: 'Invalid UUID format' });
+  }
+
+  if (!userAccounts[uuid]) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const user = userAccounts[uuid];
+
+  // Reset hunt progress while preserving user identity
+  user.locationsFound = [];
+  user.totalPoints = 0;
+  user.completedAt = null;
+  user.lastLocationAt = null;
+
+  saveLeaderboardData();
+
+  res.json({ success: true, message: 'Hunt progress reset', user });
+});
+
 // Get leaderboard (top 50 users who have made progress)
 app.get('/api/leaderboard', (req, res) => {
   const leaderboard = Object.values(userAccounts)
