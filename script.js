@@ -1127,7 +1127,7 @@ function startPhotoCapture(locationKey) {
     const titleEl = document.getElementById('photo-capture-title');
     if (titleEl) titleEl.textContent = `📸 ${localizedName}`;
     const helpEl = document.getElementById('photo-capture-help');
-    if (helpEl) helpEl.textContent = 'Now take a picture of this site!';
+    if (helpEl) helpEl.textContent = t('modals.photoCapture.help');
 
     // Reset capture button state
     const btn = document.getElementById('photo-capture-btn');
@@ -3842,8 +3842,13 @@ function buildCollageHTML(totalFound) {
         const raw = localStorage.getItem('rasnov_first_discovery_date');
         if (raw) {
             try {
-                return new Date(parseInt(raw, 10)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-            } catch(e) { return ''; }
+                const ts = parseInt(raw, 10);
+                if (!isNaN(ts)) {
+                    return new Date(ts).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+            } catch(e) {
+                console.warn('Could not parse first discovery date:', e);
+            }
         }
         return '';
     })();
@@ -3869,7 +3874,7 @@ function buildCollageHTML(totalFound) {
         ${tierLabelHTML}
         ${styleButtons}
         <div class="collage-grid">${cells}</div>
-        <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver frame, 10 for gold'}</div>
+        <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
         ${shareHTML}
     </div>`;
 }
