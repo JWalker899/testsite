@@ -1162,15 +1162,12 @@ body {
     }
 
     .logo {
-        flex: 1;
+        flex: 0 0 auto;
         min-width: 0;
     }
 
     .logo h1 {
-        font-size: 1.1rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: none;
     }
 
     .header-actions {
@@ -1180,6 +1177,11 @@ body {
 
     /* Hide the verbose user-points text on small screens */
     .user-points-badge {
+        display: none;
+    }
+
+    /* Icon-only language button on mobile */
+    .lang-text {
         display: none;
     }
 

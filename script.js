@@ -3838,7 +3838,9 @@ if (langToggle) {
 
 document.addEventListener('languageChanged', (e) => {
     currentLang = e.detail.lang;
-    langToggle.innerHTML = `<i class="fas fa-globe"></i> ${getCurrentLang().toUpperCase()}`;
+    const lang = getCurrentLang().toUpperCase();
+    langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
+    langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
 });
 // ==================== Initialization ====================
 
