@@ -3925,6 +3925,7 @@ function _loadCanvasImage(src) {
 
 // Shared helper: draw tier badge in the header area
 function _drawTierBadge(ctx, tier, totalW, headerH, border, pad) {
+    if (!tier) return;
     const label = tier === 'gold' ? 'GOLD' : 'SILVER';
     const labelW = 60;
     const lx = totalW - pad - border - labelW;
@@ -3966,7 +3967,8 @@ async function buildCollageCanvas() {
         const HEX = 130;
         const GAP = 4;
         const HEX_PER_ROW = 3;
-        // Equal-border overlap formula: overlap = HEX/4 + GAP * (1+2√5)/4
+        // Equal-gap overlap formula: overlap = HEX/4 + GAP*(1+2√5)/4 ≈ HEX/4 + GAP*1.368
+        // ensures the perpendicular gap between slanted hex edges equals the horizontal GAP
         const OVERLAP = HEX * 0.25 + GAP * 1.368;
         const ROW_STEP = HEX - OVERLAP;
         const PAD = 16;
@@ -4112,9 +4114,10 @@ async function buildCollageCanvas() {
                 }
             }
 
-            // Label
+            // Label — truncated to fit inside the card width (~166px at 11px font)
+            const MAX_LABEL_LEN = 22;
             const loc = huntLocations[photoKeys[i]];
-            const label = (localizedField(loc, 'name') || loc.name || '').slice(0, 22);
+            const label = (localizedField(loc, 'name') || loc.name || '').slice(0, MAX_LABEL_LEN);
             ctx.fillStyle = '#555';
             ctx.font = 'italic 11px sans-serif';
             ctx.textAlign = 'center';

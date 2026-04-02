@@ -2643,8 +2643,8 @@ body {
 }
 
 /* Vertical overlap adjusted so the perpendicular gap between row edges
-   equals the same horizontal gap (--hex-gap).
-   Formula: overlap = hex-size/4 + hex-gap * (1 + 2√5)/4 ≈ hex-size/4 + hex-gap * 1.368 */
+   equals the horizontal gap (--hex-gap) — giving equal spacing on all sides.
+   Formula: overlap = hex-size/4 + hex-gap × (1+2√5)/4, where (1+2√5)/4 ≈ 1.368 */
 .hex-row + .hex-row {
     margin-top: calc(-1 * (var(--hex-size, 90px) * 0.25 + var(--hex-gap, 3px) * 1.368));
 }
