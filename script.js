@@ -1400,7 +1400,7 @@ function captureLocationPhoto() {
                 <img src="${dataUrl}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         }
 
-        showNotification('Photo saved to your collage!', 'success');
+        showNotification(t('rewards.photoSaved'), 'success');
         renderUnlocksTab();
     }, 600);
 }
@@ -3956,13 +3956,11 @@ function showCollageUnlockModal(tier) {
     const titleEl = document.getElementById('collage-unlock-title');
     const msgEl = document.getElementById('collage-unlock-msg');
     if (badgeEl) {
-        badgeEl.textContent = isGold ? 'Gold' : 'Silver';
+        badgeEl.textContent = isGold ? t('rewards.goldCollage') : t('rewards.silverCollage');
         badgeEl.className = `collage-modal-badge ${tier}`;
     }
-    if (titleEl) titleEl.textContent = isGold ? 'Gold Collage Unlocked!' : 'Silver Collage Unlocked!';
-    if (msgEl) msgEl.textContent = isGold
-        ? "You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!"
-        : "You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!";
+    if (titleEl) titleEl.textContent = isGold ? t('modals.collage.gold') : t('modals.collage.silver');
+    if (msgEl) msgEl.textContent = isGold ? t('modals.collage.goldMsg') : t('modals.collage.silverMsg');
     openModal('collage-unlock-modal');
 }
 
@@ -3976,7 +3974,7 @@ function buildCollageHTML(totalFound) {
     const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
     const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
     const tierLabelHTML = tier
-        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? 'Gold Collage' : 'Silver Collage'}</div>`
+        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? t('rewards.goldCollage') : t('rewards.silverCollage')}</div>`
         : '';
 
     const collageStyle = localStorage.getItem('rasnov_collage_style') || 'polaroid';
@@ -4003,9 +4001,9 @@ function buildCollageHTML(totalFound) {
         return `<div class="collage-wrapper ${borderClass}">
             <div class="collage-empty-state">
                 <span class="collage-empty-icon">📷</span>
-                <p>Scan a location QR code and take your first photo to start building your collage!</p>
+                <p>${t('rewards.collageEmpty')}</p>
             </div>
-            <div class="collage-footer">${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+            <div class="collage-footer">${totalFound} / ${locationKeys.length} ${t('rewards.collageTip')}</div>
         </div>`;
     }
 
@@ -4039,9 +4037,9 @@ function buildCollageHTML(totalFound) {
 
     const styleButtons = `
         <div class="collage-style-switcher">
-            <button class="collage-style-btn ${collageStyle === 'polaroid' ? 'active' : ''}" onclick="setCollageStyle('polaroid')" title="Polaroid">📌 Polaroid</button>
-            <button class="collage-style-btn ${collageStyle === 'hexagon' ? 'active' : ''}" onclick="setCollageStyle('hexagon')" title="Hexagon">⬡ Hexagon</button>
-            <button class="collage-style-btn ${collageStyle === 'grid' ? 'active' : ''}" onclick="setCollageStyle('grid')" title="Grid">▦ Grid</button>
+            <button class="collage-style-btn ${collageStyle === 'polaroid' ? 'active' : ''}" onclick="setCollageStyle('polaroid')" title="Polaroid">${t('rewards.polaroid')}</button>
+            <button class="collage-style-btn ${collageStyle === 'hexagon' ? 'active' : ''}" onclick="setCollageStyle('hexagon')" title="Hexagon">${t('rewards.hexagon')}</button>
+            <button class="collage-style-btn ${collageStyle === 'grid' ? 'active' : ''}" onclick="setCollageStyle('grid')" title="Grid">${t('rewards.grid')}</button>
         </div>`;
 
     const tripDate = (() => {
@@ -4062,20 +4060,20 @@ function buildCollageHTML(totalFound) {
 
     const shareHTML = `
         <div class="collage-action-row">
-            <button class="collage-download-btn" onclick="downloadCollage()">📥 Download</button>
-            <button class="collage-share-btn" onclick="shareCollageNative()">📤 Share</button>
+            <button class="collage-download-btn" onclick="downloadCollage()">${t('rewards.download')}</button>
+            <button class="collage-share-btn" onclick="shareCollageNative()">${t('rewards.share')}</button>
         </div>
     `;
 
     return `<div class="collage-wrapper ${borderClass} collage-style-${collageStyle}">
         <div class="collage-header">
-            <span class="collage-title">🗺️ My Rasnov Journey</span>
+            <span class="collage-title">${t('rewards.journeyTitle')}</span>
             ${dateHTML}
         </div>
         ${tierLabelHTML}
         ${styleButtons}
         <div class="collage-grid">${cells}</div>
-        <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        <div class="collage-footer">${photoKeys.length === 1 ? t('rewards.collageFooter', {photos: photoKeys.length, found: totalFound, total: locationKeys.length}) : t('rewards.collageFooterPlural', {photos: photoKeys.length, found: totalFound, total: locationKeys.length})}${tier ? '' : ' ' + t('rewards.collageTip')}</div>
         ${shareHTML}
     </div>`;
 }
@@ -4451,7 +4449,7 @@ function renderUnlocksTab() {
             ? t('modals.surveyForm.title')
             : (theme.pointsRequired === 0 ? '🔓' : `${theme.pointsRequired} pts`);
         const applyBtn = (unlocked && !active)
-            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">Apply</button>`
+            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">${t('rewards.apply')}</button>`
             : '';
         return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
             <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
@@ -4467,26 +4465,26 @@ function renderUnlocksTab() {
             <div class="discount-emoji">${d.emoji}</div>
             <div class="discount-name">${d.name}</div>
             <div class="discount-desc">${d.description}</div>
-            <div class="discount-req">${unlocked ? '✓ Unlocked!' : `🔒 Find ${d.placesRequired} places`}</div>
+            <div class="discount-req">${unlocked ? t('rewards.unlocked') : t('rewards.findPlaces', {count: d.placesRequired})}</div>
         </div>`;
     }).join('');
 
     container.innerHTML = `
-        <h2 class="section-title">Rewards</h2>
+        <h2 class="section-title">${t('rewards.title')}</h2>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Theme Unlocks</div>
+            <div class="rewards-section-title">${t('rewards.themeUnlocks')}</div>
             <div class="theme-unlocks-row">${themeBadgesHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Discounts</div>
+            <div class="rewards-section-title">${t('rewards.discounts')}</div>
             <div class="discounts-grid">${discountsHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Your Rasnov Collage</div>
-            <p class="collage-intro">Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.</p>
+            <div class="rewards-section-title">${t('rewards.collageTitle')}</div>
+            <p class="collage-intro">${t('rewards.collageIntro')}</p>
             ${buildCollageHTML(totalFound)}
         </div>`;
 }

@@ -245,6 +245,29 @@
     "loading": "Se încarcă clasamentul...",
     "refresh": "Actualizează"
   },
+  "rewards": {
+    "title": "Recompense",
+    "themeUnlocks": "Teme Deblocate",
+    "discounts": "Reduceri",
+    "collageTitle": "Colajul tău din Râșnov",
+    "collageIntro": "Amintirile tale din explorarea Râșnovului. Câștigă un cadru de argint la 6 locuri și unul de aur la 10.",
+    "apply": "Aplică",
+    "unlocked": "✓ Deblocat!",
+    "findPlaces": "🔒 Găsește {{count}} locuri",
+    "goldCollage": "Colaj de Aur",
+    "silverCollage": "Colaj de Argint",
+    "collageEmpty": "Scanați un cod QR la o locație și faceți prima fotografie pentru a construi colajul!",
+    "collageFooter": "📷 {{photos}} fotografie · {{found}} / {{total}} locuri explorate",
+    "collageFooterPlural": "📷 {{photos}} fotografii · {{found}} / {{total}} locuri explorate",
+    "collageTip": "— găsește 6 pentru colaj de argint, 10 pentru aur",
+    "polaroid": "📌 Polaroid",
+    "hexagon": "⬡ Hexagon",
+    "grid": "▦ Grilă",
+    "download": "📥 Descarcă",
+    "share": "📤 Distribuie",
+    "journeyTitle": "🗺️ Călătoria mea în Râșnov",
+    "photoSaved": "Fotografie salvată în colajul tău!"
+  },
   "modals": {
     "qr": {
       "title": "Scanează codul QR",
@@ -283,6 +306,9 @@
     },
     "collage": {
       "silver": "Colaj de Argint Deblocat!",
+      "gold": "Colaj de Aur Deblocat!",
+      "silverMsg": "Ați vizitat 6 locuri — colajul are acum un cadru de argint. Continuați explorarea pentru aur!",
+      "goldMsg": "Ați vizitat 10 locuri — colajul are acum un cadru de aur. Împărtășiți aventura din Râșnov!",
       "viewCollage": "Vezi Colajul Meu"
     }
   },
