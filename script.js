@@ -1299,6 +1299,7 @@ const MAX_QUIZ_ATTEMPTS = 3;
 let photoCaptureStream = null;
 let photoCaptureLocationKey = null;
 let photoCaptureDiscoveryPending = false; // true when camera was auto-opened on discovery
+let photoCaptureSelfie = false; // true when front (selfie) camera is active
 
 function startPhotoCapture(locationKey) {
     photoCaptureLocationKey = locationKey;
@@ -1320,19 +1321,27 @@ function startPhotoCapture(locationKey) {
     openModal('photo-capture-modal');
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(stream => {
-                photoCaptureStream = stream;
-                const video = document.getElementById('photo-capture-video');
-                if (video) {
-                    video.srcObject = stream;
-                    video.play();
-                }
-            })
-            .catch(err => {
-                console.error('Camera error for photo capture:', err);
-                showNotification('Could not access camera.', 'warning');
-                closePhotoCapture();
+        const applyStream = (stream, selfie) => {
+            photoCaptureSelfie = selfie;
+            photoCaptureStream = stream;
+            const video = document.getElementById('photo-capture-video');
+            if (video) {
+                video.srcObject = stream;
+                video.classList.toggle('selfie', selfie);
+                video.play();
+            }
+        };
+        // Try front (selfie) camera first; fall back to back camera silently
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then(stream => applyStream(stream, true))
+            .catch(() => {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(stream => applyStream(stream, false))
+                    .catch(err => {
+                        console.error('Camera error for photo capture:', err);
+                        showNotification('Could not access camera.', 'warning');
+                        closePhotoCapture();
+                    });
             });
     } else {
         showNotification('Camera not supported on this device.', 'warning');
@@ -1351,7 +1360,16 @@ function captureLocationPhoto() {
     canvas.width = cw;
     canvas.height = ch;
     const ctx = canvas.getContext('2d');
+    if (photoCaptureSelfie) {
+        // Mirror the canvas to match the mirrored preview shown to the user
+        ctx.save();
+        ctx.translate(cw, 0);
+        ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0, cw, ch);
+    if (photoCaptureSelfie) {
+        ctx.restore();
+    }
 
     // Watermark
     ctx.font = `bold ${Math.round(cw * 0.033)}px sans-serif`;
@@ -1413,8 +1431,12 @@ function closePhotoCapture() {
         photoCaptureStream.getTracks().forEach(t => t.stop());
         photoCaptureStream = null;
     }
+    photoCaptureSelfie = false;
     const video = document.getElementById('photo-capture-video');
-    if (video) video.srcObject = null;
+    if (video) {
+        video.srcObject = null;
+        video.classList.remove('selfie');
+    }
     closeModal('photo-capture-modal');
 
     if (photoCaptureDiscoveryPending) {
