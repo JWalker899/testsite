@@ -30,7 +30,6 @@ Interactive gamification to explore Rasnov:
 - **Location Services**: Automatic discovery when near locations
 - **Progress Tracking**: Visual progress bar showing completion (X/8 locations)
 - **Educational Facts**: Learn interesting history about each discovered location
-- **Testing Mode**: Easy testing without physical QR codes or location requirements
 
 ### 🌟 Additional Tourist Features
 - **Interactive Map**: Shows all locations from Google Places with enhanced popups
@@ -121,13 +120,6 @@ Deploy to GitHub Pages or any static host with automatic weekly data updates:
 
 ### Using the Treasure Hunt
 
-#### For Testing (Recommended for Demo)
-1. Click **"Testing Mode"** button (orange)
-2. Click **"Start Hunt"** button
-3. Click on any location name to mark it as "found"
-4. View progress bar and fun facts
-
-#### For Real Use with QR Codes
 1. Print QR codes with these values at each location:
    - Fortress: `RASNOV_FORTRESS`
    - Well: `RASNOV_WELL`

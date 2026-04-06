@@ -12,7 +12,6 @@ const isHuntPage = !!document.getElementById('scan-qr');
 const startHuntBtn = document.getElementById('start-hunt');
 const scanQrBtn = document.getElementById('scan-qr');
 const useLocationBtn = document.getElementById('use-location');
-const testLocationBtn = document.getElementById('test-location');
 const resetHuntBtn = document.getElementById('reset-hunt');
 const progressFill = document.getElementById('progress-fill');
 const progressCount = document.getElementById('progress-count');
@@ -27,7 +26,6 @@ const arSceneContainer = document.getElementById('ar-scene-container');
 const arOverlayText = document.getElementById('ar-overlay-text');
 const arLocationName = document.getElementById('ar-location-name');
 const arLocationHint = document.getElementById('ar-location-hint');
-const arTestModeIndicator = document.getElementById('ar-test-mode-indicator');
 const arCaptureBtn = document.getElementById('ar-capture-btn');
 const arHuntBanner = document.getElementById('ar-hunt-banner');
 const arHuntText = document.getElementById('ar-hunt-text');
@@ -35,7 +33,6 @@ const arFlash = document.getElementById('ar-flash');
 
 // State Management
 let huntActive = false;
-let testingMode = false;
 let foundLocations = new Set();
 let foundExtraLocations = new Set(); // keys of found bonus (off-track) locations
 
@@ -1232,35 +1229,6 @@ useLocationBtn.addEventListener('click', () => {
 });
 --- end geolocation handler --- */
 
-/* TEST LOCATION BUTTON – handler commented out intentionally.
-   The button is also commented out in hunt.html (search for "TEST LOCATION BUTTON").
-   Kept here in case it needs to be restored in a future revision.
-   To re-enable: uncomment this block and re-enable the button in hunt.html.
-
-// Test Location Button - Launch AR for first unfound location
-if (testLocationBtn) testLocationBtn.addEventListener('click', () => {
-    // Find first unfound location
-    const locationKeys = Object.keys(huntLocations);
-    let targetLocation = locationKeys[0]; // Default to fortress
-    
-    for (const key of locationKeys) {
-        if (!foundLocations.has(key)) {
-            targetLocation = key;
-            break;
-        }
-    }
-    
-    // Check if browser supports getUserMedia
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showNotification('Camera access is not supported on this browser. Please use a modern browser with HTTPS.', 'error');
-        return;
-    }
-    
-    showNotification(`Testing at ${huntLocations[targetLocation].name}...`, 'info');
-    launchARExperience(targetLocation, true);
-});
-*/
-
 // AR Close Button
 if (arCloseBtn) arCloseBtn.addEventListener('click', () => {
     closeARView();
@@ -1270,32 +1238,6 @@ if (arCloseBtn) arCloseBtn.addEventListener('click', () => {
 if (arCaptureBtn) arCaptureBtn.addEventListener('click', () => {
     captureARPhoto();
 });
-
-function handleTestingModeClick(e) {
-    if (testingMode && huntActive) {
-        const locationKey = this.dataset.location;
-        if (!foundLocations.has(locationKey)) {
-            discoverLocation(locationKey);
-        }
-    }
-}
-
-let qrScannerActive = false;
-let qrScannerCanvas = null;
-let qrScannerContext = null;
-
-// Quiz gating state: require a question answer before awarding points
-let pendingQuizLocationKey = null;
-let pendingQuizExtraInfo = null;
-let pendingQuizIsExtra = false;
-let pendingQuizIsFirstVisit = false;
-let pendingQuizAttempts = 0;
-const MAX_QUIZ_ATTEMPTS = 3;
-
-// Simple photo capture (no AR) — used after QR code discovery
-let photoCaptureStream = null;
-let photoCaptureLocationKey = null;
-let photoCaptureDiscoveryPending = false; // true when camera was auto-opened on discovery
 
 function startPhotoCapture(locationKey) {
     photoCaptureLocationKey = locationKey;
@@ -1454,20 +1396,12 @@ function startQRScanner() {
                 
                 // Start scanning for QR codes
                 requestAnimationFrame(scanQRCode);
-                
-                // Simulate QR code detection in testing mode
-                if (testingMode) {
-                    setTimeout(() => {
-                        const randomLocation = Object.keys(huntLocations)[Math.floor(Math.random() * Object.keys(huntLocations).length)];
-                        simulateQRScan(randomLocation);
-                    }, 2000);
-                }
             })
             .catch(err => {
                 console.error('Error accessing camera:', err);
                 showNotification(t('messages.cameraError'), 'warning');
                 
-                // In testing mode or if camera fails, show QR code options
+                // If camera fails, show QR code options
                 showQRCodeOptions();
             });
     } else {
@@ -1684,12 +1618,12 @@ function checkNearbyLocations() {
                 location.lat, location.lng
             );
             
-            // Within 100 meters (or 50km in testing mode for easier testing)
-            const threshold = testingMode ? 50000 : 100;
+            // Within 100 meters
+            const threshold = 100;
             
             if (distance < threshold) {
                 // Launch AR experience instead of just discovering
-                launchARExperience(key, false);
+                launchARExperience(key);
                 foundNearby = true;
             }
         }
@@ -1921,7 +1855,7 @@ function closeSurveyForm() {
 }
 
 // AR Camera Functions
-async function launchARExperience(locationKey, isTestMode = false) {
+async function launchARExperience(locationKey) {
     currentARLocation = locationKey;
     const location = huntLocations[locationKey];
     
@@ -1959,13 +1893,6 @@ async function launchARExperience(locationKey, isTestMode = false) {
 
     // Start lightweight orientation tracking (no image processing – just sensor polling)
     _startOrientationTracking();
-    
-    // Show test mode indicator if applicable
-    if (isTestMode) {
-        arTestModeIndicator.style.display = 'flex';
-    } else {
-        arTestModeIndicator.style.display = 'none';
-    }
 
     // ── Try WebXR immersive-ar first (Android Chrome + ARCore) ────────────────
     // WebXR gives true ground-plane hit testing and 6DoF pose – Pokémon GO style.
@@ -1990,16 +1917,6 @@ async function launchARExperience(locationKey, isTestMode = false) {
         
     } catch (error) {
         console.error('AR Camera Error:', error);
-        
-        // In test mode, show demo view even without camera
-        if (isTestMode) {
-            arLoading.classList.add('hidden');
-            
-            // Setup AR scene without camera (will show placeholder)
-            setupARScene(locationKey);
-            
-            return;
-        }
         
         arLoading.classList.add('hidden');
         
@@ -3105,7 +3022,6 @@ function closeARView() {
     
     // Reset state
     currentARLocation = null;
-    arTestModeIndicator.style.display = 'none';
     
     console.log('AR view closed');
 }
@@ -4527,5 +4443,4 @@ loadScavengerData().then(() => {
 document.documentElement.style.scrollBehavior = 'smooth';
 
 console.log('Discover Rasnov - Tourist Website Initialized');
-console.log('Testing mode available for treasure hunt');
 console.log('User Points System Active - Points saved to account');

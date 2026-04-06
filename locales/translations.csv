@@ -178,10 +178,8 @@ messages.startHuntFirst,Please start the hunt first!,Vă rugăm să porniți vâ
 messages.gettingLocation,Getting your location...,Se obține locația dvs...
 messages.locationError,Could not get your location. Please enable location services.,Nu s-a putut obține locația. Activați serviciile de localizare.
 messages.geolocationNotSupported,Geolocation is not supported by your browser.,Geolocalizarea nu este acceptată de browserul dvs.
-messages.testingEnabled,Testing mode enabled! Click on any location to mark it as found.,Mod testare activat! Apăsați pe orice locație pentru a o marca ca găsită.
-messages.testingDisabled,Testing mode disabled.,Mod testare dezactivat.
 messages.cameraNotSupported,Camera access is not supported on this browser. Please use a modern browser with HTTPS.,Accesul la cameră nu este acceptat de acest browser. Folosiți un browser modern cu HTTPS.
-messages.cameraError,Could not access camera. Testing mode allows manual selection.,Nu se poate accesa camera. Modul testare permite selecție manuală.
+messages.cameraError,Could not access camera.,Nu se poate accesa camera.
 messages.qrSuccess,QR Code scanned successfully!,Cod QR scanat cu succes!
 messages.alreadyFound,You already found this location!,Ai găsit deja această locație!
 messages.qrUnrecognized,QR code not recognized. Make sure you're at a treasure hunt location.,Cod QR nerecunoscut. Asigurați-vă că sunteți la o locație a vânătorii.
