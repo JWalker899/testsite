@@ -218,7 +218,7 @@
     "scanQR": "Scan QR Code",
     "sectionTitle": "Treasure Hunt",
     "sectionSubtitle": "Explore Rasnov in a fun, interactive way!",
-    "nextSite": "Next Site: ",
+    "nextSite": "Next Site:",
     "progress": {
       "title": "Your Progress",
       "locationsFound": "locations found"
