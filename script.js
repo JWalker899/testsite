@@ -4486,5 +4486,34 @@ loadScavengerData().then(() => {
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
 
+// Cookie Consent Logic
+(function initCookieConsent() {
+    const cookieConsent = document.getElementById('cookie-consent');
+    const acceptBtn = document.getElementById('accept-cookies');
+    const rejectBtn = document.getElementById('reject-cookies');
+
+    if (!cookieConsent || !acceptBtn || !rejectBtn) return; // Not on a page with cookie banner
+
+    const consentKey = 'rasnov_cookie_consent';
+    const consent = localStorage.getItem(consentKey);
+
+    if (!consent) {
+        // Show banner if no consent given
+        cookieConsent.style.display = 'block';
+    }
+
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem(consentKey, 'accepted');
+        cookieConsent.style.display = 'none';
+        // Here you could enable analytics or other cookies
+    });
+
+    rejectBtn.addEventListener('click', () => {
+        localStorage.setItem(consentKey, 'rejected');
+        cookieConsent.style.display = 'none';
+        // Disable non-essential cookies
+    });
+})();
+
 console.log('Discover Rasnov - Tourist Website Initialized');
 console.log('User Points System Active - Points saved to account');

@@ -2969,3 +2969,62 @@ body {
 .welcome-content .cta-button {
     margin-top: 1.25rem;
 }
+
+/* Cookie Consent Banner */
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 1rem;
+    z-index: 10000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    display: none; /* Hidden by default, shown via JS */
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cookie-content p {
+    flex: 1;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.cookie-buttons button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.cookie-buttons button:hover {
+    background: var(--secondary-color);
+}
+
+.cookie-buttons #reject-cookies {
+    background: transparent;
+    border: 1px solid white;
+}
+
+.cookie-buttons #reject-cookies:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

@@ -432,5 +432,11 @@
       "expensive": "Scump",
       "veryExpensive": "Foarte scump"
     }
+  },
+  "cookies": {
+    "message": "Acest site web utilizează cookie-uri pentru a vă îmbunătăți experiența. Continuând să utilizați acest site, sunteți de acord cu utilizarea cookie-urilor noastre.",
+    "accept": "Accept",
+    "reject": "Respinge",
+    "settings": "Setări cookie"
   }
 }
