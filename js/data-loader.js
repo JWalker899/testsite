@@ -26,6 +26,32 @@
   let placesData = null;
 
   /**
+   * Get a translated string using the global t() function, with fallback
+   */
+  function tr(key, vars) {
+    if (typeof window.t === 'function') {
+      return window.t(key, vars);
+    }
+    // Minimal fallback if i18n hasn't loaded yet
+    const fallbacks = {
+      'cards.learnMore': 'Learn More',
+      'cards.openNow': 'Open now',
+      'cards.closed': 'Closed',
+      'cards.address': 'Address',
+      'cards.phone': 'Phone',
+      'cards.website': 'Website',
+      'cards.openingHours': 'Opening Hours',
+      'cards.priceLevel': 'Price Level',
+      'cards.visitWebsite': 'Visit website',
+      'cards.viewOnMap': 'View on Map',
+      'cards.callNow': 'Call Now',
+      'cards.featuredPlace': 'Featured Place of the Day',
+      'cards.loading': 'Loading amazing places...',
+    };
+    return fallbacks[key] || key;
+  }
+
+  /**
    * Initialize the data loader
    */
   async function init() {
@@ -93,7 +119,7 @@
           grid.innerHTML = `
             <div class="loading-state">
               <div class="loading-spinner"></div>
-              <p>Loading amazing places...</p>
+              <p>${tr('cards.loading')}</p>
             </div>
           `;
         }
@@ -172,7 +198,7 @@
       if (cardImage) {
         const banner = document.createElement('div');
         banner.className = 'featured-banner';
-        banner.innerHTML = '<i class="fas fa-star"></i> Featured Place of the Day';
+        banner.innerHTML = `<i class="fas fa-star"></i> ${tr('cards.featuredPlace')}`;
         cardImage.prepend(banner);
       }
       grid.appendChild(card);
@@ -246,7 +272,7 @@
           ${getMetaInfo(place, category)}
         </div>
         <button class="card-button" data-action="show-details">
-          Learn More
+          ${tr('cards.learnMore')}
         </button>
       </div>
     `;
@@ -271,9 +297,9 @@
     }
     
     // Generate description from address and rating
-    let desc = place.address || 'A wonderful place to visit in Rasnov';
+    let desc = place.address || tr('cards.defaultDesc');
     if (place.rating && place.userRatingsTotal > 0) {
-      desc += `. Rated ${place.rating}/5 by ${place.userRatingsTotal} visitors.`;
+      desc += '. ' + tr('cards.ratedBy', { rating: place.rating, count: place.userRatingsTotal });
     }
     return escapeHtml(desc);
   }
@@ -286,7 +312,7 @@
 
     // Opening hours
     if (place.openingHours) {
-      const status = place.openingHours.openNow ? 'Open now' : 'Closed';
+      const status = place.openingHours.openNow ? tr('cards.openNow') : tr('cards.closed');
       const icon = place.openingHours.openNow ? 'clock' : 'clock';
       meta.push(`<span><i class="fas fa-${icon}"></i> ${status}</span>`);
     }
@@ -299,7 +325,7 @@
 
     // Rating and reviews
     if (place.rating && place.userRatingsTotal > 0) {
-      meta.push(`<span><i class="fas fa-users"></i> ${place.userRatingsTotal} reviews</span>`);
+      meta.push(`<span><i class="fas fa-users"></i> ${tr('cards.reviews', { count: place.userRatingsTotal })}</span>`);
     }
 
     // Phone
@@ -377,7 +403,7 @@
             <div class="modal-info-item">
               <i class="fas fa-map-marker-alt"></i>
               <div>
-                <strong>Address</strong>
+                <strong>${tr('cards.address')}</strong>
                 <p>${escapeHtml(place.address)}</p>
               </div>
             </div>
@@ -387,7 +413,7 @@
             <div class="modal-info-item">
               <i class="fas fa-phone"></i>
               <div>
-                <strong>Phone</strong>
+                <strong>${tr('cards.phone')}</strong>
                 <p><a href="tel:${place.phone}">${escapeHtml(place.phone)}</a></p>
               </div>
             </div>
@@ -397,8 +423,8 @@
             <div class="modal-info-item">
               <i class="fas fa-globe"></i>
               <div>
-                <strong>Website</strong>
-                <p><a href="${place.website}" target="_blank" rel="noopener noreferrer">Visit website</a></p>
+                <strong>${tr('cards.website')}</strong>
+                <p><a href="${place.website}" target="_blank" rel="noopener noreferrer">${tr('cards.visitWebsite')}</a></p>
               </div>
             </div>
           ` : ''}
@@ -407,7 +433,7 @@
             <div class="modal-info-item">
               <i class="fas fa-clock"></i>
               <div>
-                <strong>Opening Hours</strong>
+                <strong>${tr('cards.openingHours')}</strong>
                 <ul class="opening-hours-list">
                   ${place.openingHours.weekdayText.map(day => `<li>${escapeHtml(day)}</li>`).join('')}
                 </ul>
@@ -419,7 +445,7 @@
             <div class="modal-info-item">
               <i class="fas fa-dollar-sign"></i>
               <div>
-                <strong>Price Level</strong>
+                <strong>${tr('cards.priceLevel')}</strong>
                 <p>${'💰'.repeat(place.priceLevel)} (${getPriceLevelText(place.priceLevel)})</p>
               </div>
             </div>
@@ -427,11 +453,11 @@
           
           <div class="modal-actions">
             <button class="modal-button" onclick="showOnMap(${place.coordinates.lat}, ${place.coordinates.lng}, '${escapeHtml(place.name)}')">
-              <i class="fas fa-map"></i> View on Map
+              <i class="fas fa-map"></i> ${tr('cards.viewOnMap')}
             </button>
             ${place.phone ? `
               <button class="modal-button" onclick="window.location.href='tel:${place.phone}'">
-                <i class="fas fa-phone"></i> Call Now
+                <i class="fas fa-phone"></i> ${tr('cards.callNow')}
               </button>
             ` : ''}
           </div>
@@ -447,13 +473,13 @@
    * Get price level text
    */
   function getPriceLevelText(level) {
-    const levels = {
-      1: 'Inexpensive',
-      2: 'Moderate',
-      3: 'Expensive',
-      4: 'Very Expensive'
+    const keys = {
+      1: 'cards.price.inexpensive',
+      2: 'cards.price.moderate',
+      3: 'cards.price.expensive',
+      4: 'cards.price.veryExpensive'
     };
-    return levels[level] || 'Unknown';
+    return keys[level] ? tr(keys[level]) : tr('cards.price.moderate');
   }
 
   /**
@@ -515,7 +541,7 @@
 
     indicator.innerHTML = `
       <i class="fas fa-info-circle"></i>
-      <span>Data last updated: ${formatted}</span>
+      <span>${tr('cards.lastUpdated', { date: formatted })}</span>
     `;
   }
 
@@ -553,5 +579,13 @@
   } else {
     init();
   }
+
+  // Re-render cards when language changes
+  document.addEventListener('languageChanged', function() {
+    if (placesData) {
+      renderAllCards();
+      updateLastUpdatedTime();
+    }
+  });
 
 })();

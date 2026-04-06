@@ -351,6 +351,7 @@
     "funFact": "Curiozitate",
     "takePhoto": "📸 Fă o poză aici",
     "huntComplete": "🎉 Felicitări! Ai completat vânătoarea! Total puncte: {{points}}",
+    "bonusLocationsPrompt": "Acum găsiți locațiile bonus ascunse prin oraș!",
     "bearWalking": "🐻 Grizzly vine spre tine!",
     "bearHere": "🐻 Grizzly e aici! Fă o poză!",
     "moveCamera": "Mișcă camera și găsește Grizzly la {{name}}!",
@@ -369,5 +370,30 @@
     "description": "Descriere",
     "amenities": "Facilități",
     "book": "Rezervă"
+  },
+  "cards": {
+    "learnMore": "Află mai mult",
+    "ratedBy": "Evaluat {{rating}}/5 de {{count}} vizitatori.",
+    "reviews": "{{count}} recenzii",
+    "openNow": "Deschis acum",
+    "closed": "Închis",
+    "defaultDesc": "Un loc minunat de vizitat în Râșnov",
+    "lastUpdated": "Date actualizate la: {{date}}",
+    "loading": "Se încarcă locații uimitoare...",
+    "featuredPlace": "Locul zilei",
+    "address": "Adresă",
+    "phone": "Telefon",
+    "website": "Site web",
+    "openingHours": "Ore de deschidere",
+    "priceLevel": "Nivel de preț",
+    "visitWebsite": "Vizitează site-ul",
+    "viewOnMap": "Vizualizează pe hartă",
+    "callNow": "Sună acum",
+    "price": {
+      "inexpensive": "Ieftin",
+      "moderate": "Moderat",
+      "expensive": "Scump",
+      "veryExpensive": "Foarte scump"
+    }
   }
 }
