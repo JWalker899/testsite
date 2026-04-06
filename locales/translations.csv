@@ -129,6 +129,9 @@ hunt.tabRewards,Rewards,Recompense
 hunt.startHunt,Start Hunt,Începe Vânătoarea
 hunt.resetHunt,Reset Hunt,Resetează
 hunt.scanQR,Scan QR Code,Scanează QR
+hunt.sectionTitle,Treasure Hunt,Vânătoare de Comori
+hunt.sectionSubtitle,Explore Rasnov in a fun, interactive way!,Explorați Râșnovul într-un mod distractiv și interactiv!
+hunt.nextSite,Next Site:,Locul următor:
 hunt.progress.title,Your Progress,Progresul tău
 hunt.progress.locationsFound,locations found,locații găsite
 hunt.items.fortress,Rasnov Fortress Gate,Poarta Cetății Râșnov
@@ -198,6 +201,22 @@ rewards.download,📥 Download,📥 Descarcă
 rewards.share,📤 Share,📤 Distribuie
 rewards.journeyTitle,🗺️ My Rasnov Journey,🗺️ Călătoria mea în Râșnov
 rewards.photoSaved,Photo saved to your collage!,Fotografie salvată în colajul tău!
+themes.default.name,Mountain Blue,Albastru Montan
+themes.default.description,The classic Rasnov look.,Aspectul clasic din Râșnov.
+themes.forest.name,Forest Green,Verde Pădure
+themes.forest.description,Deep Carpathian forest vibes.,Spiritul pădurii carpatice profunde.
+themes.sunset.name,Sunset Glow,Strălucire la Apus
+themes.sunset.description,Warm glow of a Rasnov sunset.,Căldura unui apus din Râșnov.
+themes.survey.name,Survey Supporter,Susținător Sondaj
+themes.survey.description,Unlocked by starting the Rasnov survey. Thank you for your feedback!,Deblocat prin participarea la sondajul din Râșnov. Mulțumim pentru feedback!
+discounts.cafe.name,10% off at local cafés,10% reducere la cafenelele locale
+discounts.cafe.description,Show your progress to any participating café in Rasnov old town.,Arată-ți progresul la orice cafenea participantă din centrul vechi al Râșnovului.
+discounts.dino.name,Free Dino Park upgrade,Upgrade gratuit la Dino Park
+discounts.dino.description,Upgrade your Dino Park ticket to premium for free.,Upgradează biletul tău Dino Park la premium gratuit.
+discounts.fortress.name,Free fortress audio guide,Ghid audio gratuit la cetate
+discounts.fortress.description,Download the Rasnov Fortress audio guide at no charge.,Descarcă ghidul audio al Cetății Râșnov gratuit.
+discounts.souvenir.name,Rasnov explorer souvenir,Suvenir de explorator Râșnov
+discounts.souvenir.description,Collect a free Rasnov explorer pin from the tourism office.,Ridică un pin gratuit de explorator Râșnov de la biroul de turism.
 messages.startHuntFirst,Please start the hunt first!,Vă rugăm să porniți vânătoarea mai întâi!
 messages.gettingLocation,Getting your location...,Se obține locația dvs...
 messages.locationError,Could not get your location. Please enable location services.,Nu s-a putut obține locația. Activați serviciile de localizare.

@@ -216,6 +216,9 @@
     "startHunt": "Începe Vânătoarea",
     "resetHunt": "Resetează",
     "scanQR": "Scanează QR",
+    "sectionTitle": "Vânătoare de Comori",
+    "sectionSubtitle": "Explorați Râșnovul într-un mod distractiv și interactiv!",
+    "nextSite": "Locul următor:",
     "progress": {
       "title": "Progresul tău",
       "locationsFound": "locații găsite"
@@ -244,6 +247,42 @@
     "colTime": "Timp",
     "loading": "Se încarcă clasamentul...",
     "refresh": "Actualizează"
+  },
+  "themes": {
+    "default": {
+      "name": "Albastru Montan",
+      "description": "Aspectul clasic din Râșnov."
+    },
+    "forest": {
+      "name": "Verde Pădure",
+      "description": "Spiritul pădurii carpatice profunde."
+    },
+    "sunset": {
+      "name": "Strălucire la Apus",
+      "description": "Căldura unui apus din Râșnov."
+    },
+    "survey": {
+      "name": "Susținător Sondaj",
+      "description": "Deblocat prin participarea la sondajul din Râșnov. Mulțumim pentru feedback!"
+    }
+  },
+  "discounts": {
+    "cafe": {
+      "name": "10% reducere la cafenelele locale",
+      "description": "Arată-ți progresul la orice cafenea participantă din centrul vechi al Râșnovului."
+    },
+    "dino": {
+      "name": "Upgrade gratuit la Dino Park",
+      "description": "Upgradează biletul tău Dino Park la premium gratuit."
+    },
+    "fortress": {
+      "name": "Ghid audio gratuit la cetate",
+      "description": "Descarcă ghidul audio al Cetății Râșnov gratuit."
+    },
+    "souvenir": {
+      "name": "Suvenir de explorator Râșnov",
+      "description": "Ridică un pin gratuit de explorator Râșnov de la biroul de turism."
+    }
   },
   "rewards": {
     "title": "Recompense",

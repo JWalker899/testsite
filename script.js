@@ -3846,9 +3846,9 @@ document.addEventListener('languageChanged', (e) => {
 const THEMES = [
     {
         id: 'default',
-        name: 'Mountain Blue',
+        nameKey: 'themes.default.name',
         emoji: '🏔️',
-        description: 'The classic Rasnov look.',
+        descriptionKey: 'themes.default.description',
         pointsRequired: 0,
         vars: {
             '--primary-color': '#2c5f8d',
@@ -3858,9 +3858,9 @@ const THEMES = [
     },
     {
         id: 'forest',
-        name: 'Forest Green',
+        nameKey: 'themes.forest.name',
         emoji: '🌲',
-        description: 'Deep Carpathian forest vibes.',
+        descriptionKey: 'themes.forest.description',
         pointsRequired: 30,
         vars: {
             '--primary-color': '#2e7d32',
@@ -3870,9 +3870,9 @@ const THEMES = [
     },
     {
         id: 'sunset',
-        name: 'Sunset Glow',
+        nameKey: 'themes.sunset.name',
         emoji: '🌅',
-        description: 'Warm glow of a Rasnov sunset.',
+        descriptionKey: 'themes.sunset.description',
         pointsRequired: 80,
         vars: {
             '--primary-color': '#bf360c',
@@ -3882,9 +3882,9 @@ const THEMES = [
     },
     {
         id: 'survey',
-        name: 'Survey Supporter',
+        nameKey: 'themes.survey.name',
         emoji: '📋',
-        description: 'Unlocked by starting the Rasnov survey. Thank you for your feedback!',
+        descriptionKey: 'themes.survey.description',
         pointsRequired: 0,
         surveyRequired: true,
         vars: {
@@ -3899,26 +3899,26 @@ const THEMES = [
 const DISCOUNTS = [
     {
         emoji: '☕',
-        name: '10% off at local cafés',
-        description: 'Show your progress to any participating café in Rasnov old town.',
+        nameKey: 'discounts.cafe.name',
+        descriptionKey: 'discounts.cafe.description',
         placesRequired: 2
     },
     {
         emoji: '🦕',
-        name: 'Free Dino Park upgrade',
-        description: 'Upgrade your Dino Park ticket to premium for free.',
+        nameKey: 'discounts.dino.name',
+        descriptionKey: 'discounts.dino.description',
         placesRequired: 4
     },
     {
         emoji: '🏰',
-        name: 'Free fortress audio guide',
-        description: 'Download the Rasnov Fortress audio guide at no charge.',
+        nameKey: 'discounts.fortress.name',
+        descriptionKey: 'discounts.fortress.description',
         placesRequired: 6
     },
     {
         emoji: '🎁',
-        name: 'Rasnov explorer souvenir',
-        description: 'Collect a free Rasnov explorer pin from the tourism office.',
+        nameKey: 'discounts.souvenir.name',
+        descriptionKey: 'discounts.souvenir.description',
         placesRequired: 8
     }
 ];
@@ -4450,7 +4450,7 @@ function renderUnlocksTab() {
             ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">${t('rewards.apply')}</button>`
             : '';
         return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
-            <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
+            <span class="theme-badge-name">${t(theme.nameKey)}${active ? ' ✓' : ''}</span>
             <span class="theme-badge-pts">${ptsLabel}</span>
             ${applyBtn}
         </div>`;
@@ -4461,8 +4461,8 @@ function renderUnlocksTab() {
         const unlocked = totalFound >= d.placesRequired;
         return `<div class="discount-card ${unlocked ? 'unlocked' : 'locked'}">
             <div class="discount-emoji">${d.emoji}</div>
-            <div class="discount-name">${d.name}</div>
-            <div class="discount-desc">${d.description}</div>
+            <div class="discount-name">${t(d.nameKey)}</div>
+            <div class="discount-desc">${t(d.descriptionKey)}</div>
             <div class="discount-req">${unlocked ? t('rewards.unlocked') : t('rewards.findPlaces', {count: d.placesRequired})}</div>
         </div>`;
     }).join('');
