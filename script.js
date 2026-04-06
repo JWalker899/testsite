@@ -3861,6 +3861,7 @@ document.addEventListener('languageChanged', (e) => {
     const lang = getCurrentLang().toUpperCase();
     langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
     langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
+    renderUnlocksTab();
 });
 // ==================== Initialization ====================
 
