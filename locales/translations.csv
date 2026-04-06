@@ -148,7 +148,7 @@ leaderboard.colRank,#,#
 leaderboard.colPlayer,Player,Jucător
 leaderboard.colPoints,Points,Puncte
 leaderboard.colLocations,Locations,Locații
-leaderboard.colStatus,Status,Status
+leaderboard.colTime,Time,Timp
 leaderboard.loading,Loading leaderboard...,Se încarcă clasamentul...
 leaderboard.refresh,Refresh,Actualizează
 modals.qr.title,Scan QR Code,Scanează codul QR
@@ -173,7 +173,31 @@ modals.survey.no,Maybe later,Poate mai târziu
 modals.surveyForm.title,Rasnov Survey,Sondaj Râșnov
 modals.surveyForm.openTab,Open in new tab ↗,Deschide în filă nouă ↗
 modals.collage.silver,Silver Collage Unlocked!,Colaj de Argint Deblocat!
+modals.collage.gold,Gold Collage Unlocked!,Colaj de Aur Deblocat!
+modals.collage.silverMsg,You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!,Ați vizitat 6 locuri — colajul are acum un cadru de argint. Continuați explorarea pentru aur!
+modals.collage.goldMsg,You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!,Ați vizitat 10 locuri — colajul are acum un cadru de aur. Împărtășiți aventura din Râșnov!
 modals.collage.viewCollage,View My Collage,Vezi Colajul Meu
+rewards.title,Rewards,Recompense
+rewards.themeUnlocks,Theme Unlocks,Teme Deblocate
+rewards.discounts,Discounts,Reduceri
+rewards.collageTitle,Your Rasnov Collage,Colajul tău din Râșnov
+rewards.collageIntro,"Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.","Amintirile tale din explorarea Râșnovului. Câștigă un cadru de argint la 6 locuri și unul de aur la 10."
+rewards.apply,Apply,Aplică
+rewards.unlocked,✓ Unlocked!,✓ Deblocat!
+rewards.findPlaces,🔒 Find {{count}} places,🔒 Găsește {{count}} locuri
+rewards.goldCollage,Gold Collage,Colaj de Aur
+rewards.silverCollage,Silver Collage,Colaj de Argint
+rewards.collageEmpty,Scan a location QR code and take your first photo to start building your collage!,Scanați un cod QR la o locație și faceți prima fotografie pentru a construi colajul!
+rewards.collageFooter,📷 {{photos}} photo · {{found}} / {{total}} places explored,📷 {{photos}} fotografie · {{found}} / {{total}} locuri explorate
+rewards.collageFooterPlural,📷 {{photos}} photos · {{found}} / {{total}} places explored,📷 {{photos}} fotografii · {{found}} / {{total}} locuri explorate
+rewards.collageTip,"— find 6 for a silver collage, 10 for gold","— găsește 6 pentru colaj de argint, 10 pentru aur"
+rewards.polaroid,📌 Polaroid,📌 Polaroid
+rewards.hexagon,⬡ Hexagon,⬡ Hexagon
+rewards.grid,▦ Grid,▦ Grilă
+rewards.download,📥 Download,📥 Descarcă
+rewards.share,📤 Share,📤 Distribuie
+rewards.journeyTitle,🗺️ My Rasnov Journey,🗺️ Călătoria mea în Râșnov
+rewards.photoSaved,Photo saved to your collage!,Fotografie salvată în colajul tău!
 messages.startHuntFirst,Please start the hunt first!,Vă rugăm să porniți vânătoarea mai întâi!
 messages.gettingLocation,Getting your location...,Se obține locația dvs...
 messages.locationError,Could not get your location. Please enable location services.,Nu s-a putut obține locația. Activați serviciile de localizare.
