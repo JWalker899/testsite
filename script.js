@@ -748,11 +748,14 @@ function restoreHuntState() {
         const lastRegular = [...currentUser.locationsFound].reverse().find(k => huntLocations[k]);
         if (lastRegular) updateNextSiteBanner(lastRegular);
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
-        if (startHuntBtn) {
-            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.classList.remove('active-hunt');
-            startHuntBtn.classList.add('hunt-complete');
-        }
+        huntActive = true;
+        if (startHuntBtn) startHuntBtn.style.display = 'none';
+        if (resetHuntBtn) resetHuntBtn.style.display = '';
+        if (scanQrBtn) scanQrBtn.disabled = false;
+        // Remind the user to look for bonus locations
+        setTimeout(() => {
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
+        }, 500);
     }
 }
 
@@ -1239,6 +1242,32 @@ if (arCaptureBtn) arCaptureBtn.addEventListener('click', () => {
     captureARPhoto();
 });
 
+function handleTestingModeClick(e) {
+    if (testingMode && huntActive) {
+        const locationKey = this.dataset.location;
+        if (!foundLocations.has(locationKey)) {
+            discoverLocation(locationKey);
+        }
+    }
+}
+
+let qrScannerActive = false;
+let qrScannerCanvas = null;
+let qrScannerContext = null;
+
+// Quiz gating state: require a question answer before awarding points
+let pendingQuizLocationKey = null;
+let pendingQuizExtraInfo = null;
+let pendingQuizIsExtra = false;
+let pendingQuizIsFirstVisit = false;
+let pendingQuizAttempts = 0;
+const MAX_QUIZ_ATTEMPTS = 3;
+
+// Simple photo capture (no AR) — used after QR code discovery
+let photoCaptureStream = null;
+let photoCaptureLocationKey = null;
+let photoCaptureDiscoveryPending = false; // true when camera was auto-opened on discovery
+
 function startPhotoCapture(locationKey) {
     photoCaptureLocationKey = locationKey;
     const loc = huntLocations[locationKey];
@@ -1259,19 +1288,27 @@ function startPhotoCapture(locationKey) {
     openModal('photo-capture-modal');
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(stream => {
-                photoCaptureStream = stream;
-                const video = document.getElementById('photo-capture-video');
-                if (video) {
-                    video.srcObject = stream;
-                    video.play();
-                }
-            })
-            .catch(err => {
-                console.error('Camera error for photo capture:', err);
-                showNotification('Could not access camera.', 'warning');
-                closePhotoCapture();
+        const applyStream = (stream, selfie) => {
+            photoCaptureSelfie = selfie;
+            photoCaptureStream = stream;
+            const video = document.getElementById('photo-capture-video');
+            if (video) {
+                video.srcObject = stream;
+                video.classList.toggle('selfie', selfie);
+                video.play();
+            }
+        };
+        // Try front (selfie) camera first; fall back to back camera silently
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then(stream => applyStream(stream, true))
+            .catch(() => {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(stream => applyStream(stream, false))
+                    .catch(err => {
+                        console.error('Camera error for photo capture:', err);
+                        showNotification('Could not access camera.', 'warning');
+                        closePhotoCapture();
+                    });
             });
     } else {
         showNotification('Camera not supported on this device.', 'warning');
@@ -1290,7 +1327,16 @@ function captureLocationPhoto() {
     canvas.width = cw;
     canvas.height = ch;
     const ctx = canvas.getContext('2d');
+    if (photoCaptureSelfie) {
+        // Mirror the canvas to match the mirrored preview shown to the user
+        ctx.save();
+        ctx.translate(cw, 0);
+        ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0, cw, ch);
+    if (photoCaptureSelfie) {
+        ctx.restore();
+    }
 
     // Watermark
     ctx.font = `bold ${Math.round(cw * 0.033)}px sans-serif`;
@@ -1342,7 +1388,7 @@ function captureLocationPhoto() {
                 <img src="${dataUrl}" class="ar-captured-photo" alt="Your photo at ${escapeHtml(localizedName)}">`;
         }
 
-        showNotification('Photo saved to your collage!', 'success');
+        showNotification(t('rewards.photoSaved'), 'success');
         renderUnlocksTab();
     }, 600);
 }
@@ -1352,8 +1398,12 @@ function closePhotoCapture() {
         photoCaptureStream.getTracks().forEach(t => t.stop());
         photoCaptureStream = null;
     }
+    photoCaptureSelfie = false;
     const video = document.getElementById('photo-capture-video');
-    if (video) video.srcObject = null;
+    if (video) {
+        video.srcObject = null;
+        video.classList.remove('selfie');
+    }
     closeModal('photo-capture-modal');
 
     if (photoCaptureDiscoveryPending) {
@@ -1764,19 +1814,10 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     // Check if a new collage tier has been unlocked
     checkCollageUnlocks();
     
-    // Check if hunt is complete
+    // Check if all main hunt locations are now found
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            const celebrationMsg = t('messages.huntComplete', {points: currentUser.totalPoints});
-            showNotification(celebrationMsg, 'success');
-            huntActive = false;
-            if (startHuntBtn) {
-                startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-                startHuntBtn.classList.remove('active-hunt');
-                startHuntBtn.classList.add('hunt-complete');
-                startHuntBtn.style.display = '';
-            }
-            if (resetHuntBtn) resetHuntBtn.style.display = 'none';
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
         }, 2000);
     }
 }
@@ -2930,16 +2971,10 @@ function discoverLocationQuietly(locationKey) {
     // Update progress
     updateProgress();
     
-    // Check if hunt is complete
+    // Check if all main hunt locations are now found
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('Congratulations! You completed the treasure hunt!', 'success');
-            huntActive = false;
-            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.classList.remove('active-hunt');
-            startHuntBtn.classList.add('hunt-complete');
-            startHuntBtn.style.display = '';
-            resetHuntBtn.style.display = 'none';
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
         }, 1000);
     }
 }
@@ -3546,7 +3581,17 @@ function loadMap() {
     mapDiv.innerHTML = '<div id="map-display" style="width: 100%; height: 100%;"></div>';
     
     // Initialize Leaflet map
-    window.leafletMap = L.map('map-display').setView([45.5889, 25.4631], 14);
+    // Romania bounding box (with a small buffer) used as maxBounds to keep
+    // panning within the region, and minZoom prevents zooming too far out.
+    const romaniaBounds = L.latLngBounds(
+        L.latLng(43.5, 20.0),  // SW corner
+        L.latLng(48.5, 30.5)   // NE corner
+    );
+    window.leafletMap = L.map('map-display', {
+        minZoom: 7,
+        maxBounds: romaniaBounds,
+        maxBoundsViscosity: 1.0
+    }).setView([45.5889, 25.4631], 14);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -3757,6 +3802,7 @@ document.addEventListener('languageChanged', (e) => {
     const lang = getCurrentLang().toUpperCase();
     langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
     langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
+    renderUnlocksTab();
 });
 // ==================== Initialization ====================
 
@@ -3764,9 +3810,9 @@ document.addEventListener('languageChanged', (e) => {
 const THEMES = [
     {
         id: 'default',
-        name: 'Mountain Blue',
+        nameKey: 'themes.default.name',
         emoji: '🏔️',
-        description: 'The classic Rasnov look.',
+        descriptionKey: 'themes.default.description',
         pointsRequired: 0,
         vars: {
             '--primary-color': '#2c5f8d',
@@ -3776,9 +3822,9 @@ const THEMES = [
     },
     {
         id: 'forest',
-        name: 'Forest Green',
+        nameKey: 'themes.forest.name',
         emoji: '🌲',
-        description: 'Deep Carpathian forest vibes.',
+        descriptionKey: 'themes.forest.description',
         pointsRequired: 30,
         vars: {
             '--primary-color': '#2e7d32',
@@ -3788,9 +3834,9 @@ const THEMES = [
     },
     {
         id: 'sunset',
-        name: 'Sunset Glow',
+        nameKey: 'themes.sunset.name',
         emoji: '🌅',
-        description: 'Warm glow of a Rasnov sunset.',
+        descriptionKey: 'themes.sunset.description',
         pointsRequired: 80,
         vars: {
             '--primary-color': '#bf360c',
@@ -3800,9 +3846,9 @@ const THEMES = [
     },
     {
         id: 'survey',
-        name: 'Survey Supporter',
+        nameKey: 'themes.survey.name',
         emoji: '📋',
-        description: 'Unlocked by starting the Rasnov survey. Thank you for your feedback!',
+        descriptionKey: 'themes.survey.description',
         pointsRequired: 0,
         surveyRequired: true,
         vars: {
@@ -3817,26 +3863,26 @@ const THEMES = [
 const DISCOUNTS = [
     {
         emoji: '☕',
-        name: '10% off at local cafés',
-        description: 'Show your progress to any participating café in Rasnov old town.',
+        nameKey: 'discounts.cafe.name',
+        descriptionKey: 'discounts.cafe.description',
         placesRequired: 2
     },
     {
         emoji: '🦕',
-        name: 'Free Dino Park upgrade',
-        description: 'Upgrade your Dino Park ticket to premium for free.',
+        nameKey: 'discounts.dino.name',
+        descriptionKey: 'discounts.dino.description',
         placesRequired: 4
     },
     {
         emoji: '🏰',
-        name: 'Free fortress audio guide',
-        description: 'Download the Rasnov Fortress audio guide at no charge.',
+        nameKey: 'discounts.fortress.name',
+        descriptionKey: 'discounts.fortress.description',
         placesRequired: 6
     },
     {
         emoji: '🎁',
-        name: 'Rasnov explorer souvenir',
-        description: 'Collect a free Rasnov explorer pin from the tourism office.',
+        nameKey: 'discounts.souvenir.name',
+        descriptionKey: 'discounts.souvenir.description',
         placesRequired: 8
     }
 ];
@@ -3872,13 +3918,11 @@ function showCollageUnlockModal(tier) {
     const titleEl = document.getElementById('collage-unlock-title');
     const msgEl = document.getElementById('collage-unlock-msg');
     if (badgeEl) {
-        badgeEl.textContent = isGold ? 'Gold' : 'Silver';
+        badgeEl.textContent = isGold ? t('rewards.goldCollage') : t('rewards.silverCollage');
         badgeEl.className = `collage-modal-badge ${tier}`;
     }
-    if (titleEl) titleEl.textContent = isGold ? 'Gold Collage Unlocked!' : 'Silver Collage Unlocked!';
-    if (msgEl) msgEl.textContent = isGold
-        ? "You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!"
-        : "You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!";
+    if (titleEl) titleEl.textContent = isGold ? t('modals.collage.gold') : t('modals.collage.silver');
+    if (msgEl) msgEl.textContent = isGold ? t('modals.collage.goldMsg') : t('modals.collage.silverMsg');
     openModal('collage-unlock-modal');
 }
 
@@ -3892,7 +3936,7 @@ function buildCollageHTML(totalFound) {
     const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
     const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
     const tierLabelHTML = tier
-        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? 'Gold Collage' : 'Silver Collage'}</div>`
+        ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? t('rewards.goldCollage') : t('rewards.silverCollage')}</div>`
         : '';
 
     const collageStyle = localStorage.getItem('rasnov_collage_style') || 'polaroid';
@@ -3919,9 +3963,9 @@ function buildCollageHTML(totalFound) {
         return `<div class="collage-wrapper ${borderClass}">
             <div class="collage-empty-state">
                 <span class="collage-empty-icon">📷</span>
-                <p>Scan a location QR code and take your first photo to start building your collage!</p>
+                <p>${t('rewards.collageEmpty')}</p>
             </div>
-            <div class="collage-footer">${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+            <div class="collage-footer">${totalFound} / ${locationKeys.length} ${t('rewards.collageTip')}</div>
         </div>`;
     }
 
@@ -3955,9 +3999,9 @@ function buildCollageHTML(totalFound) {
 
     const styleButtons = `
         <div class="collage-style-switcher">
-            <button class="collage-style-btn ${collageStyle === 'polaroid' ? 'active' : ''}" onclick="setCollageStyle('polaroid')" title="Polaroid">📌 Polaroid</button>
-            <button class="collage-style-btn ${collageStyle === 'hexagon' ? 'active' : ''}" onclick="setCollageStyle('hexagon')" title="Hexagon">⬡ Hexagon</button>
-            <button class="collage-style-btn ${collageStyle === 'grid' ? 'active' : ''}" onclick="setCollageStyle('grid')" title="Grid">▦ Grid</button>
+            <button class="collage-style-btn ${collageStyle === 'polaroid' ? 'active' : ''}" onclick="setCollageStyle('polaroid')" title="Polaroid">${t('rewards.polaroid')}</button>
+            <button class="collage-style-btn ${collageStyle === 'hexagon' ? 'active' : ''}" onclick="setCollageStyle('hexagon')" title="Hexagon">${t('rewards.hexagon')}</button>
+            <button class="collage-style-btn ${collageStyle === 'grid' ? 'active' : ''}" onclick="setCollageStyle('grid')" title="Grid">${t('rewards.grid')}</button>
         </div>`;
 
     const tripDate = (() => {
@@ -3978,20 +4022,20 @@ function buildCollageHTML(totalFound) {
 
     const shareHTML = `
         <div class="collage-action-row">
-            <button class="collage-download-btn" onclick="downloadCollage()">📥 Download</button>
-            <button class="collage-share-btn" onclick="shareCollageNative()">📤 Share</button>
+            <button class="collage-download-btn" onclick="downloadCollage()">${t('rewards.download')}</button>
+            <button class="collage-share-btn" onclick="shareCollageNative()">${t('rewards.share')}</button>
         </div>
     `;
 
     return `<div class="collage-wrapper ${borderClass} collage-style-${collageStyle}">
         <div class="collage-header">
-            <span class="collage-title">🗺️ My Rasnov Journey</span>
+            <span class="collage-title">${t('rewards.journeyTitle')}</span>
             ${dateHTML}
         </div>
         ${tierLabelHTML}
         ${styleButtons}
         <div class="collage-grid">${cells}</div>
-        <div class="collage-footer">📷 ${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} · ${totalFound} / ${locationKeys.length} places explored${tier ? '' : ' — find 6 for a silver collage, 10 for gold'}</div>
+        <div class="collage-footer">${photoKeys.length === 1 ? t('rewards.collageFooter', {photos: photoKeys.length, found: totalFound, total: locationKeys.length}) : t('rewards.collageFooterPlural', {photos: photoKeys.length, found: totalFound, total: locationKeys.length})}${tier ? '' : ' ' + t('rewards.collageTip')}</div>
         ${shareHTML}
     </div>`;
 }
@@ -4367,10 +4411,10 @@ function renderUnlocksTab() {
             ? t('modals.surveyForm.title')
             : (theme.pointsRequired === 0 ? '🔓' : `${theme.pointsRequired} pts`);
         const applyBtn = (unlocked && !active)
-            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">Apply</button>`
+            ? `<button class="theme-badge-apply" onclick="applyTheme('${theme.id}')">${t('rewards.apply')}</button>`
             : '';
         return `<div class="theme-badge ${unlocked ? 'unlocked' : 'locked'} ${active ? 'active-theme' : ''}">
-            <span class="theme-badge-name">${theme.name}${active ? ' ✓' : ''}</span>
+            <span class="theme-badge-name">${t(theme.nameKey)}${active ? ' ✓' : ''}</span>
             <span class="theme-badge-pts">${ptsLabel}</span>
             ${applyBtn}
         </div>`;
@@ -4381,28 +4425,28 @@ function renderUnlocksTab() {
         const unlocked = totalFound >= d.placesRequired;
         return `<div class="discount-card ${unlocked ? 'unlocked' : 'locked'}">
             <div class="discount-emoji">${d.emoji}</div>
-            <div class="discount-name">${d.name}</div>
-            <div class="discount-desc">${d.description}</div>
-            <div class="discount-req">${unlocked ? '✓ Unlocked!' : `🔒 Find ${d.placesRequired} places`}</div>
+            <div class="discount-name">${t(d.nameKey)}</div>
+            <div class="discount-desc">${t(d.descriptionKey)}</div>
+            <div class="discount-req">${unlocked ? t('rewards.unlocked') : t('rewards.findPlaces', {count: d.placesRequired})}</div>
         </div>`;
     }).join('');
 
     container.innerHTML = `
-        <h2 class="section-title">Rewards</h2>
+        <h2 class="section-title">${t('rewards.title')}</h2>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Theme Unlocks</div>
+            <div class="rewards-section-title">${t('rewards.themeUnlocks')}</div>
             <div class="theme-unlocks-row">${themeBadgesHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Discounts</div>
+            <div class="rewards-section-title">${t('rewards.discounts')}</div>
             <div class="discounts-grid">${discountsHTML}</div>
         </div>
 
         <div class="rewards-section">
-            <div class="rewards-section-title">Your Rasnov Collage</div>
-            <p class="collage-intro">Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.</p>
+            <div class="rewards-section-title">${t('rewards.collageTitle')}</div>
+            <p class="collage-intro">${t('rewards.collageIntro')}</p>
             ${buildCollageHTML(totalFound)}
         </div>`;
 }

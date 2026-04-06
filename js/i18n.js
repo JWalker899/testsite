@@ -35,6 +35,7 @@
             funFact: 'Fun Fact',
             takePhoto: '📸 Take a Photo Here',
             huntComplete: '🎉 Congratulations! You completed the treasure hunt! Total points: {{points}}',
+            bonusLocationsPrompt: 'Now find the bonus locations hidden around town!',
             bearWalking: '🐻 Grizzly is walking toward you!',
             bearHere: '🐻 Grizzly is here! Take a photo!',
             moveCamera: 'Move the camera around and find Grizzly!',
@@ -47,6 +48,54 @@
             about: 'About', hours: 'Hours', price: 'Price', tips: 'Tips',
             menuHighlights: 'Menu Highlights', note: 'Note', description: 'Description',
             amenities: 'Amenities', book: 'Book'
+        },
+        cards: {
+            learnMore: 'Learn More',
+            ratedBy: 'Rated {{rating}}/5 by {{count}} visitors.',
+            reviews: '{{count}} reviews',
+            openNow: 'Open now',
+            closed: 'Closed',
+            defaultDesc: 'A wonderful place to visit in Rasnov',
+            lastUpdated: 'Data last updated: {{date}}',
+            loading: 'Loading amazing places...',
+            featuredPlace: 'Featured Place of the Day',
+            address: 'Address',
+            phone: 'Phone',
+            website: 'Website',
+            openingHours: 'Opening Hours',
+            priceLevel: 'Price Level',
+            visitWebsite: 'Visit website',
+            viewOnMap: 'View on Map',
+            callNow: 'Call Now',
+            price: {
+                inexpensive: 'Inexpensive',
+                moderate: 'Moderate',
+                expensive: 'Expensive',
+                veryExpensive: 'Very Expensive'
+            }
+        },
+        rewards: {
+            title: 'Rewards',
+            themeUnlocks: 'Theme Unlocks',
+            discounts: 'Discounts',
+            collageTitle: 'Your Rasnov Collage',
+            collageIntro: 'Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.',
+            apply: 'Apply',
+            unlocked: '✓ Unlocked!',
+            findPlaces: '🔒 Find {{count}} places',
+            goldCollage: 'Gold Collage',
+            silverCollage: 'Silver Collage',
+            collageEmpty: 'Scan a location QR code and take your first photo to start building your collage!',
+            collageFooter: '📷 {{photos}} photo · {{found}} / {{total}} places explored',
+            collageFooterPlural: '📷 {{photos}} photos · {{found}} / {{total}} places explored',
+            collageTip: '— find 6 for a silver collage, 10 for gold',
+            polaroid: '📌 Polaroid',
+            hexagon: '⬡ Hexagon',
+            grid: '▦ Grid',
+            download: '📥 Download',
+            share: '📤 Share',
+            journeyTitle: '🗺️ My Rasnov Journey',
+            photoSaved: 'Photo saved to your collage!'
         }
     };
 

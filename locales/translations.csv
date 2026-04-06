@@ -129,6 +129,9 @@ hunt.tabRewards,Rewards,Recompense
 hunt.startHunt,Start Hunt,Începe Vânătoarea
 hunt.resetHunt,Reset Hunt,Resetează
 hunt.scanQR,Scan QR Code,Scanează QR
+hunt.sectionTitle,Treasure Hunt,Vânătoare de Comori
+hunt.sectionSubtitle,Explore Rasnov in a fun, interactive way!,Explorați Râșnovul într-un mod distractiv și interactiv!
+hunt.nextSite,Next Site:,Locul următor:
 hunt.progress.title,Your Progress,Progresul tău
 hunt.progress.locationsFound,locations found,locații găsite
 hunt.items.fortress,Rasnov Fortress Gate,Poarta Cetății Râșnov
@@ -148,7 +151,7 @@ leaderboard.colRank,#,#
 leaderboard.colPlayer,Player,Jucător
 leaderboard.colPoints,Points,Puncte
 leaderboard.colLocations,Locations,Locații
-leaderboard.colStatus,Status,Status
+leaderboard.colTime,Time,Timp
 leaderboard.loading,Loading leaderboard...,Se încarcă clasamentul...
 leaderboard.refresh,Refresh,Actualizează
 modals.qr.title,Scan QR Code,Scanează codul QR
@@ -173,7 +176,47 @@ modals.survey.no,Maybe later,Poate mai târziu
 modals.surveyForm.title,Rasnov Survey,Sondaj Râșnov
 modals.surveyForm.openTab,Open in new tab ↗,Deschide în filă nouă ↗
 modals.collage.silver,Silver Collage Unlocked!,Colaj de Argint Deblocat!
+modals.collage.gold,Gold Collage Unlocked!,Colaj de Aur Deblocat!
+modals.collage.silverMsg,You've visited 6 places — your collage now has a silver frame. Keep exploring for gold!,Ați vizitat 6 locuri — colajul are acum un cadru de argint. Continuați explorarea pentru aur!
+modals.collage.goldMsg,You've visited 10 places — your collage now has a golden frame. Share your Rasnov adventure!,Ați vizitat 10 locuri — colajul are acum un cadru de aur. Împărtășiți aventura din Râșnov!
 modals.collage.viewCollage,View My Collage,Vezi Colajul Meu
+rewards.title,Rewards,Recompense
+rewards.themeUnlocks,Theme Unlocks,Teme Deblocate
+rewards.discounts,Discounts,Reduceri
+rewards.collageTitle,Your Rasnov Collage,Colajul tău din Râșnov
+rewards.collageIntro,"Your memories from exploring Rasnov. Earn a silver frame at 6 places and a gold frame at 10.","Amintirile tale din explorarea Râșnovului. Câștigă un cadru de argint la 6 locuri și unul de aur la 10."
+rewards.apply,Apply,Aplică
+rewards.unlocked,✓ Unlocked!,✓ Deblocat!
+rewards.findPlaces,🔒 Find {{count}} places,🔒 Găsește {{count}} locuri
+rewards.goldCollage,Gold Collage,Colaj de Aur
+rewards.silverCollage,Silver Collage,Colaj de Argint
+rewards.collageEmpty,Scan a location QR code and take your first photo to start building your collage!,Scanați un cod QR la o locație și faceți prima fotografie pentru a construi colajul!
+rewards.collageFooter,📷 {{photos}} photo · {{found}} / {{total}} places explored,📷 {{photos}} fotografie · {{found}} / {{total}} locuri explorate
+rewards.collageFooterPlural,📷 {{photos}} photos · {{found}} / {{total}} places explored,📷 {{photos}} fotografii · {{found}} / {{total}} locuri explorate
+rewards.collageTip,"— find 6 for a silver collage, 10 for gold","— găsește 6 pentru colaj de argint, 10 pentru aur"
+rewards.polaroid,📌 Polaroid,📌 Polaroid
+rewards.hexagon,⬡ Hexagon,⬡ Hexagon
+rewards.grid,▦ Grid,▦ Grilă
+rewards.download,📥 Download,📥 Descarcă
+rewards.share,📤 Share,📤 Distribuie
+rewards.journeyTitle,🗺️ My Rasnov Journey,🗺️ Călătoria mea în Râșnov
+rewards.photoSaved,Photo saved to your collage!,Fotografie salvată în colajul tău!
+themes.default.name,Mountain Blue,Albastru Montan
+themes.default.description,The classic Rasnov look.,Aspectul clasic din Râșnov.
+themes.forest.name,Forest Green,Verde Pădure
+themes.forest.description,Deep Carpathian forest vibes.,Spiritul pădurii carpatice profunde.
+themes.sunset.name,Sunset Glow,Strălucire la Apus
+themes.sunset.description,Warm glow of a Rasnov sunset.,Căldura unui apus din Râșnov.
+themes.survey.name,Survey Supporter,Susținător Sondaj
+themes.survey.description,Unlocked by starting the Rasnov survey. Thank you for your feedback!,Deblocat prin participarea la sondajul din Râșnov. Mulțumim pentru feedback!
+discounts.cafe.name,10% off at local cafés,10% reducere la cafenelele locale
+discounts.cafe.description,Show your progress to any participating café in Rasnov old town.,Arată-ți progresul la orice cafenea participantă din centrul vechi al Râșnovului.
+discounts.dino.name,Free Dino Park upgrade,Upgrade gratuit la Dino Park
+discounts.dino.description,Upgrade your Dino Park ticket to premium for free.,Upgradează biletul tău Dino Park la premium gratuit.
+discounts.fortress.name,Free fortress audio guide,Ghid audio gratuit la cetate
+discounts.fortress.description,Download the Rasnov Fortress audio guide at no charge.,Descarcă ghidul audio al Cetății Râșnov gratuit.
+discounts.souvenir.name,Rasnov explorer souvenir,Suvenir de explorator Râșnov
+discounts.souvenir.description,Collect a free Rasnov explorer pin from the tourism office.,Ridică un pin gratuit de explorator Râșnov de la biroul de turism.
 messages.startHuntFirst,Please start the hunt first!,Vă rugăm să porniți vânătoarea mai întâi!
 messages.gettingLocation,Getting your location...,Se obține locația dvs...
 messages.locationError,Could not get your location. Please enable location services.,Nu s-a putut obține locația. Activați serviciile de localizare.
@@ -217,6 +260,7 @@ messages.pointAtGround,Point at the ground then tap to place Grizzly!,Îndreapt�
 messages.findGrizzly,Find Grizzly and take a picture!,Găsește Grizzly și fă o poză!
 messages.langChangedRo,Limba a fost schimbată în Română,Limba a fost schimbată în Română
 messages.langChangedEn,Language changed to English,Language changed to English
+messages.bonusLocationsPrompt,Now find the bonus locations hidden around town!,Acum găsiți locațiile bonus ascunse prin oraș!
 details.about,About,Despre
 details.hours,Hours,Ore
 details.price,Price,Preț
@@ -226,3 +270,24 @@ details.note,Note,Notă
 details.description,Description,Descriere
 details.amenities,Amenities,Facilități
 details.book,Book,Rezervă
+cards.learnMore,Learn More,Află mai mult
+cards.ratedBy,Rated {{rating}}/5 by {{count}} visitors.,Evaluat {{rating}}/5 de {{count}} vizitatori.
+cards.reviews,{{count}} reviews,{{count}} recenzii
+cards.openNow,Open now,Deschis acum
+cards.closed,Closed,Închis
+cards.defaultDesc,A wonderful place to visit in Rasnov,Un loc minunat de vizitat în Râșnov
+cards.lastUpdated,Data last updated: {{date}},Date actualizate la: {{date}}
+cards.loading,Loading amazing places...,Se încarcă locații uimitoare...
+cards.featuredPlace,Featured Place of the Day,Locul zilei
+cards.address,Address,Adresă
+cards.phone,Phone,Telefon
+cards.website,Website,Site web
+cards.openingHours,Opening Hours,Ore de deschidere
+cards.priceLevel,Price Level,Nivel de preț
+cards.visitWebsite,Visit website,Vizitează site-ul
+cards.viewOnMap,View on Map,Vizualizează pe hartă
+cards.callNow,Call Now,Sună acum
+cards.price.inexpensive,Inexpensive,Ieftin
+cards.price.moderate,Moderate,Moderat
+cards.price.expensive,Expensive,Scump
+cards.price.veryExpensive,Very Expensive,Foarte scump

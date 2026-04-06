@@ -251,6 +251,8 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -289,6 +291,9 @@ body {
 
 .card-body {
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .card-title {
@@ -324,6 +329,7 @@ body {
     cursor: pointer;
     transition: var(--transition);
     width: 100%;
+    margin-top: auto;
 }
 
 .card-button:hover {
@@ -988,10 +994,12 @@ body {
     background: none;
 }
 
-/* Keep Leaflet controls below the sticky header */
+/* Keep Leaflet controls below the sticky header.
+   Use !important because Leaflet's CDN stylesheet is loaded after this file
+   and would otherwise override this value with its default of 1000. */
 .leaflet-top,
 .leaflet-bottom {
-    z-index: 900;
+    z-index: 900 !important;
 }
 
 /* Info Section */
@@ -1625,6 +1633,10 @@ body {
     display: block;
     max-height: 60vh;
     object-fit: cover;
+}
+
+#photo-capture-video.selfie {
+    transform: scaleX(-1);
 }
 
 /* Thumbnail photo shown below each found hunt item */
