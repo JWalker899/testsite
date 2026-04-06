@@ -216,6 +216,9 @@
     "startHunt": "Start Hunt",
     "resetHunt": "Reset Hunt",
     "scanQR": "Scan QR Code",
+    "sectionTitle": "Treasure Hunt",
+    "sectionSubtitle": "Explore Rasnov in a fun, interactive way!",
+    "nextSite": "Next Site: ",
     "progress": {
       "title": "Your Progress",
       "locationsFound": "locations found"
@@ -244,6 +247,42 @@
     "colTime": "Time",
     "loading": "Loading leaderboard...",
     "refresh": "Refresh"
+  },
+  "themes": {
+    "default": {
+      "name": "Mountain Blue",
+      "description": "The classic Rasnov look."
+    },
+    "forest": {
+      "name": "Forest Green",
+      "description": "Deep Carpathian forest vibes."
+    },
+    "sunset": {
+      "name": "Sunset Glow",
+      "description": "Warm glow of a Rasnov sunset."
+    },
+    "survey": {
+      "name": "Survey Supporter",
+      "description": "Unlocked by starting the Rasnov survey. Thank you for your feedback!"
+    }
+  },
+  "discounts": {
+    "cafe": {
+      "name": "10% off at local cafés",
+      "description": "Show your progress to any participating café in Rasnov old town."
+    },
+    "dino": {
+      "name": "Free Dino Park upgrade",
+      "description": "Upgrade your Dino Park ticket to premium for free."
+    },
+    "fortress": {
+      "name": "Free fortress audio guide",
+      "description": "Download the Rasnov Fortress audio guide at no charge."
+    },
+    "souvenir": {
+      "name": "Rasnov explorer souvenir",
+      "description": "Collect a free Rasnov explorer pin from the tourism office."
+    }
   },
   "rewards": {
     "title": "Rewards",
