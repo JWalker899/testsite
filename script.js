@@ -3630,7 +3630,17 @@ function loadMap() {
     mapDiv.innerHTML = '<div id="map-display" style="width: 100%; height: 100%;"></div>';
     
     // Initialize Leaflet map
-    window.leafletMap = L.map('map-display').setView([45.5889, 25.4631], 14);
+    // Romania bounding box (with a small buffer) used as maxBounds to keep
+    // panning within the region, and minZoom prevents zooming too far out.
+    const romaniaBounds = L.latLngBounds(
+        L.latLng(43.5, 20.0),  // SW corner
+        L.latLng(48.5, 30.5)   // NE corner
+    );
+    window.leafletMap = L.map('map-display', {
+        minZoom: 7,
+        maxBounds: romaniaBounds,
+        maxBoundsViscosity: 1.0
+    }).setView([45.5889, 25.4631], 14);
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

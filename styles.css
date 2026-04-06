@@ -1003,10 +1003,12 @@ body {
     background: none;
 }
 
-/* Keep Leaflet controls below the sticky header */
+/* Keep Leaflet controls below the sticky header.
+   Use !important because Leaflet's CDN stylesheet is loaded after this file
+   and would otherwise override this value with its default of 1000. */
 .leaflet-top,
 .leaflet-bottom {
-    z-index: 900;
+    z-index: 900 !important;
 }
 
 /* Info Section */
