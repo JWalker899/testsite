@@ -1650,6 +1650,10 @@ body {
     object-fit: cover;
 }
 
+#photo-capture-video.selfie {
+    transform: scaleX(-1);
+}
+
 /* Thumbnail photo shown below each found hunt item */
 .hunt-item-photo {
     width: 100%;
