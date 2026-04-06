@@ -251,6 +251,8 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -289,6 +291,9 @@ body {
 
 .card-body {
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .card-title {
@@ -324,6 +329,7 @@ body {
     cursor: pointer;
     transition: var(--transition);
     width: 100%;
+    margin-top: auto;
 }
 
 .card-button:hover {

@@ -243,6 +243,7 @@ messages.pointAtGround,Point at the ground then tap to place Grizzly!,Îndreapt�
 messages.findGrizzly,Find Grizzly and take a picture!,Găsește Grizzly și fă o poză!
 messages.langChangedRo,Limba a fost schimbată în Română,Limba a fost schimbată în Română
 messages.langChangedEn,Language changed to English,Language changed to English
+messages.bonusLocationsPrompt,Now find the bonus locations hidden around town!,Acum găsiți locațiile bonus ascunse prin oraș!
 details.about,About,Despre
 details.hours,Hours,Ore
 details.price,Price,Preț
@@ -252,3 +253,24 @@ details.note,Note,Notă
 details.description,Description,Descriere
 details.amenities,Amenities,Facilități
 details.book,Book,Rezervă
+cards.learnMore,Learn More,Află mai mult
+cards.ratedBy,Rated {{rating}}/5 by {{count}} visitors.,Evaluat {{rating}}/5 de {{count}} vizitatori.
+cards.reviews,{{count}} reviews,{{count}} recenzii
+cards.openNow,Open now,Deschis acum
+cards.closed,Closed,Închis
+cards.defaultDesc,A wonderful place to visit in Rasnov,Un loc minunat de vizitat în Râșnov
+cards.lastUpdated,Data last updated: {{date}},Date actualizate la: {{date}}
+cards.loading,Loading amazing places...,Se încarcă locații uimitoare...
+cards.featuredPlace,Featured Place of the Day,Locul zilei
+cards.address,Address,Adresă
+cards.phone,Phone,Telefon
+cards.website,Website,Site web
+cards.openingHours,Opening Hours,Ore de deschidere
+cards.priceLevel,Price Level,Nivel de preț
+cards.visitWebsite,Visit website,Vizitează site-ul
+cards.viewOnMap,View on Map,Vizualizează pe hartă
+cards.callNow,Call Now,Sună acum
+cards.price.inexpensive,Inexpensive,Ieftin
+cards.price.moderate,Moderate,Moderat
+cards.price.expensive,Expensive,Scump
+cards.price.veryExpensive,Very Expensive,Foarte scump

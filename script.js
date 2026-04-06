@@ -751,11 +751,14 @@ function restoreHuntState() {
         const lastRegular = [...currentUser.locationsFound].reverse().find(k => huntLocations[k]);
         if (lastRegular) updateNextSiteBanner(lastRegular);
     } else if (foundLocations.size === Object.keys(huntLocations).length) {
-        if (startHuntBtn) {
-            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.classList.remove('active-hunt');
-            startHuntBtn.classList.add('hunt-complete');
-        }
+        huntActive = true;
+        if (startHuntBtn) startHuntBtn.style.display = 'none';
+        if (resetHuntBtn) resetHuntBtn.style.display = '';
+        if (scanQrBtn) scanQrBtn.disabled = false;
+        // Remind the user to look for bonus locations
+        setTimeout(() => {
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
+        }, 500);
     }
 }
 
@@ -1830,19 +1833,10 @@ async function discoverLocation(locationKey, isFirstVisit = false) {
     // Check if a new collage tier has been unlocked
     checkCollageUnlocks();
     
-    // Check if hunt is complete
+    // Check if all main hunt locations are now found
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            const celebrationMsg = t('messages.huntComplete', {points: currentUser.totalPoints});
-            showNotification(celebrationMsg, 'success');
-            huntActive = false;
-            if (startHuntBtn) {
-                startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-                startHuntBtn.classList.remove('active-hunt');
-                startHuntBtn.classList.add('hunt-complete');
-                startHuntBtn.style.display = '';
-            }
-            if (resetHuntBtn) resetHuntBtn.style.display = 'none';
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
         }, 2000);
     }
 }
@@ -3013,16 +3007,10 @@ function discoverLocationQuietly(locationKey) {
     // Update progress
     updateProgress();
     
-    // Check if hunt is complete
+    // Check if all main hunt locations are now found
     if (foundLocations.size === Object.keys(huntLocations).length) {
         setTimeout(() => {
-            showNotification('Congratulations! You completed the treasure hunt!', 'success');
-            huntActive = false;
-            startHuntBtn.innerHTML = '<i class="fas fa-trophy"></i> Completed!';
-            startHuntBtn.classList.remove('active-hunt');
-            startHuntBtn.classList.add('hunt-complete');
-            startHuntBtn.style.display = '';
-            resetHuntBtn.style.display = 'none';
+            showNotification(t('messages.bonusLocationsPrompt'), 'success');
         }, 1000);
     }
 }
