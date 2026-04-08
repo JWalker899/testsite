@@ -393,9 +393,8 @@
     }
   },
   "cookies": {
-    "message": "Acest site web utilizează cookie-uri pentru a vă îmbunătăți experiența. Continuând să utilizați acest site, sunteți de acord cu utilizarea cookie-urilor noastre.",
-    "accept": "Accept",
-    "reject": "Respinge",
+    "message": "Acest site utilizează doar cookie-uri funcționale pentru a salva progresul dvs. Nu se folosesc cookie-uri de urmărire sau publicitate.",
+    "dismiss": "OK",
     "settings": "Setări cookie"
   }
 }
