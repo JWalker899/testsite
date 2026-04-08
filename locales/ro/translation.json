@@ -162,7 +162,18 @@
     "cta": "Încarcă Harta",
     "locations": "📍 Locații",
     "restaurants": "🍽️ Restaurante",
-    "accommodations": "🏨 Cazări"
+    "accommodations": "🏨 Cazări",
+    "scavenger": {
+      "discovered": "Descoperit!",
+      "upNext": "Urmează să găsești!",
+      "findQr": "Găsește codul QR lângă {{name}} pentru a-l debloca!",
+      "goToHunt": "Mergi la Vânătoare →",
+      "mystery": "Găsește o locație misterioasă aici!",
+      "easy": "Ușor",
+      "medium": "Mediu",
+      "hard": "Dificil",
+      "foundCount": "{{found}}/{{total}} găsite"
+    }
   },
   "huntHero": {
     "title": "Vânătoare Comori",

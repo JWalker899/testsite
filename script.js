@@ -3883,71 +3883,68 @@ async function loadScavengerMapMarkers() {
         const diff     = (loc.difficulty != null) ? loc.difficulty : 1;
         const locName  = escapeHtml(loc.name || key);
 
-        let icon, popupContent;
+        let icon, popupContent, markerOptions;
 
         if (isFound) {
             // Light-blue check bubble — reveals the location name
             icon = makeScavengerBubbleIcon('✓', UNLOCKED_COLOR, NORMAL_SIZE, false);
+            markerOptions = { icon };
             popupContent = `
                 <div class="map-popup" style="text-align:center;">
                     <div style="font-size:1.6rem;margin-bottom:4px;">✅</div>
                     <strong style="color:#2c3e50;">${locName}</strong><br>
-                    <span style="color:#27ae60;font-size:0.9rem;">Discovered!</span>
+                    <span style="color:#27ae60;font-size:0.9rem;">${t('map.scavenger.discovered')}</span>
                 </div>`;
         } else if (isNext) {
-            // Next-up: bigger bubble, pulsing, hints at name
+            // Next-up: bigger bubble, pulsing, hints at name — rendered on top
             icon = makeScavengerBubbleIcon('?', difficultyColor(diff), NEXT_SIZE, true);
+            markerOptions = { icon, zIndexOffset: 1000 };
             popupContent = `
                 <div class="map-popup" style="text-align:center;">
                     <div style="font-size:1.4rem;margin-bottom:4px;">🗺️</div>
-                    <strong style="color:#2c3e50;font-size:1rem;">You're up next!</strong><br>
-                    <span style="color:#555;font-size:0.9rem;">Find the QR code near <strong>${locName}</strong> to unlock it!</span><br>
-                    <a href="hunt.html" style="display:inline-block;margin-top:8px;padding:5px 14px;background:#e67e22;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;">Go to Hunt →</a>
+                    <strong style="color:#2c3e50;font-size:1rem;">${t('map.scavenger.upNext')}</strong><br>
+                    <span style="color:#555;font-size:0.9rem;">${t('map.scavenger.findQr', { name: locName })}</span><br>
+                    <a href="hunt.html" style="display:inline-block;margin-top:8px;padding:5px 14px;background:#e67e22;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;">${t('map.scavenger.goToHunt')}</a>
                 </div>`;
         } else {
             // Locked mystery location — no name reveal
             icon = makeScavengerBubbleIcon('?', difficultyColor(diff), NORMAL_SIZE, false);
-            const diffLabel = ['Easy', 'Medium', 'Hard'][diff] || 'Medium';
+            markerOptions = { icon };
+            const diffKeys = [t('map.scavenger.easy'), t('map.scavenger.medium'), t('map.scavenger.hard')];
+            const diffLabel = diffKeys[diff] || diffKeys[1];
             popupContent = `
                 <div class="map-popup" style="text-align:center;">
                     <div style="font-size:1.4rem;margin-bottom:4px;">🔍</div>
-                    <strong style="color:#2c3e50;">Find a mystery location here!</strong><br>
+                    <strong style="color:#2c3e50;">${t('map.scavenger.mystery')}</strong><br>
                     <span style="display:inline-block;margin-top:4px;padding:2px 8px;background:${difficultyColor(diff)};color:#fff;border-radius:4px;font-size:0.8rem;">${diffLabel}</span>
                 </div>`;
         }
 
-        L.marker([loc.lat, loc.lng], { icon })
+        L.marker([loc.lat, loc.lng], markerOptions)
             .addTo(window.leafletMap)
             .bindPopup(popupContent, { maxWidth: 220 });
     });
 
-    addScavengerMapLegend(foundSet.size, huntOrder.length);
+    addScavengerFoundCounter(foundSet.size, huntOrder.length);
     console.log('✅ Scavenger hunt markers added to map');
 }
 
 /**
- * Add a legend control to the Leaflet map explaining scavenger marker icons.
+ * Add a small found-count control to the Leaflet map.
  */
-function addScavengerMapLegend(foundCount, totalCount) {
+function addScavengerFoundCounter(foundCount, totalCount) {
     if (!window.leafletMap) return;
 
-    const LegendControl = L.Control.extend({
+    const CounterControl = L.Control.extend({
         onAdd() {
             const div = L.DomUtil.create('div', 'map-legend');
-            div.innerHTML = `
-                <div class="map-legend-title">🏴 Scavenger Hunt</div>
-                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#2980b9;"></div><span>Discovered ✓</span></div>
-                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#27ae60;"></div><span>Easy ?</span></div>
-                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#f39c12;"></div><span>Medium ?</span></div>
-                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#e74c3c;"></div><span>Hard ?</span></div>
-                <div style="margin-top:6px;font-size:0.78rem;color:#666;">${foundCount}/${totalCount} found</div>
-            `;
+            div.innerHTML = `<div style="font-size:0.82rem;color:#333;">🏴 ${t('map.scavenger.foundCount', { found: foundCount, total: totalCount })}</div>`;
             L.DomEvent.disableClickPropagation(div);
             return div;
         }
     });
 
-    new LegendControl({ position: 'bottomright' }).addTo(window.leafletMap);
+    new CounterControl({ position: 'bottomright' }).addTo(window.leafletMap);
 }
 
 

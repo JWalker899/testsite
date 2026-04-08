@@ -96,6 +96,15 @@ map.cta,Load Map,Încarcă Harta
 map.locations,📍 Locations,📍 Locații
 map.restaurants,🍽️ Restaurants,🍽️ Restaurante
 map.accommodations,🏨 Accommodations,🏨 Cazări
+map.scavenger.discovered,Discovered!,Descoperit!
+map.scavenger.upNext,You're up next!,Urmează să găsești!
+map.scavenger.findQr,Find the QR code near {{name}} to unlock it!,Găsește codul QR lângă {{name}} pentru a-l debloca!
+map.scavenger.goToHunt,Go to Hunt →,Mergi la Vânătoare →
+map.scavenger.mystery,Find a mystery location here!,Găsește o locație misterioasă aici!
+map.scavenger.easy,Easy,Ușor
+map.scavenger.medium,Medium,Mediu
+map.scavenger.hard,Hard,Dificil
+map.scavenger.foundCount,{{found}}/{{total}} found,{{found}}/{{total}} găsite
 info.title,Essential Information,Informații esențiale
 info.emergency.title,Emergency,Urgență
 info.emergency.police,Police,Poliție

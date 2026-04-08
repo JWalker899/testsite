@@ -6,6 +6,25 @@
     var FALLBACK_EN = {
         nav: { home: 'Discover Rasnov', hunt: 'Treasure Hunt', map: 'Map', info: 'Info' },
         header: { guest: 'Guest', points: 'pts', langLabel: 'EN' },
+        map: {
+            title: 'Interactive Map',
+            subtitle: 'Interactive map showing all locations, restaurants, and accommodations',
+            cta: 'Load Map',
+            locations: '📍 Locations',
+            restaurants: '🍽️ Restaurants',
+            accommodations: '🏨 Accommodations',
+            scavenger: {
+                discovered: 'Discovered!',
+                upNext: "You're up next!",
+                findQr: 'Find the QR code near {{name}} to unlock it!',
+                goToHunt: 'Go to Hunt →',
+                mystery: 'Find a mystery location here!',
+                easy: 'Easy',
+                medium: 'Medium',
+                hard: 'Hard',
+                foundCount: '{{found}}/{{total}} found'
+            }
+        },
         footer: {
             aboutTitle: 'About Rasnov',
             aboutText: 'Historic town in Transylvania, Romania, known for its medieval fortress and stunning mountain scenery.',
