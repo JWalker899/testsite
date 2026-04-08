@@ -3647,6 +3647,9 @@ function loadMap() {
     
     // Load markers from places data
     loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon);
+
+    // Load scavenger hunt markers (locked/unlocked question-mark & check bubbles)
+    loadScavengerMapMarkers();
     
     mapDiv.classList.add('loaded');
 }
@@ -3795,7 +3798,159 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Language Toggle (Basic implementation)
+// ---- Difficulty color helper ----
+const DIFFICULTY_COLORS = ['#27ae60', '#f39c12', '#e74c3c']; // 0=green 1=yellow 2=red
+
+function difficultyColor(d) {
+    return DIFFICULTY_COLORS[d] || DIFFICULTY_COLORS[1];
+}
+
+// ---- Speech-bubble divIcon factory ----
+// Creates a rounded-rectangle "speech bubble" icon with a downward callout pointer.
+// symbol: text content (e.g. '?' or '✓')
+// bgColor: background fill colour
+// size: bubble width in px (height is auto-proportional)
+// nextUp: if true, wraps in the pulsing CSS class
+function makeScavengerBubbleIcon(symbol, bgColor, size, nextUp) {
+    const bodyH = Math.round(size * 0.82);
+    const ptrH  = size - bodyH;          // height of the triangular pointer
+    const halfPtr = Math.round(size * 0.22);
+    const r     = Math.round(size * 0.22); // corner radius
+    const fs    = Math.round(size * 0.46); // font size
+    const totalH = size;
+
+    // Inner HTML: a rounded box + CSS triangle pointer below it
+    const inner = `
+      <div style="width:${size}px;height:${bodyH}px;background:${bgColor};border-radius:${r}px;border:2px solid rgba(255,255,255,0.85);box-shadow:0 2px 6px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;">
+        <span style="color:#fff;font-size:${fs}px;font-weight:700;font-family:Arial,sans-serif;line-height:1;user-select:none;">${symbol}</span>
+      </div>
+      <div style="width:0;height:0;border-left:${halfPtr}px solid transparent;border-right:${halfPtr}px solid transparent;border-top:${ptrH + 2}px solid ${bgColor};margin:-1px auto 0;"></div>
+    `;
+    // Note: ptrH + 2 adds a 2px overlap so the pointer merges flush with the bubble body
+
+    const wrapClass = nextUp ? 'scavenger-marker-next' : '';
+    const html = `<div class="${wrapClass}" style="display:flex;flex-direction:column;align-items:center;width:${size}px;height:${totalH}px;">${inner}</div>`;
+
+    return L.divIcon({
+        className: '',
+        html,
+        iconSize:    [size, totalH],
+        iconAnchor:  [Math.round(size / 2), totalH],
+        popupAnchor: [0, -totalH]
+    });
+}
+
+/**
+ * Wait for scavenger hunt data to be loaded into huntLocations.
+ */
+const MAX_DATA_LOAD_ATTEMPTS  = 20;
+const DATA_LOAD_RETRY_DELAY_MS = 300;
+
+async function waitForScavengerData() {
+    for (let i = 0; i < MAX_DATA_LOAD_ATTEMPTS; i++) {
+        if (Object.keys(huntLocations).length > 0) return true;
+        if (i < MAX_DATA_LOAD_ATTEMPTS - 1) await new Promise(resolve => setTimeout(resolve, DATA_LOAD_RETRY_DELAY_MS));
+    }
+    return false;
+}
+
+/**
+ * Add scavenger hunt location markers to the Leaflet map.
+ * Must be called after loadMap() has created window.leafletMap.
+ */
+async function loadScavengerMapMarkers() {
+    const ok = await waitForScavengerData();
+    if (!ok || !window.leafletMap) return;
+
+    // Determine which locations have been found (works on both index & hunt pages)
+    const foundSet = new Set(
+        (currentUser && currentUser.locationsFound) ? currentUser.locationsFound : []
+    );
+
+    // Next un-found location in hunt order
+    const nextKey = huntOrder.find(k => !foundSet.has(k)) || null;
+
+    const UNLOCKED_COLOR = '#2980b9'; // light blue
+    const NORMAL_SIZE    = 36;
+    const NEXT_SIZE      = 46;
+
+    huntOrder.forEach(key => {
+        const loc = huntLocations[key];
+        if (!loc || loc.lat == null || loc.lng == null) return;
+
+        const isFound  = foundSet.has(key);
+        const isNext   = key === nextKey;
+        const diff     = (loc.difficulty != null) ? loc.difficulty : 1;
+        const locName  = escapeHtml(loc.name || key);
+
+        let icon, popupContent;
+
+        if (isFound) {
+            // Light-blue check bubble — reveals the location name
+            icon = makeScavengerBubbleIcon('✓', UNLOCKED_COLOR, NORMAL_SIZE, false);
+            popupContent = `
+                <div class="map-popup" style="text-align:center;">
+                    <div style="font-size:1.6rem;margin-bottom:4px;">✅</div>
+                    <strong style="color:#2c3e50;">${locName}</strong><br>
+                    <span style="color:#27ae60;font-size:0.9rem;">Discovered!</span>
+                </div>`;
+        } else if (isNext) {
+            // Next-up: bigger bubble, pulsing, hints at name
+            icon = makeScavengerBubbleIcon('?', difficultyColor(diff), NEXT_SIZE, true);
+            popupContent = `
+                <div class="map-popup" style="text-align:center;">
+                    <div style="font-size:1.4rem;margin-bottom:4px;">🗺️</div>
+                    <strong style="color:#2c3e50;font-size:1rem;">You're up next!</strong><br>
+                    <span style="color:#555;font-size:0.9rem;">Find the QR code near <strong>${locName}</strong> to unlock it!</span><br>
+                    <a href="hunt.html" style="display:inline-block;margin-top:8px;padding:5px 14px;background:#e67e22;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;">Go to Hunt →</a>
+                </div>`;
+        } else {
+            // Locked mystery location — no name reveal
+            icon = makeScavengerBubbleIcon('?', difficultyColor(diff), NORMAL_SIZE, false);
+            const diffLabel = ['Easy', 'Medium', 'Hard'][diff] || 'Medium';
+            popupContent = `
+                <div class="map-popup" style="text-align:center;">
+                    <div style="font-size:1.4rem;margin-bottom:4px;">🔍</div>
+                    <strong style="color:#2c3e50;">Find a mystery location here!</strong><br>
+                    <span style="display:inline-block;margin-top:4px;padding:2px 8px;background:${difficultyColor(diff)};color:#fff;border-radius:4px;font-size:0.8rem;">${diffLabel}</span>
+                </div>`;
+        }
+
+        L.marker([loc.lat, loc.lng], { icon })
+            .addTo(window.leafletMap)
+            .bindPopup(popupContent, { maxWidth: 220 });
+    });
+
+    addScavengerMapLegend(foundSet.size, huntOrder.length);
+    console.log('✅ Scavenger hunt markers added to map');
+}
+
+/**
+ * Add a legend control to the Leaflet map explaining scavenger marker icons.
+ */
+function addScavengerMapLegend(foundCount, totalCount) {
+    if (!window.leafletMap) return;
+
+    const LegendControl = L.Control.extend({
+        onAdd() {
+            const div = L.DomUtil.create('div', 'map-legend');
+            div.innerHTML = `
+                <div class="map-legend-title">🏴 Scavenger Hunt</div>
+                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#2980b9;"></div><span>Discovered ✓</span></div>
+                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#27ae60;"></div><span>Easy ?</span></div>
+                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#f39c12;"></div><span>Medium ?</span></div>
+                <div class="map-legend-item"><div class="map-legend-swatch" style="background:#e74c3c;"></div><span>Hard ?</span></div>
+                <div style="margin-top:6px;font-size:0.78rem;color:#666;">${foundCount}/${totalCount} found</div>
+            `;
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        }
+    });
+
+    new LegendControl({ position: 'bottomright' }).addTo(window.leafletMap);
+}
+
+
 const langToggle = document.querySelector('.lang-toggle');
 let currentLang = 'en';
 
