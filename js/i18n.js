@@ -193,6 +193,8 @@
                 console.warn('i18next backend failed, using fallback strings.', err);
             }
             applyI18n();
+            var lang = i18next.language || savedLang;
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: lang } }));
         });
     });
 }());
