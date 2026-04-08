@@ -356,10 +356,8 @@
     "gettingLocation": "Getting your location...",
     "locationError": "Could not get your location. Please enable location services.",
     "geolocationNotSupported": "Geolocation is not supported by your browser.",
-    "testingEnabled": "Testing mode enabled! Click on any location to mark it as found.",
-    "testingDisabled": "Testing mode disabled.",
     "cameraNotSupported": "Camera access is not supported on this browser. Please use a modern browser with HTTPS.",
-    "cameraError": "Could not access camera. Testing mode allows manual selection.",
+    "cameraError": "Could not access camera.",
     "qrSuccess": "QR Code scanned successfully!",
     "alreadyFound": "You already found this location!",
     "qrUnrecognized": "QR code not recognized. Make sure you're at a treasure hunt location.",
@@ -434,5 +432,11 @@
       "expensive": "Expensive",
       "veryExpensive": "Very Expensive"
     }
+  },
+  "cookies": {
+    "message": "This website uses cookies to enhance your experience. By continuing to use this site, you agree to our use of cookies.",
+    "accept": "Accept",
+    "reject": "Reject",
+    "settings": "Cookie Settings"
   }
 }

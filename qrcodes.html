@@ -93,6 +93,65 @@
             font-weight: bold;
         }
 
+        /* Cookie Consent Banner */
+        .cookie-consent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem;
+            z-index: 10000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .cookie-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .cookie-content p {
+            flex: 1;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .cookie-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .cookie-buttons button {
+            background: #2c5f8d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .cookie-buttons button:hover {
+            background: #e8734e;
+        }
+
+        .cookie-buttons #reject-cookies {
+            background: transparent;
+            border: 1px solid white;
+        }
+
+        .cookie-buttons #reject-cookies:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         @media print {
             body { background: #fff; padding: 12px; }
             .qr-card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
@@ -101,6 +160,16 @@
     </style>
 </head>
 <body>
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="cookie-consent">
+        <div class="cookie-content">
+            <p>This website uses cookies to enhance your experience. By continuing to use this site, you agree to our use of cookies.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies">Accept</button>
+                <button id="reject-cookies">Reject</button>
+            </div>
+        </div>
+    </div>
     <h1>Discover Rasnov — QR Codes</h1>
     <p class="subtitle">All hunt location QR codes for debugging and printing. Access via URL only – not linked from the main site.</p>
 
@@ -179,5 +248,33 @@
             <div class="qr-pts">+3 bonus points</div>
         </div>
     </div>
+
+    <script>
+        // Cookie Consent Logic for QR Codes page
+        (function initCookieConsent() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('accept-cookies');
+            const rejectBtn = document.getElementById('reject-cookies');
+
+            if (!cookieConsent || !acceptBtn || !rejectBtn) return;
+
+            const consentKey = 'rasnov_cookie_consent';
+            const consent = localStorage.getItem(consentKey);
+
+            if (!consent) {
+                cookieConsent.style.display = 'block';
+            }
+
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem(consentKey, 'accepted');
+                cookieConsent.style.display = 'none';
+            });
+
+            rejectBtn.addEventListener('click', () => {
+                localStorage.setItem(consentKey, 'rejected');
+                cookieConsent.style.display = 'none';
+            });
+        })();
+    </script>
 </body>
 </html>
