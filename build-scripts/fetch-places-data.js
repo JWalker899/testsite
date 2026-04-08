@@ -317,8 +317,12 @@ async function processPlace(place, index, total, downloadImages) {
     photos: [],
   };
 
-  // Fetch place details for additional info
-  const details = await fetchPlaceDetails(place.place_id);
+  // Fetch English details and Romanian name/address in parallel
+  const [details, detailsRo] = await Promise.all([
+    fetchPlaceDetails(place.place_id),
+    fetchPlaceDetailsRo(place.place_id),
+  ]);
+
   if (details) {
     processedPlace.phone = details.formatted_phone_number || null;
     processedPlace.website = details.website || null;
@@ -331,8 +335,6 @@ async function processPlace(place, index, total, downloadImages) {
     }
   }
 
-  // Fetch Romanian-language name and address
-  const detailsRo = await fetchPlaceDetailsRo(place.place_id);
   if (detailsRo) {
     if (detailsRo.name && detailsRo.name !== processedPlace.name) {
       processedPlace.name_ro = detailsRo.name;
