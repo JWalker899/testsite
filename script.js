@@ -811,19 +811,19 @@ function displayLeaderboard(leaderboard) {
         document.getElementById('total-players').textContent = '0';
         return;
     }
-    
-    // Generate table rows
-    const rows = leaderboard.map((player, index) => {
+
+    const MAX_ROWS = 10;
+    const userIndex = currentUser ? leaderboard.findIndex(p => p.uuid && p.uuid === currentUser.uuid) : -1;
+    const userRankNum = userIndex >= 0 ? leaderboard[userIndex].rank : null;
+
+    function buildRow(player) {
         const rank = player.rank;
         const isCurrentUser = currentUser && player.uuid && player.uuid === currentUser.uuid;
         const topClass = rank <= 3 ? `top-3 rank-${rank}` : '';
         const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-        
         const timeDisplay = formatHuntTime(player.firstScanAt, player.lastLocationAt);
         const timeClass = player.completedAt ? 'finish-time' : 'hunt-time';
-
         const highlightClass = isCurrentUser ? ' style="background: #e3f2fd; font-weight: 600;"' : '';
-        
         return `
             <tr class="${topClass}"${highlightClass}>
                 <td class="rank-col">
@@ -846,13 +846,26 @@ function displayLeaderboard(leaderboard) {
                 </td>
             </tr>
         `;
-    }).join('');
-    
-    leaderboardBody.innerHTML = rows;
+    }
+
+    // Generate table rows
+    const topRows = leaderboard.slice(0, MAX_ROWS).map(buildRow).join('');
+
+    let extraRow = '';
+    if (userIndex >= MAX_ROWS) {
+        // Current user is outside the top 10 — add separator + their row
+        extraRow = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 0.4rem; color: #bbb; font-size: 1.2rem; border: none;">•••</td>
+            </tr>
+            ${buildRow(leaderboard[userIndex])}
+        `;
+    }
+
+    leaderboardBody.innerHTML = topRows + extraRow;
     
     // Update user stats
-    const userRank = currentUser ? leaderboard.findIndex(p => p.uuid && p.uuid === currentUser.uuid) + 1 : '-';
-    document.getElementById('user-rank').textContent = userRank > 0 ? `#${userRank}` : '-';
+    document.getElementById('user-rank').textContent = userRankNum ? `#${userRankNum}` : '-';
     document.getElementById('user-leaderboard-points').textContent = currentUser ? `⭐ ${currentUser.totalPoints}` : '-';
     document.getElementById('total-players').textContent = leaderboard.length;
     
