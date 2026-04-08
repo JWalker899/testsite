@@ -4499,32 +4499,22 @@ loadScavengerData().then(() => {
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
 
-// Cookie Consent Logic
+// Cookie Notice Logic
 (function initCookieConsent() {
     const cookieConsent = document.getElementById('cookie-consent');
-    const acceptBtn = document.getElementById('accept-cookies');
-    const rejectBtn = document.getElementById('reject-cookies');
+    const dismissBtn = document.getElementById('dismiss-cookies');
 
-    if (!cookieConsent || !acceptBtn || !rejectBtn) return; // Not on a page with cookie banner
+    if (!cookieConsent || !dismissBtn) return; // Not on a page with cookie banner
 
-    const consentKey = 'rasnov_cookie_consent';
-    const consent = localStorage.getItem(consentKey);
+    const dismissKey = 'rasnov_cookie_dismissed';
 
-    if (!consent) {
-        // Show banner if no consent given
+    if (!localStorage.getItem(dismissKey)) {
         cookieConsent.style.display = 'block';
     }
 
-    acceptBtn.addEventListener('click', () => {
-        localStorage.setItem(consentKey, 'accepted');
+    dismissBtn.addEventListener('click', () => {
+        localStorage.setItem(dismissKey, 'true');
         cookieConsent.style.display = 'none';
-        // Here you could enable analytics or other cookies
-    });
-
-    rejectBtn.addEventListener('click', () => {
-        localStorage.setItem(consentKey, 'rejected');
-        cookieConsent.style.display = 'none';
-        // Disable non-essential cookies
     });
 })();
 

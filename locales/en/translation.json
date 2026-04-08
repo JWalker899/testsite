@@ -434,9 +434,8 @@
     }
   },
   "cookies": {
-    "message": "This website uses cookies to enhance your experience. By continuing to use this site, you agree to our use of cookies.",
-    "accept": "Accept",
-    "reject": "Reject",
+    "message": "This website uses functional cookies only to save your progress. No tracking or advertising cookies are used.",
+    "dismiss": "OK",
     "settings": "Cookie Settings"
   }
 }
