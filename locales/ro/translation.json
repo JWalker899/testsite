@@ -2,8 +2,7 @@
   "nav": {
     "home": "Descoperă Râșnov",
     "hunt": "Vânătoare Comori",
-    "map": "Hartă",
-    "info": "Info"
+    "map": "Hartă"
   },
   "header": {
     "guest": "Oaspete",
@@ -18,7 +17,6 @@
     "home": "Acasă",
     "hunt": "Vânătoare",
     "map": "Hartă",
-    "infoLink": "Info",
     "copyright": "© 2026 Descoperă Râșnov. Făcut cu ❤ pentru turiști."
   },
   "hero": {
@@ -165,45 +163,6 @@
     "locations": "📍 Locații",
     "restaurants": "🍽️ Restaurante",
     "accommodations": "🏨 Cazări"
-  },
-  "info": {
-    "title": "Informații esențiale",
-    "emergency": {
-      "title": "Urgență",
-      "police": "Poliție",
-      "medical": "Medical",
-      "touristInfo": "Info Turist"
-    },
-    "transportation": {
-      "title": "Transport",
-      "busToBrasov": "Autobuz la Brașov",
-      "taxi": "Taxi",
-      "carRental": "Închiriere Mașini"
-    },
-    "language": {
-      "title": "Limbă",
-      "main": "Principal",
-      "common": "Obișnuit",
-      "tip": "Sfat"
-    },
-    "currency": {
-      "title": "Valută",
-      "currency": "Valută",
-      "atms": "Bancomate",
-      "cards": "Cărți"
-    },
-    "hours": {
-      "title": "Ore de Deschidere",
-      "fortress": "Cetate",
-      "shops": "Magazine",
-      "restaurants": "Restaurante"
-    },
-    "visitTime": {
-      "title": "Cel mai Bun Timp pentru Vizită",
-      "peak": "Vârf",
-      "shoulder": "Transițional",
-      "winter": "Iarnă"
-    }
   },
   "huntHero": {
     "title": "Vânătoare Comori",
