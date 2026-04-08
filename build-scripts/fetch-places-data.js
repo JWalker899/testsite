@@ -90,9 +90,15 @@ async function fetchPlaces(type, typeName) {
     location: `${CONFIG.CENTER_LAT},${CONFIG.CENTER_LNG}`,
     radius: CONFIG.SEARCH_RADIUS,
     type: type,
-    keyword: 'Rasnov',
     key: CONFIG.GOOGLE_API_KEY,
   };
+
+  // Use a keyword to anchor tourist attractions and restaurants to Rasnov.
+  // Lodging listings often don't mention the city name explicitly, so omitting
+  // the keyword avoids zero results for accommodations.
+  if (type !== 'lodging') {
+    params.keyword = 'Rasnov';
+  }
 
   try {
     const response = await retryRequest(() => axios.get(url, { params }));
@@ -141,6 +147,36 @@ async function fetchPlaceDetails(placeId) {
     return null;
   } catch (error) {
     console.error(`    ⚠️  Could not fetch details for ${placeId}`);
+    return null;
+  }
+}
+
+/**
+ * Fetch place name and address in Romanian using the Place Details API.
+ * Returns { name, address } in Romanian, or null on failure.
+ */
+async function fetchPlaceDetailsRo(placeId) {
+  const url = 'https://maps.googleapis.com/maps/api/place/details/json';
+  const params = {
+    place_id: placeId,
+    fields: 'name,vicinity',
+    language: 'ro',
+    key: CONFIG.GOOGLE_API_KEY,
+  };
+
+  try {
+    const response = await retryRequest(() => axios.get(url, { params }));
+    await sleep(CONFIG.RATE_LIMIT_DELAY);
+
+    if (response.data.status === 'OK') {
+      return {
+        name: response.data.result.name || null,
+        address: response.data.result.vicinity || null,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`    ⚠️  Could not fetch Romanian details for ${placeId}`);
     return null;
   }
 }
@@ -281,8 +317,12 @@ async function processPlace(place, index, total, downloadImages) {
     photos: [],
   };
 
-  // Fetch place details for additional info
-  const details = await fetchPlaceDetails(place.place_id);
+  // Fetch English details and Romanian name/address in parallel
+  const [details, detailsRo] = await Promise.all([
+    fetchPlaceDetails(place.place_id),
+    fetchPlaceDetailsRo(place.place_id),
+  ]);
+
   if (details) {
     processedPlace.phone = details.formatted_phone_number || null;
     processedPlace.website = details.website || null;
@@ -292,6 +332,15 @@ async function processPlace(place, index, total, downloadImages) {
         openNow: details.opening_hours.open_now || false,
         weekdayText: details.opening_hours.weekday_text || [],
       };
+    }
+  }
+
+  if (detailsRo) {
+    if (detailsRo.name && detailsRo.name !== processedPlace.name) {
+      processedPlace.name_ro = detailsRo.name;
+    }
+    if (detailsRo.address && detailsRo.address !== processedPlace.address) {
+      processedPlace.address_ro = detailsRo.address;
     }
   }
 
