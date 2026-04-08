@@ -3826,6 +3826,7 @@ function makeScavengerBubbleIcon(symbol, bgColor, size, nextUp) {
       </div>
       <div style="width:0;height:0;border-left:${halfPtr}px solid transparent;border-right:${halfPtr}px solid transparent;border-top:${ptrH + 2}px solid ${bgColor};margin:-1px auto 0;"></div>
     `;
+    // Note: ptrH + 2 adds a 2px overlap so the pointer merges flush with the bubble body
 
     const wrapClass = nextUp ? 'scavenger-marker-next' : '';
     const html = `<div class="${wrapClass}" style="display:flex;flex-direction:column;align-items:center;width:${size}px;height:${totalH}px;">${inner}</div>`;
@@ -3842,10 +3843,13 @@ function makeScavengerBubbleIcon(symbol, bgColor, size, nextUp) {
 /**
  * Wait for scavenger hunt data to be loaded into huntLocations.
  */
-async function waitForScavengerData(maxAttempts = 20, delayMs = 300) {
-    for (let i = 0; i < maxAttempts; i++) {
+const MAX_DATA_LOAD_ATTEMPTS  = 20;
+const DATA_LOAD_RETRY_DELAY_MS = 300;
+
+async function waitForScavengerData() {
+    for (let i = 0; i < MAX_DATA_LOAD_ATTEMPTS; i++) {
         if (Object.keys(huntLocations).length > 0) return true;
-        if (i < maxAttempts - 1) await new Promise(resolve => setTimeout(resolve, delayMs));
+        if (i < MAX_DATA_LOAD_ATTEMPTS - 1) await new Promise(resolve => setTimeout(resolve, DATA_LOAD_RETRY_DELAY_MS));
     }
     return false;
 }
@@ -3931,7 +3935,7 @@ function addScavengerMapLegend(foundCount, totalCount) {
         onAdd() {
             const div = L.DomUtil.create('div', 'map-legend');
             div.innerHTML = `
-                <div class="map-legend-title">🏴 Treasure Hunt</div>
+                <div class="map-legend-title">🏴 Scavenger Hunt</div>
                 <div class="map-legend-item"><div class="map-legend-swatch" style="background:#2980b9;"></div><span>Discovered ✓</span></div>
                 <div class="map-legend-item"><div class="map-legend-swatch" style="background:#27ae60;"></div><span>Easy ?</span></div>
                 <div class="map-legend-item"><div class="map-legend-swatch" style="background:#f39c12;"></div><span>Medium ?</span></div>
