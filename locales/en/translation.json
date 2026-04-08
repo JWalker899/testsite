@@ -2,8 +2,7 @@
   "nav": {
     "home": "Discover Rasnov",
     "hunt": "Treasure Hunt",
-    "map": "Map",
-    "info": "Info"
+    "map": "Map"
   },
   "header": {
     "guest": "Guest",
@@ -18,7 +17,6 @@
     "home": "Home",
     "hunt": "Treasure Hunt",
     "map": "Map",
-    "infoLink": "Info",
     "copyright": "© 2026 Discover Rasnov. Made with ❤ for tourists."
   },
   "hero": {
@@ -165,45 +163,6 @@
     "locations": "📍 Locations",
     "restaurants": "🍽️ Restaurants",
     "accommodations": "🏨 Accommodations"
-  },
-  "info": {
-    "title": "Essential Information",
-    "emergency": {
-      "title": "Emergency",
-      "police": "Police",
-      "medical": "Medical",
-      "touristInfo": "Tourist Info"
-    },
-    "transportation": {
-      "title": "Transportation",
-      "busToBrasov": "Bus to Brasov",
-      "taxi": "Taxi",
-      "carRental": "Car Rental"
-    },
-    "language": {
-      "title": "Language",
-      "main": "Main",
-      "common": "Common",
-      "tip": "Tip"
-    },
-    "currency": {
-      "title": "Currency",
-      "currency": "Currency",
-      "atms": "ATMs",
-      "cards": "Cards"
-    },
-    "hours": {
-      "title": "Opening Hours",
-      "fortress": "Fortress",
-      "shops": "Shops",
-      "restaurants": "Restaurants"
-    },
-    "visitTime": {
-      "title": "Best Time to Visit",
-      "peak": "Peak",
-      "shoulder": "Shoulder",
-      "winter": "Winter"
-    }
   },
   "huntHero": {
     "title": "Treasure Hunt",
