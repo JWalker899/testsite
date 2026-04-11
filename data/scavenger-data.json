@@ -1,111 +1,302 @@
 {
-  "order": ["fortress", "well", "tower", "church", "museum", "peak", "square", "dino"],
+  "order": ["gate", "garden", "perch", "city_center", "promenada", "ski_jump", "top_of_ski_jump", "shooting_range", "cave", "dino_parc_entrance", "bronto", "cinema", "claca", "river", "schubz_center", "schleif", "orthodox_church", "old_church"],
   "locations": {
-    "fortress": {
-      "name": "Rasnov Fortress Gate",
-      "qr": "RASNOV_FORTRESS",
+    "gate": {
+      "name": "Râșnov Citadel Gate",
+      "name_ro": "Poarta Cetății Râșnov",
+      "qr": "RASNOV_FORTRESS_GATE",
       "difficulty": 0,
-      "lat": 45.5889,
-      "lng": 25.4631,
+      "lat": 45.588897705078125,
+      "lng": 25.4700870513916,
       "fact": "The fortress was built in 1215 by Teutonic Knights to protect against Mongol invasions.",
-      "hint": "Next, discover the legendary source of water that saved the fortress during sieges - the Ancient Well!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "Who captured the Citadel?",
         "answer": "Gabriel Báthory",
         "options": ["Gabriel Báthory", "Petre Ancuța", "Florentina Felician", "Gheorghiță Dorel"]
       }
     },
-    "well": {
-      "name": "Ancient Well",
-      "qr": "RASNOV_WELL",
-      "difficulty": 0,
-      "lat": 45.5892,
-      "lng": 25.4635,
+    "garden": {
+      "name": "Râșnov Citadel Garden",
+      "name_ro": "Grădinile Cetății Râșnov",
+      "qr": "RASNOV_FORTRESS_GARDEN",
+      "difficulty": 2,
+      "lat": 45.5905835,
+      "lng": 25.4693836,
       "fact": "This 143-meter deep well was dug by Turkish prisoners and took 17 years to complete.",
-      "hint": "Now climb high to the Watch Tower where guards kept lookout for approaching enemies!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "What caused the cave to be discovered?",
         "answer": "A flood",
         "options": ["A flood", "An earthquake", "Hikers", "Explosives"]
       }
     },
-    "tower": {
-      "name": "Watch Tower",
-      "qr": "RASNOV_TOWER",
-      "difficulty": 1,
-      "lat": 45.5885,
-      "lng": 25.4640,
+    "perch": {
+      "name": "Râșnov Citadel Perch",
+      "name_ro": "Cetatea Râșnov de la înălțime",
+      "qr": "RASNOV_FORTRESS_PERCH",
+      "difficulty": 2,
+      "lat": 44.43154808935033,
+      "lng": 26.06017102393582,
       "fact": "The watch tower provided 360-degree views to spot approaching enemies from miles away.",
-      "hint": "Seek the Old Church where villagers found sanctuary and spiritual guidance for centuries!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "What was Schleif used for in the Middle Ages?",
         "answer": "A popular play area for children",
         "options": ["A popular play area for children", "A campsite", "A farm", "Nothing Schleif is new"]
       }
     },
-    "church": {
-      "name": "Old Church",
-      "qr": "RASNOV_CHURCH",
-      "difficulty": 1,
-      "lat": 45.5890,
-      "lng": 25.4638,
+    "city_center": {
+      "name": "City Center",
+      "name_ro": "Centrul Orașului",
+      "qr": "CITY_CENTER",
+      "difficulty": 0,
+      "lat": 45.5906617,
+      "lng": 25.4648709,
       "fact": "This Gothic church dates back to the 14th century and still holds services today.",
-      "hint": "Journey to the Village Museum to explore authentic Romanian traditions and artifacts!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "The Schubz Center is a part of what group?",
         "answer": "Mioritics Association",
         "options": ["Mioritics Association", "Nexora Labs", "Veridian Core", "Aurelix Group"]
       }
     },
-    "museum": {
-      "name": "Village Museum",
-      "qr": "RASNOV_MUSEUM",
-      "difficulty": 1,
-      "lat": 45.5850,
-      "lng": 25.4600,
+    "promenada": {
+      "name": "Promenada Sissi",
+      "name_ro": "Promenada Sissi",
+      "qr": "PROMENADA",
+      "difficulty": 0,
+      "lat": 45.597057,
+      "lng": 25.472071,
       "fact": "The museum houses over 300 artifacts showcasing traditional Romanian village life.",
-      "hint": "Adventure awaits at the Mountain Peak - breathtaking views from 1650m elevation!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "When was the first Film and History Festival?",
         "answer": "September 2009",
         "options": ["September 2009", "February 2009", "May 2009", "December 2009"]
       }
     },
-    "peak": {
-      "name": "Mountain Peak",
-      "qr": "RASNOV_PEAK",
-      "difficulty": 2,
-      "lat": 45.5700,
-      "lng": 25.4500,
+    "ski_jump": {
+      "name": "Ski Jump",
+      "name_ro": "Valea Cărbunării",
+      "qr": "SKI_JUMP",
+      "difficulty": 0,
+      "lat": 45.571920,
+      "lng": 25.471220,
       "fact": "At 1650m elevation, this peak offers views of the entire Barsa region on clear days.",
-      "hint": "Head down to the historic Town Square where markets and festivals have thrived for 600 years!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "Who built the Citadel?",
         "answer": "Knights of the Teutonic Order",
         "options": ["Knights of the Teutonic Order", "Lord of Râșnov", "King of Romania", "Unknown"]
       }
     },
-    "square": {
-      "name": "Town Square",
-      "qr": "RASNOV_SQUARE",
-      "difficulty": 0,
-      "lat": 45.5880,
-      "lng": 25.4620,
+    "top_of_ski_jump": {
+      "name": "Top of Ski Jump",
+      "name_ro": "Creasta Văii Cărbunării",
+      "qr": "TOP_OF_SKI_JUMP",
+      "difficulty": 2,
+      "lat": 45.5874184,
+      "lng": 25.4620149,
       "fact": "The town square has been a gathering place for markets and festivals for over 600 years.",
-      "hint": "One more adventure awaits - visit the amazing Dino Park with life-size dinosaur replicas!",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
       "quiz": {
         "question": "What is Râșnov named after?",
         "answer": "Rose Meadow",
         "options": ["Rose Meadow", "A river", "The lord", "Another fortress"]
       }
     },
-    "dino": {
-      "name": "Dino Park Entrance",
+    "shooting_range": {
+      "name": "Shooting Range",
+      "name_ro": "Poligon Râșnov",
+      "qr": "SHOOTING_RANGE",
+      "difficulty": 0,
+      "lat": 45.571902,
+      "lng": 25.471518,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "cave": {
+      "name": "Cave",
+      "name_ro": "Peștera Valea Cetatii",
+      "qr": "CAVE",
+      "difficulty": 2,
+      "lat": 45.585639,
+      "lng": 25.493802,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "dino_parc_entrance": {
+      "name": "Dino Parc Entrance",
       "name_ro": "Intrarea Dino Parc",
-      "qr": "RASNOV_DINO",
-      "difficulty": 1,
-      "lat": 45.5895,
-      "lng": 25.4625,
+      "qr": "DINO_PARC_ENTRANCE",
+      "difficulty": 0,
+      "lat": 45.591266,
+      "lng": 25.473929,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "bronto": {
+      "name": "Dino Parc Under the Brontosaurus",
+      "name_ro": "Dino Parc Sub Brontosaurus",
+      "qr": "DINO_PARC_UNDER_BRONTO",
+      "difficulty": 2,
+      "lat": 45.591480,
+      "lng": 25.476188,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "cinema": {
+      "name": "Cinema",
+      "name_ro": "Amza Pellea",
+      "qr": "CINEMA",
+      "difficulty": 0,
+      "lat": 45.590615,
+      "lng": 25.4625309,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "claca": {
+      "name": "Claca, Gospodărie Culturală",
+      "name_ro": "Claca, Gospodărie Culturală",
+      "qr": "CLACA",
+      "difficulty": 0,
+      "lat": 45.589462,
+      "lng": 25.4562018,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "river": {
+      "name": "River",
+      "name_ro": "Râul Ghimbășel",
+      "qr": "RIVER",
+      "difficulty": 0,
+      "lat": 45.589430,
+      "lng": 25.459204,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "schubz_center": {
+      "name": "Schubz Center",
+      "name_ro": "Centrul Schubz",
+      "qr": "SCHUBZ_CENTER",
+      "difficulty": 0,
+      "lat": 45.5874184,
+      "lng": 25.4620149,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "schleif": {
+      "name": "Schleif",
+      "name_ro": "Schleif",
+      "qr": "SCHLEIF",
+      "difficulty": 2,
+      "lat": 45.58718,
+      "lng": 25.46721,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "orthodox_church": {
+      "name": "Orthodox Church",
+      "name_ro": "Biserica Ortodoxă",
+      "qr": "ORTHODOX_CHURCH",
+      "difficulty": 0,
+      "lat": 45.5838031,
+      "lng": 25.4634136,
+      "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
+      "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
+      "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
+      "hint_ro": "Felicitări! Ai terminat întreaga vânătoare în Râșnov!",
+      "quiz": {
+        "question": "How many dinosaurs?",
+        "answer": "120",
+        "options": ["120", "111", "127", "77"]
+      }
+    },
+    "old_church": {
+      "name": "Old Church",
+      "name_ro": "Biserica Veche",
+      "qr": "OLD_CHURCH",
+      "difficulty": 0,
+      "lat": 45.5916357,
+      "lng": 25.465188,
       "fact": "Dino Park features over 100 life-size dinosaur replicas in their natural habitat settings.",
       "fact_ro": "Dino Parc are peste 100 de replici de dinozauri la scară naturală în habitat similar.",
       "hint": "Congratulations! You've completed the entire Rasnov treasure hunt!",
