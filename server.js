@@ -556,6 +556,16 @@ app.get('/api/config', (req, res) => {
 // QR code image endpoint – used by the /qrcodes debug page.
 // Generates a PNG QR code for the given absolute URL query parameter.
 const VALID_QR_LOCATIONS = loadValidQRLocations();
+// Validate an optional domain override for QR code generation.
+// Accepts only http/https URLs without path, query, or fragment.
+const DOMAIN_RE = /^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?$/;
+function resolveQRDomain(queryDomain) {
+  if (queryDomain && DOMAIN_RE.test(queryDomain)) {
+    return queryDomain.replace(/\/+$/, '');
+  }
+  return SITE_DOMAIN;
+}
+
 app.get('/api/qrcode', (req, res) => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
   if (isRateLimited(ip)) {
@@ -567,8 +577,9 @@ app.get('/api/qrcode', (req, res) => {
     return res.status(400).send('Invalid location');
   }
 
-  // Build the canonical hunt URL using the configured site domain.
-  const huntUrl = `${SITE_DOMAIN}/hunt.html?location=${encodeURIComponent(location)}`;
+  // Build the canonical hunt URL using the configured site domain or an override.
+  const domain = resolveQRDomain(req.query.domain);
+  const huntUrl = `${domain}/hunt.html?location=${encodeURIComponent(location)}`;
 
   QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
     if (err) {
@@ -603,7 +614,8 @@ app.get('/api/qrcode-extra', (req, res) => {
   // Encode name: spaces become underscores, then append -<pts>
   const encodedName = name.replace(/ /g, '_');
   const locationParam = `${encodedName}-${pts}`;
-  const huntUrl = `${SITE_DOMAIN}/hunt.html?location=${encodeURIComponent(locationParam)}`;
+  const domain = resolveQRDomain(req.query.domain);
+  const huntUrl = `${domain}/hunt.html?location=${encodeURIComponent(locationParam)}`;
 
   QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
     if (err) {
