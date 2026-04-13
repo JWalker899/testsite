@@ -7,7 +7,7 @@
  * lastUpdated timestamp. If data is older than 1 month or doesn't exist,
  * it fetches new data. Otherwise, it skips the fetch to conserve API tokens.
  * 
- * Cloudinary is checked first when local data is absent – this avoids
+ * Storage is checked first when local data is absent – this avoids
  * unnecessary Google Places API calls after a fresh deploy.
  * 
  * Usage:
@@ -18,7 +18,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../cloudinary-storage');
+const storage = require('../storage');
 const { main: fetchData } = require('./fetch-places-data.js');
 
 // Configuration
@@ -28,26 +28,26 @@ const PHOTOS_DIR = path.join(__dirname, '../assets/place-photos');
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
 /**
- * Try to restore places data and images from Cloudinary.
+ * Try to restore places data and images from storage.
  * Returns true when data was successfully restored (so a Google API call is unnecessary).
  */
-async function restoreFromCloudinary() {
-  if (!cloudinaryStorage.isConfigured()) return false;
+async function restoreFromStorage() {
+  if (!storage.isConfigured()) return false;
 
-  console.log('☁️  Checking Cloudinary for cached places data...\n');
+  console.log('☁️  Checking storage for cached places data...\n');
   try {
-    const data = await cloudinaryStorage.downloadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA);
+    const data = await storage.downloadJSON(storage.PUBLIC_IDS.PLACES_DATA);
     if (!data || !data.lastUpdated) return false;
 
     const lastUpdated = new Date(data.lastUpdated);
     const ageDays = Math.floor((Date.now() - lastUpdated) / (24 * 60 * 60 * 1000));
 
     if (Date.now() - lastUpdated > ONE_MONTH_MS) {
-      console.log(`   ☁️  Cloudinary data is stale (${ageDays} days) — will re-fetch from Google.\n`);
+      console.log(`   ☁️  Stored data is stale (${ageDays} days) — will re-fetch from Google.\n`);
       return false;
     }
 
-    console.log(`   ☁️  Cloudinary data is fresh (${ageDays} days old) — restoring locally.\n`);
+    console.log(`   ☁️  Stored data is fresh (${ageDays} days old) — restoring locally.\n`);
 
     // Write to local files so the server and conditional checks use this data
     const dir = path.dirname(DATA_FILE);
@@ -56,10 +56,10 @@ async function restoreFromCloudinary() {
     fs.writeFileSync(DATA_FILE, jsonOutput, 'utf8');
     fs.writeFileSync(SAMPLE_FILE, jsonOutput, 'utf8');
 
-    console.log('✅ Places data restored from Cloudinary.\n');
+    console.log('✅ Places data restored from storage.\n');
     return true;
   } catch (e) {
-    console.warn('⚠️  Could not restore places data from Cloudinary:', e.message, '\n');
+    console.warn('⚠️  Could not restore places data from storage:', e.message, '\n');
     return false;
   }
 }
@@ -173,10 +173,10 @@ async function main() {
   }
 
   if (needsData || needsImages) {
-    // Before hitting the Google Places API, check whether Cloudinary already
+    // Before hitting the Google Places API, check whether storage already
     // has up-to-date data from a previous run (e.g. after a fresh deploy).
     if (!forceFlag) {
-      const restored = await restoreFromCloudinary();
+      const restored = await restoreFromStorage();
       if (restored) {
         // If images are still missing after restoring data, they will be
         // downloaded on-demand by the server photo proxy route.

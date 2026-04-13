@@ -12,6 +12,21 @@ module.exports = {
   // will expect codes that start with this URL.
   SITE_DOMAIN: 'https://rasnov-site.onrender.com',
 
+  // ---------- Storage Settings ----------
+
+  // Where to persist data files and photos across deploys.
+  // Options: 'cloudinary' (default) or 'local'
+  //   - 'cloudinary' : uses Cloudinary cloud storage (requires CLOUDINARY_URL env var)
+  //   - 'local'      : uses a folder on the server's filesystem
+  STORAGE_MODE: 'cloudinary',
+
+  // Path to the local storage folder (only used when STORAGE_MODE is 'local').
+  // An absolute path lets you place the folder outside the project directory so
+  // that git pulls / redeploys won't delete existing data.
+  // A relative path is resolved from the project root.
+  // Default: './local-storage'  (a folder inside the project directory)
+  LOCAL_STORAGE_PATH: './local-storage',
+
 };
 
 /* How to Edit/Add/Remove locations for the treasure hunt.

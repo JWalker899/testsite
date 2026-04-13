@@ -8,3 +8,4 @@ data/leaderboard.json
 assets/place-photos/*.jpg
 assets/place-photos/*.png
 assets/place-photos/*.ref
+local-storage/
