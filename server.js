@@ -30,19 +30,19 @@ async function loadLeaderboardData() {
     console.warn('Could not load local leaderboard data:', e.message);
   }
 
-  // 2. Fall back to Cloudinary when local file is absent (e.g. fresh deploy)
+  // 2. Fall back to storage when local file is absent (e.g. fresh deploy)
   if (storage.isConfigured()) {
     try {
       const data = await storage.downloadJSON(storage.PUBLIC_IDS.LEADERBOARD);
       if (data) {
         userAccounts = data;
-        // Persist locally so future restarts skip the Cloudinary round-trip
+        // Persist locally so future restarts skip the storage round-trip
         saveLeaderboardLocal();
-        console.log('☁️  Restored leaderboard from Cloudinary');
+        console.log('☁️  Restored leaderboard from storage');
         return;
       }
     } catch (e) {
-      console.warn('Could not restore leaderboard from Cloudinary:', e.message);
+      console.warn('Could not restore leaderboard from storage:', e.message);
     }
   }
 
@@ -68,13 +68,13 @@ function saveLeaderboardLocal() {
   }
 }
 
-// Persist user accounts to disk and Cloudinary
+// Persist user accounts to disk and storage
 function saveLeaderboardData() {
   saveLeaderboardLocal();
-  // Upload to Cloudinary asynchronously so mutations are not blocked
+  // Upload to storage asynchronously so mutations are not blocked
   if (storage.isConfigured()) {
     storage.uploadJSON(storage.PUBLIC_IDS.LEADERBOARD, userAccounts)
-      .catch(e => console.error('Failed to upload leaderboard to Cloudinary:', e.message));
+      .catch(e => console.error('Failed to upload leaderboard to storage:', e.message));
   }
 }
 // Validate UUID v4 format
@@ -271,21 +271,21 @@ app.get('/assets/place-photos/:filename', async (req, res) => {
     try { fs.unlinkSync(getRefPath(filepath)); } catch (_) {}
   }
 
-  // Attempt to restore from Cloudinary before hitting the Google Places API
+  // Attempt to restore from storage before hitting the Google Places API
   if (storage.isConfigured()) {
     try {
       const baseName = filename.replace(/\.(jpg|png)$/i, '');
-      const cloudinaryId = storage.PUBLIC_IDS.photoId(baseName);
-      const downloaded = await storage.downloadImage(cloudinaryId, filepath);
+      const storageId = storage.PUBLIC_IDS.photoId(baseName);
+      const downloaded = await storage.downloadImage(storageId, filepath);
       if (downloaded) {
         // Write a sidecar .ref file so the cache is considered valid next time
         const photoRef = findPhotoReference(filename);
         if (photoRef) writeCachedPhotoRef(filepath, photoRef);
-        console.log(`☁️  Served photo from Cloudinary: ${filename}`);
+        console.log(`☁️  Served photo from storage: ${filename}`);
         return res.sendFile(filepath);
       }
     } catch (e) {
-      console.warn(`Could not fetch photo ${filename} from Cloudinary:`, e.message);
+      console.warn(`Could not fetch photo ${filename} from storage:`, e.message);
     }
   }
 
@@ -314,12 +314,12 @@ app.get('/assets/place-photos/:filename', async (req, res) => {
     writeCachedPhotoRef(filepath, photoReference);
     console.log(`📸 Cached photo: ${filename}`);
 
-    // Upload to Cloudinary for persistence across deploys
+    // Upload to storage for persistence across deploys
     if (storage.isConfigured()) {
       const baseName = filename.replace(/\.(jpg|png)$/i, '');
       storage.uploadImageBuffer(storage.PUBLIC_IDS.photoId(baseName), imageData)
-        .then(() => console.log(`☁️  Uploaded photo to Cloudinary: ${filename}`))
-        .catch(e => console.warn(`Could not upload photo ${filename} to Cloudinary:`, e.message));
+        .then(() => console.log(`☁️  Uploaded photo to storage: ${filename}`))
+        .catch(e => console.warn(`Could not upload photo ${filename} to storage:`, e.message));
     }
 
     res.setHeader('Content-Type', contentType);

@@ -54,7 +54,7 @@ const PLACE_TYPES = {
   accommodations: 'lodging',
 };
 
-/** Returns the shared base name used for both local files and Cloudinary public IDs. */
+/** Returns the shared base name used for both local files and storage public IDs. */
 const photoBaseName = (placeId, index) => `${placeId}_${index}`;
 
 /**
@@ -228,13 +228,13 @@ async function downloadPhoto(photoReference, placeId, index) {
     fs.writeFileSync(filepath, imageData);
     console.log(`    📸 Saved photo: ${filename}`);
 
-    // Upload to Cloudinary for persistence across deploys
+    // Upload to storage for persistence across deploys
     if (storage.isConfigured()) {
       try {
         await storage.uploadImageBuffer(storage.PUBLIC_IDS.photoId(baseName), imageData);
-        console.log(`    ☁️  Uploaded photo to Cloudinary: ${filename}`);
+        console.log(`    ☁️  Uploaded photo to storage: ${filename}`);
       } catch (e) {
-        console.warn(`    ⚠️  Could not upload photo ${filename} to Cloudinary:`, e.message);
+        console.warn(`    ⚠️  Could not upload photo ${filename} to storage:`, e.message);
       }
     }
 
@@ -419,7 +419,7 @@ async function processPlace(place, index, total, downloadImages, existingPhotos)
 }
 
 /**
- * Remove photos (Cloudinary + local cache) that belong to place IDs no longer
+ * Remove photos (storage + local cache) that belong to place IDs no longer
  * present in the freshly-fetched data.  This keeps storage clean after places
  * rotate in/out of the search results or are blacklisted.
  */
@@ -434,35 +434,35 @@ async function cleanupOrphanedPhotos(newData) {
   // Build the full set of photo public IDs that are expected for the new places.
   // We include all possible index slots (0..MAX_PHOTOS_PER_PLACE-1) for every
   // place so that images for current places are never accidentally deleted.
-  const expectedCloudinaryIds = new Set();
+  const expectedStorageIds = new Set();
   for (const place of allPlaces) {
     for (let i = 0; i < CONFIG.MAX_PHOTOS_PER_PLACE; i++) {
-      expectedCloudinaryIds.add(storage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
+      expectedStorageIds.add(storage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
     }
   }
 
-  // ── Cloudinary cleanup ──────────────────────────────────────────────────
+  // ── Storage cleanup ──────────────────────────────────────────────────
   if (storage.isConfigured()) {
     try {
-      console.log('\n🧹 Checking for orphaned Cloudinary photos...');
+      console.log('\n🧹 Checking for orphaned photos in storage...');
       const existing = await storage.listImagesByPrefix('rasnov-photos/');
-      const toDelete = existing.filter(id => !expectedCloudinaryIds.has(id));
+      const toDelete = existing.filter(id => !expectedStorageIds.has(id));
 
       if (toDelete.length === 0) {
-        console.log('  ✅ No orphaned Cloudinary photos found');
+        console.log('  ✅ No orphaned photos found');
       } else {
-        console.log(`  🗑️  Deleting ${toDelete.length} orphaned Cloudinary photo(s)...`);
+        console.log(`  🗑️  Deleting ${toDelete.length} orphaned photo(s)...`);
         for (const publicId of toDelete) {
           try {
             await storage.deleteImage(publicId);
-            console.log(`    ✅ Deleted from Cloudinary: ${publicId}`);
+            console.log(`    ✅ Deleted from storage: ${publicId}`);
           } catch (e) {
-            console.warn(`    ⚠️  Could not delete ${publicId} from Cloudinary:`, e.message);
+            console.warn(`    ⚠️  Could not delete ${publicId} from storage:`, e.message);
           }
         }
       }
     } catch (e) {
-      console.warn('⚠️  Could not clean up orphaned Cloudinary photos:', e.message);
+      console.warn('⚠️  Could not clean up orphaned photos:', e.message);
     }
   }
 
@@ -583,14 +583,14 @@ async function main() {
   console.log(`💾 Overwriting sample data at ${CONFIG.SAMPLE_FILE}...`);
   fs.writeFileSync(CONFIG.SAMPLE_FILE, jsonOutput, 'utf8');
 
-  // Upload to Cloudinary for persistence across deploys
+  // Upload to storage for persistence across deploys
   if (storage.isConfigured()) {
     try {
-      console.log('☁️  Uploading places data to Cloudinary...');
+      console.log('☁️  Uploading places data to storage...');
       await storage.uploadJSON(storage.PUBLIC_IDS.PLACES_DATA, result);
-      console.log('☁️  Places data uploaded to Cloudinary successfully');
+      console.log('☁️  Places data uploaded to storage successfully');
     } catch (e) {
-      console.warn('⚠️  Could not upload places data to Cloudinary:', e.message);
+      console.warn('⚠️  Could not upload places data to storage:', e.message);
     }
   }
 
