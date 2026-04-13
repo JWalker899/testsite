@@ -199,7 +199,7 @@ function filterPlacesByRadius() {
       const before = data[cat].length;
       totalBefore += before;
       data[cat] = data[cat].filter(place => {
-        if (!place.coordinates) return true; // keep places without coords
+        if (!place.coordinates) return true; // keep places without coords (can't compute distance)
         const dist = approxDistanceMeters(
           centerLat, centerLng,
           place.coordinates.lat, place.coordinates.lng
