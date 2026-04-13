@@ -18,7 +18,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../storage');
+const storage = require('../storage');
 const { main: fetchData } = require('./fetch-places-data.js');
 
 // Configuration
@@ -32,11 +32,11 @@ const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
  * Returns true when data was successfully restored (so a Google API call is unnecessary).
  */
 async function restoreFromCloudinary() {
-  if (!cloudinaryStorage.isConfigured()) return false;
+  if (!storage.isConfigured()) return false;
 
   console.log('☁️  Checking Cloudinary for cached places data...\n');
   try {
-    const data = await cloudinaryStorage.downloadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA);
+    const data = await storage.downloadJSON(storage.PUBLIC_IDS.PLACES_DATA);
     if (!data || !data.lastUpdated) return false;
 
     const lastUpdated = new Date(data.lastUpdated);

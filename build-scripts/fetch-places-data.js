@@ -20,7 +20,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../storage');
+const storage = require('../storage');
 
 // Places to exclude from results regardless of what the API returns.
 // Names are matched case-insensitively; partial matches are NOT used – the
@@ -229,9 +229,9 @@ async function downloadPhoto(photoReference, placeId, index) {
     console.log(`    📸 Saved photo: ${filename}`);
 
     // Upload to Cloudinary for persistence across deploys
-    if (cloudinaryStorage.isConfigured()) {
+    if (storage.isConfigured()) {
       try {
-        await cloudinaryStorage.uploadImageBuffer(cloudinaryStorage.PUBLIC_IDS.photoId(baseName), imageData);
+        await storage.uploadImageBuffer(storage.PUBLIC_IDS.photoId(baseName), imageData);
         console.log(`    ☁️  Uploaded photo to Cloudinary: ${filename}`);
       } catch (e) {
         console.warn(`    ⚠️  Could not upload photo ${filename} to Cloudinary:`, e.message);
@@ -437,15 +437,15 @@ async function cleanupOrphanedPhotos(newData) {
   const expectedCloudinaryIds = new Set();
   for (const place of allPlaces) {
     for (let i = 0; i < CONFIG.MAX_PHOTOS_PER_PLACE; i++) {
-      expectedCloudinaryIds.add(cloudinaryStorage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
+      expectedCloudinaryIds.add(storage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
     }
   }
 
   // ── Cloudinary cleanup ──────────────────────────────────────────────────
-  if (cloudinaryStorage.isConfigured()) {
+  if (storage.isConfigured()) {
     try {
       console.log('\n🧹 Checking for orphaned Cloudinary photos...');
-      const existing = await cloudinaryStorage.listImagesByPrefix('rasnov-photos/');
+      const existing = await storage.listImagesByPrefix('rasnov-photos/');
       const toDelete = existing.filter(id => !expectedCloudinaryIds.has(id));
 
       if (toDelete.length === 0) {
@@ -454,7 +454,7 @@ async function cleanupOrphanedPhotos(newData) {
         console.log(`  🗑️  Deleting ${toDelete.length} orphaned Cloudinary photo(s)...`);
         for (const publicId of toDelete) {
           try {
-            await cloudinaryStorage.deleteImage(publicId);
+            await storage.deleteImage(publicId);
             console.log(`    ✅ Deleted from Cloudinary: ${publicId}`);
           } catch (e) {
             console.warn(`    ⚠️  Could not delete ${publicId} from Cloudinary:`, e.message);
@@ -584,10 +584,10 @@ async function main() {
   fs.writeFileSync(CONFIG.SAMPLE_FILE, jsonOutput, 'utf8');
 
   // Upload to Cloudinary for persistence across deploys
-  if (cloudinaryStorage.isConfigured()) {
+  if (storage.isConfigured()) {
     try {
       console.log('☁️  Uploading places data to Cloudinary...');
-      await cloudinaryStorage.uploadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA, result);
+      await storage.uploadJSON(storage.PUBLIC_IDS.PLACES_DATA, result);
       console.log('☁️  Places data uploaded to Cloudinary successfully');
     } catch (e) {
       console.warn('⚠️  Could not upload places data to Cloudinary:', e.message);

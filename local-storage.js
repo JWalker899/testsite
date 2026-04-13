@@ -43,15 +43,31 @@ function isConfigured() {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Validate that a resolved path is inside the storage root.
+ * Prevents path-traversal attacks (e.g. publicId = "../../etc/passwd").
+ */
+function assertInsideRoot(resolvedPath) {
+  const root = getStorageRoot();
+  const normalizedRoot = path.resolve(root) + path.sep;
+  const normalizedPath = path.resolve(resolvedPath);
+  if (!normalizedPath.startsWith(normalizedRoot) && normalizedPath !== path.resolve(root)) {
+    throw new Error('Path traversal detected — resolved path is outside the storage root');
+  }
+}
+
 /** Turn a public ID into an absolute file path (for JSON files). */
 function jsonPath(publicId) {
-  return path.join(getStorageRoot(), publicId + '.json');
+  const resolved = path.join(getStorageRoot(), publicId + '.json');
+  assertInsideRoot(resolved);
+  return resolved;
 }
 
 /** Turn an image public ID into an absolute directory + base name. */
 function imageDirAndBase(publicId) {
   const dir = path.join(getStorageRoot(), path.dirname(publicId));
   const base = path.basename(publicId);
+  assertInsideRoot(dir);
   return { dir, base };
 }
 
@@ -184,6 +200,7 @@ async function listImagesByPrefix(prefix) {
   if (!isConfigured()) return [];
   // prefix looks like "rasnov-photos/"; map to a directory path
   const dir = path.join(getStorageRoot(), prefix);
+  assertInsideRoot(dir);
   if (!fs.existsSync(dir)) return [];
   const results = [];
   const imageExts = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
