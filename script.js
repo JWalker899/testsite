@@ -3668,10 +3668,14 @@ function loadMap() {
  * Load map markers from places data
  */
 async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon) {
+    // Capture the current map instance so we can detect if the map was
+    // replaced (e.g. by reloadMap()) while we were waiting for data.
+    const mapInstance = window.leafletMap;
+
     // Use event-based approach to wait for data
     const placesData = await waitForPlacesData();
     
-    if (!placesData) {
+    if (!placesData || window.leafletMap !== mapInstance) {
         console.error('❌ Could not load places data for map');
         return;
     }
@@ -3869,8 +3873,11 @@ async function waitForScavengerData() {
  * Must be called after loadMap() has created window.leafletMap.
  */
 async function loadScavengerMapMarkers() {
+    // Capture the current map instance so we can detect if the map was
+    // replaced (e.g. by reloadMap()) while we were waiting for data.
+    const mapInstance = window.leafletMap;
     const ok = await waitForScavengerData();
-    if (!ok || !window.leafletMap) return;
+    if (!ok || !window.leafletMap || window.leafletMap !== mapInstance) return;
 
     // Determine which locations have been found (works on both index & hunt pages)
     const foundSet = new Set(
