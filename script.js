@@ -1580,15 +1580,11 @@ function processQRCode(qrData) {
 
 function showQRCodeOptions() {
     const qrScanner = document.getElementById('qr-scanner');
-    const header = t('messages.selectQR');
     qrScanner.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
-            <h4>${header}</h4>
-            <div style="display: grid; gap: 1rem; margin-top: 1rem;">
-                ${Object.entries(huntLocations).map(([key, loc]) => `
-                    <button class="card-button" onclick="simulateQRScan('${key}')">${localizedField(loc, 'name') || loc.name}</button>
-                `).join('')}
-            </div>
+            <i class="fas fa-video-slash" style="font-size: 3rem; color: var(--secondary-color, #6c757d); margin-bottom: 1rem;"></i>
+            <h4>${t('messages.cameraBlockedTitle')}</h4>
+            <p style="margin-top: 0.5rem; color: var(--text-muted, #6c757d);">${t('messages.cameraBlockedMessage')}</p>
         </div>
     `;
 }
@@ -1653,15 +1649,7 @@ async function discoverExtraLocation(info) {
     checkCollageUnlocks();
 }
 
-function simulateQRScan(locationKey) {
-    if (huntLocations[locationKey] && !foundLocations.has(locationKey)) {
-        const isFirstVisit = foundLocations.size === 0;
-        closeModal('qr-modal');
-        showQuizModalForScannedLocation(locationKey, isFirstVisit);
-    } else if (foundLocations.has(locationKey)) {
-        showNotification('You already found this location!', 'info');
-    }
-}
+
 
 /* ==================== LOCATION-BASED DISCOVERY FUNCTIONS (Commented out) ====================
  * NOTE: These GPS/geolocation functions are preserved for potential future reimplementation.
