@@ -192,16 +192,6 @@
     "progress": {
       "title": "Your Progress",
       "locationsFound": "locations found"
-    },
-    "items": {
-      "fortress": "Rasnov Fortress Gate",
-      "well": "Ancient Well",
-      "tower": "Watch Tower",
-      "church": "Old Church",
-      "museum": "Village Museum",
-      "peak": "Mountain Peak",
-      "square": "Town Square",
-      "dino": "Dino Park Entrance"
     }
   },
   "leaderboard": {

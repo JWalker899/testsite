@@ -192,16 +192,6 @@
     "progress": {
       "title": "Progresul tău",
       "locationsFound": "locații găsite"
-    },
-    "items": {
-      "fortress": "Poarta Cetății Râșnov",
-      "well": "Fântâna Antică",
-      "tower": "Turnul de Veghe",
-      "church": "Biserica Veche",
-      "museum": "Muzeul Satului",
-      "peak": "Vârful Muntelui",
-      "square": "Piața Orașului",
-      "dino": "Intrarea Dino Parc"
     }
   },
   "leaderboard": {
