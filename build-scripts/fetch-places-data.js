@@ -34,7 +34,7 @@ const BLACKLIST_LOWER = BLACKLIST.map(name => name.toLowerCase());
 const CONFIG = {
   CENTER_LAT: 45.5889,
   CENTER_LNG: 25.4631,
-  SEARCH_RADIUS: 5000, // 5km in meters – covers the full extent of Rasnov
+  SEARCH_RADIUS: 3000, // 3km in meters
   GOOGLE_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
   UNSPLASH_API_KEY: process.env.UNSPLASH_ACCESS_KEY,
   OUTPUT_FILE: path.join(__dirname, '../data/places-data.json'),
@@ -615,4 +615,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main };
+module.exports = { main, CONFIG };

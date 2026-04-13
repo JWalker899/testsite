@@ -19,7 +19,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const storage = require('../storage');
-const { main: fetchData } = require('./fetch-places-data.js');
+const { main: fetchData, CONFIG: FETCH_CONFIG } = require('./fetch-places-data.js');
 
 // Configuration
 const DATA_FILE = path.join(__dirname, '../data/places-data.json');
@@ -154,6 +154,78 @@ function syncSampleData() {
 }
 
 /**
+ * Compute approximate distance (in meters) between two lat/lng points
+ * using the equirectangular approximation. Fast and accurate enough at
+ * small distances (< 50 km).
+ */
+function approxDistanceMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371e3; // Earth radius in meters
+  const toRad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * toRad;
+  const dLng = (lng2 - lng1) * toRad * Math.cos(((lat1 + lat2) / 2) * toRad);
+  return R * Math.sqrt(dLat * dLat + dLng * dLng);
+}
+
+/**
+ * Filter places-data.json to only include places within the current
+ * SEARCH_RADIUS of the center point.
+ *
+ * Reads the FULL dataset from sample-places-data.json (which always holds
+ * the complete set of fetched places regardless of radius changes) and
+ * writes the filtered result to places-data.json.
+ *
+ * This allows the radius to be fine-tuned without re-fetching from the API:
+ *   - Shrinking the radius removes distant places immediately.
+ *   - Enlarging the radius restores places that were previously outside,
+ *     as long as they were in the original fetch.
+ */
+function filterPlacesByRadius() {
+  // Read from sample (the unfiltered source of truth)
+  const sourceFile = fs.existsSync(SAMPLE_FILE) ? SAMPLE_FILE : DATA_FILE;
+  if (!fs.existsSync(sourceFile)) return;
+
+  try {
+    const data = JSON.parse(fs.readFileSync(sourceFile, 'utf8'));
+    const centerLat = FETCH_CONFIG.CENTER_LAT;
+    const centerLng = FETCH_CONFIG.CENTER_LNG;
+    const radius = FETCH_CONFIG.SEARCH_RADIUS;
+
+    const categories = ['locations', 'restaurants', 'accommodations'];
+    let totalBefore = 0;
+    let totalAfter = 0;
+
+    for (const cat of categories) {
+      if (!Array.isArray(data[cat])) continue;
+      const before = data[cat].length;
+      totalBefore += before;
+      data[cat] = data[cat].filter(place => {
+        if (!place.coordinates) return true; // keep places without coords
+        const dist = approxDistanceMeters(
+          centerLat, centerLng,
+          place.coordinates.lat, place.coordinates.lng
+        );
+        return dist <= radius;
+      });
+      totalAfter += data[cat].length;
+    }
+
+    const removed = totalBefore - totalAfter;
+    if (removed > 0) {
+      console.log(`📏 Radius filter (${radius}m): kept ${totalAfter}/${totalBefore} places (removed ${removed} outside radius)\n`);
+    } else {
+      console.log(`📏 Radius filter (${radius}m): all ${totalBefore} places are within radius\n`);
+    }
+
+    // Write the filtered data to the working file
+    const dir = path.dirname(DATA_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.warn('⚠️  Could not filter places by radius:', error.message);
+  }
+}
+
+/**
  * Main function
  */
 async function main() {
@@ -182,6 +254,7 @@ async function main() {
         // downloaded on-demand by the server photo proxy route.
         console.log('💡 Tip: Use --force flag to fetch fresh data from Google regardless of cache.\n');
         syncSampleData();
+        filterPlacesByRadius();
         return;
       }
     }
@@ -189,10 +262,15 @@ async function main() {
     // Fetch new data (fetch-places-data.js writes both places-data.json and
     // sample, and downloads images when the photos folder is missing).
     await fetchData();
+    // After a fresh fetch, filter to the current radius
+    filterPlacesByRadius();
   } else {
     // Data is fresh and images are present - skip API calls entirely.
     console.log('💡 Tip: Use --force flag to fetch regardless of cache age.\n');
     syncSampleData();
+    // Apply radius filter from full sample data so radius changes take effect
+    // without a re-fetch
+    filterPlacesByRadius();
   }
 }
 
