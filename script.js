@@ -908,7 +908,9 @@ function renderHuntItems() {
 
     // Preserve extra-location cards (bonus locations) added dynamically
     const extras = Array.from(container.querySelectorAll('.hunt-item.extra-location'));
+    extras.forEach(el => el.remove());
 
+    // Remove all existing regular hunt items (keep nothing)
     container.innerHTML = '';
 
     // Render items in the order defined in the JSON
