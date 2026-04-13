@@ -16,7 +16,7 @@ const resetHuntBtn = document.getElementById('reset-hunt');
 const progressFill = document.getElementById('progress-fill');
 const progressCount = document.getElementById('progress-count');
 const progressTotal = document.getElementById('progress-total');
-const huntItems = document.querySelectorAll('.hunt-item');
+// huntItems is no longer needed — hunt items are rendered dynamically by renderHuntItems()
 
 // AR Modal Elements
 const arModal = document.getElementById('ar-modal');
@@ -646,17 +646,8 @@ function resetProgress() {
     updateUserDisplayUI();
     updateProgress();
 
-    // Reset hunt item UI
-    huntItems.forEach(item => {
-        item.classList.remove('found');
-        const icon = item.querySelector('i');
-        if (icon) icon.className = 'fas fa-lock';
-        const photo = item.querySelector('.hunt-item-photo');
-        if (photo) photo.remove();
-    });
-
-    // Remove dynamically-added extra location cards
-    document.querySelectorAll('.hunt-item.extra-location').forEach(el => el.remove());
+    // Reset hunt item UI — re-render all items in their locked state
+    renderHuntItems();
 
     // Clear saved photos
     Object.keys(huntLocations).forEach(key => {
@@ -907,6 +898,44 @@ async function loadScavengerData() {
     } catch (e) {
         console.error('❌ Could not load scavenger data:', e.message);
     }
+}
+
+// Build hunt item cards dynamically from scavenger-data.json.
+// Uses localizedField() so names update when the language changes.
+function renderHuntItems() {
+    const container = document.getElementById('hunt-items-container');
+    if (!container) return;
+
+    // Preserve extra-location cards (bonus locations) added dynamically
+    const extras = Array.from(container.querySelectorAll('.hunt-item.extra-location'));
+
+    container.innerHTML = '';
+
+    // Render items in the order defined in the JSON
+    huntOrder.forEach(key => {
+        const loc = huntLocations[key];
+        if (!loc) return;
+        const isFound = foundLocations.has(key);
+        const item = document.createElement('div');
+        item.className = 'hunt-item' + (isFound ? ' found' : '');
+        item.setAttribute('data-location', key);
+
+        const icon = document.createElement('i');
+        icon.className = isFound ? 'fas fa-check-circle' : 'fas fa-lock';
+        item.appendChild(icon);
+
+        const span = document.createElement('span');
+        span.textContent = localizedField(loc, 'name') || loc.name;
+        item.appendChild(span);
+
+        // Restore photo thumbnail if previously captured
+        addPhotoToHuntItem(key, item);
+
+        container.appendChild(item);
+    });
+
+    // Re-append any bonus location cards
+    extras.forEach(el => container.appendChild(el));
 }
 
 // Returns the next unvisited location in the circular order after currentKey.
@@ -3984,6 +4013,7 @@ document.addEventListener('languageChanged', (e) => {
     const lang = getCurrentLang().toUpperCase();
     langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
     langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
+    renderHuntItems();
     renderUnlocksTab();
     reloadMap();
 });
@@ -4649,6 +4679,9 @@ loadScavengerData().then(() => {
     if (isHuntPage) {
         // Initialize button states (before restoreHuntState which may re-enable them)
         if (scanQrBtn) scanQrBtn.disabled = true;
+
+        // Build the hunt item list from scavenger-data.json
+        renderHuntItems();
 
         // Restore hunt state (found locations, photos, button states) from saved data
         restoreHuntState();

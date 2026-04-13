@@ -127,39 +127,8 @@
                                 <p class="progress-text"><span id="progress-count">0</span> / <span id="progress-total">8</span> <span data-i18n="hunt.progress.locationsFound">locations found</span></p>
                             </div>
 
-                            <div class="hunt-items">
-                                <div class="hunt-item" data-location="fortress">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.fortress">Rasnov Fortress Gate</span>
-                                </div>
-                                <div class="hunt-item" data-location="well">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.well">Ancient Well</span>
-                                </div>
-                                <div class="hunt-item" data-location="tower">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.tower">Watch Tower</span>
-                                </div>
-                                <div class="hunt-item" data-location="church">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.church">Old Church</span>
-                                </div>
-                                <div class="hunt-item" data-location="museum">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.museum">Village Museum</span>
-                                </div>
-                                <div class="hunt-item" data-location="peak">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.peak">Mountain Peak</span>
-                                </div>
-                                <div class="hunt-item" data-location="square">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.square">Town Square</span>
-                                </div>
-                                <div class="hunt-item" data-location="dino">
-                                    <i class="fas fa-lock"></i>
-                                    <span data-i18n="hunt.items.dino">Dino Park Entrance</span>
-                                </div>
+                            <div class="hunt-items" id="hunt-items-container">
+                                <!-- Dynamically populated from scavenger-data.json by renderHuntItems() -->
                             </div>
                         </div>
                     </div>
