@@ -1,5 +1,5 @@
 {
-  "order": ["gate", "garden", "perch", "city_center", "promenada", "ski_jump", "top_of_ski_jump", "shooting_range", "cave", "dino_parc_entrance", "bronto", "cinema", "claca", "river", "schubz_center", "schleif", "orthodox_church", "old_church"],
+  "order": ["gate", "garden", "perch", "city_center", "promenada", "old_church", "orthodox_church", "ski_jump", "top_of_ski_jump", "shooting_range", "schubz_center", "cinema", "river", "claca", "schleif", "cave", "dino_parc_entrance", "bronto"],
   "locations": {
     "gate": {
       "name": "Râșnov Citadel Gate",
