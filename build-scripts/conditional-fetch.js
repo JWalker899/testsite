@@ -18,7 +18,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../cloudinary-storage');
+const cloudinaryStorage = require('../storage');
 const { main: fetchData } = require('./fetch-places-data.js');
 
 // Configuration

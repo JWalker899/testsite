@@ -10,6 +10,8 @@
     "download-photos": "node build-scripts/download-photos.js",
     "fetch-and-start": "node build-scripts/conditional-fetch.js && node server.js",
     "force-fetch-and-start": "node build-scripts/conditional-fetch.js --force && node server.js",
+    "migrate:cloudinary-to-local": "node migrate-storage.js cloudinary-to-local",
+    "migrate:local-to-cloudinary": "node migrate-storage.js local-to-cloudinary",
     "dev": "node server.js"
   },
   "dependencies": {

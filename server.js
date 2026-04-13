@@ -4,7 +4,7 @@ const fs = require('fs');
 const axios = require('axios');
 const QRCode = require('qrcode');
 require('dotenv').config();
-const cloudinaryStorage = require('./cloudinary-storage');
+const cloudinaryStorage = require('./storage');
 const siteConfig = require('./site.config');
 const SITE_DOMAIN = siteConfig.SITE_DOMAIN;
 const app = express();

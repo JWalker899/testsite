@@ -20,7 +20,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../cloudinary-storage');
+const cloudinaryStorage = require('../storage');
 
 // Places to exclude from results regardless of what the API returns.
 // Names are matched case-insensitively; partial matches are NOT used – the
