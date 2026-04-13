@@ -226,8 +226,8 @@ This file defines every treasure hunt location. It has two parts:
 
 | Field | Description | Example |
 |---|---|---|
-| `name` | Display name in English | `"Rashnov Citadel Gate"` |
-| `name_ro` | Display name in Romanian | `"Poarta Cetatii Rashnov"` |
+| `name` | Display name in English | `"Rasnov Citadel Gate"` |
+| `name_ro` | Display name in Romanian | `"Poarta Cetatii Rasnov"` |
 | `qr` | The text encoded into the QR code. Must be unique and in ALL CAPS with underscores. | `"RASNOV_FORTRESS_GATE"` |
 | `difficulty` | `0` for easy, `2` for hard. Affects point value. | `0` |
 | `lat` | Latitude of the location (for the map pin and GPS discovery). | `45.588897` |
