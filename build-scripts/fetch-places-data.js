@@ -259,6 +259,41 @@ function getLocalPhotoPath(placeId, index) {
 }
 
 /**
+ * Load existing places data from the output file or sample file.
+ * Used to detect which places already have cached photos so we can skip
+ * redundant Google Places Photo API calls.
+ */
+function loadExistingData() {
+  for (const file of [CONFIG.OUTPUT_FILE, CONFIG.SAMPLE_FILE]) {
+    if (fs.existsSync(file)) {
+      try {
+        return JSON.parse(fs.readFileSync(file, 'utf8'));
+      } catch (e) {
+        console.warn(`  ⚠️  Could not parse ${path.basename(file)}:`, e.message);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Build a Map of placeId → photos array from existing data.
+ * Only includes entries where the place has at least one photo.
+ */
+function buildPhotoLookup(data) {
+  const lookup = new Map();
+  if (!data) return lookup;
+  for (const key of ['locations', 'restaurants', 'accommodations']) {
+    for (const place of (data[key] || [])) {
+      if (place.id && Array.isArray(place.photos) && place.photos.length > 0) {
+        lookup.set(place.id, place.photos);
+      }
+    }
+  }
+  return lookup;
+}
+
+/**
  * Fetch Unsplash photos as fallback
  */
 async function fetchUnsplashPhoto(query) {
@@ -300,7 +335,7 @@ async function fetchUnsplashPhoto(query) {
 /**
  * Process and format a single place
  */
-async function processPlace(place, index, total, downloadImages) {
+async function processPlace(place, index, total, downloadImages, existingPhotos) {
   console.log(`  Processing [${index + 1}/${total}] ${place.name}...`);
 
   const processedPlace = {
@@ -344,8 +379,12 @@ async function processPlace(place, index, total, downloadImages) {
     }
   }
 
-  // Process photos
-  if (place.photos && place.photos.length > 0) {
+  // Process photos — reuse cached photos when available to avoid extra API calls
+  const cachedPhotos = existingPhotos.get(place.place_id);
+  if (cachedPhotos && cachedPhotos.length > 0) {
+    console.log(`    📸 Reusing ${cachedPhotos.length} cached photo(s)`);
+    processedPlace.photos = cachedPhotos;
+  } else if (place.photos && place.photos.length > 0) {
     const photoCount = Math.min(place.photos.length, CONFIG.MAX_PHOTOS_PER_PLACE);
     for (let i = 0; i < photoCount; i++) {
       const photo = place.photos[i];
@@ -489,6 +528,14 @@ async function main() {
     process.exit(1);
   }
 
+  // Load existing data so we can reuse photos for places we've already fetched,
+  // avoiding redundant Google Places Photo API calls.
+  const existingData = loadExistingData();
+  const existingPhotos = buildPhotoLookup(existingData);
+  if (existingPhotos.size > 0) {
+    console.log(`📸 Found ${existingPhotos.size} place(s) with cached photos — will reuse where possible`);
+  }
+
   const result = {
     lastUpdated: new Date().toISOString(),
     center: {
@@ -507,7 +554,7 @@ async function main() {
     // Process each place
     for (let i = 0; i < places.length; i++) {
       try {
-        const processedPlace = await processPlace(places[i], i, places.length, downloadImages);
+        const processedPlace = await processPlace(places[i], i, places.length, downloadImages, existingPhotos);
         result[key].push(processedPlace);
         await sleep(CONFIG.RATE_LIMIT_DELAY); // Rate limiting
       } catch (error) {
