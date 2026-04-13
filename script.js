@@ -3544,6 +3544,28 @@ function showAccommodationDetails(accommodationId) {
 // Map Loading Function
 let map = null;
 
+/**
+ * Destroy any existing map instance and re-initialize it so that
+ * translated strings (titles, popup labels, counters) are refreshed.
+ * Called whenever the active language changes.
+ */
+function reloadMap() {
+    const mapDiv = document.getElementById('interactive-map');
+    if (!mapDiv) return;
+
+    // Destroy the Leaflet instance if it exists
+    if (window.leafletMap) {
+        window.leafletMap.remove();
+        window.leafletMap = null;
+    }
+
+    // Clear the container and reset the loaded state so loadMap() runs fresh
+    mapDiv.innerHTML = '';
+    mapDiv.classList.remove('loaded');
+
+    loadMap();
+}
+
 function loadMap() {
     const mapDiv = document.getElementById('interactive-map');
     if (!mapDiv) return;
@@ -3968,6 +3990,7 @@ document.addEventListener('languageChanged', (e) => {
     langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
     langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
     renderUnlocksTab();
+    reloadMap();
 });
 // ==================== Initialization ====================
 
