@@ -573,7 +573,7 @@ function showUserProfile() {
                 </div>
                 <div class="profile-stat">
                     <span class="stat-label">Locations Found</span>
-                    <span class="stat-value">${currentUser.locationsFound.length} / 8</span>
+                    <span class="stat-value">${currentUser.locationsFound.length} / ${huntOrder.length}</span>
                 </div>
                 <div class="profile-stat">
                     <span class="stat-label">Hunt Status</span>
@@ -830,7 +830,7 @@ function displayLeaderboard(leaderboard) {
                     <span class="points-value">⭐ ${player.totalPoints}</span>
                 </td>
                 <td class="locations-col">
-                    ${player.locationsFound} / 8
+                    ${player.locationsFound} / ${huntOrder.length}
                 </td>
                 <td class="time-col">
                     <span class="${timeClass}">⏱️ ${timeDisplay}</span>
@@ -892,8 +892,16 @@ async function loadScavengerData() {
         const response = await fetch('./data/scavenger-data.json');
         if (!response.ok) throw new Error('Failed to fetch scavenger-data.json');
         const data = await response.json();
-        huntLocations = data.locations || {};
+        const allLocations = data.locations || {};
         huntOrder = data.order || [];
+        // Only include locations that are listed in the order array.
+        // Any location defined in the JSON but not in the order is ignored.
+        huntLocations = {};
+        for (const key of huntOrder) {
+            if (allLocations[key]) {
+                huntLocations[key] = allLocations[key];
+            }
+        }
         console.log('✅ Loaded scavenger data from scavenger-data.json');
     } catch (e) {
         console.error('❌ Could not load scavenger data:', e.message);
