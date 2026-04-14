@@ -449,14 +449,15 @@ function showQuizModalForScannedLocation(locationKey, isFirstVisit = false) {
     const questionEl = document.getElementById('quiz-question');
 
     if (location.quiz && location.quiz.question) {
-        pendingQuizCorrectAnswer = location.quiz.answer;
+        pendingQuizCorrectAnswer = localizedField(location.quiz, 'answer') || location.quiz.answer;
         selectedQuizAnswer = null;
 
         if (questionEl) {
-            questionEl.textContent = location.quiz.question;
+            questionEl.textContent = localizedField(location.quiz, 'question') || location.quiz.question;
         }
 
-        const options = shuffleArray([...location.quiz.options]);
+        const quizOptions = (currentLang && currentLang !== 'en' && location.quiz['options_' + currentLang]) || location.quiz.options;
+        const options = shuffleArray([...quizOptions]);
         renderQuizOptions(options);
 
         const submitBtn = document.querySelector('#quiz-modal .cta-button');
