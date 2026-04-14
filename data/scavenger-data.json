@@ -1,5 +1,5 @@
 {
-  "order": ["gate", "garden", "perch", "city_center", "promenada", "old_church", "orthodox_church", "ski_jump", "top_of_ski_jump", "shooting_range", "schubz_center", "cinema", "river", "claca", "schleif", "cave", "dino_parc_entrance", "bronto"],
+  "order": ["gate", "garden", "perch", "city_center", "promenada", "ski_jump", "top_of_ski_jump", "shooting_range", "cinema", "river", "cave", "dino_parc_entrance"],
   "locations": {
     "gate": {
       "name": "Râșnov Citadel Gate",
@@ -9,11 +9,14 @@
       "lat": 45.588897705078125,
       "lng": 25.4700870513916,
       "hint": "Congratulations! You found the Râșnov Citadel Gate next look for the Râșnov Citadel Garden!",
-      "hint_ro": "Felicitări! Ai găsit Poarta Cetății Râșnov, următorul lucru pe care îl cauți este Grădina Cetății Râșnov!",
+      "hint_ro": "Felicitări! Ai găsit Poarta Cetății Râșnov, caută apoi Grădinile Cetății Râșnov!",
       "quiz": {
         "question": "Who captured the Citadel?",
+        "question_ro": "Cine a cucerit cetatea?",
         "answer": "Gabriel Báthory",
-        "options": ["Gabriel Báthory", "Petre Ancuța", "Florentina Felician", "Gheorghiță Dorel"]
+        "answer_ro": "Gabriel Báthory",
+        "options": ["Gabriel Báthory", "Petre Ancuța", "Florentina Felician", "Gheorghiță Dorel"],
+        "options_ro": ["Gabriel Báthory", "Petre Ancuța", "Florentina Felician", "Gheorghiță Dorel"]
       }
     },
     "garden": {
@@ -24,11 +27,14 @@
       "lat": 45.5905835,
       "lng": 25.4693836,
       "hint": "Congratulations! You found the Râșnov Citadel Garden next look for the Râșnov Citadel Perch!",
-      "hint_ro": "Felicitări! Ai găsit Grădina Cetății Râșnov, următorul lucru pe care îl cauți este Pervazul Cetății Râșnov!",
+      "hint_ro": "Felicitări! Ai găsit Grădinile Cetății Râșnov, caută apoi Cetatea Râșnov de la înălțime!",
       "quiz": {
         "question": "How many houses did the Citadel hold?",
+        "question_ro": "Câte case avea cetatea?",
         "answer": "80",
-        "options": ["80", "100", "120", "150"]
+        "answer_ro": "80",
+        "options": ["80", "100", "120", "150"],
+        "options_ro": ["80", "100", "120", "150"]
       }
     },
     "perch": {
@@ -39,11 +45,14 @@
       "lat": 44.43154808935033,
       "lng": 26.06017102393582,
       "hint": "Congratulations! You found the Râșnov Citadel Perch next look for the City Center!",
-      "hint_ro": "Felicitări! Ai găsit Cetatea Râșnov de la înălțime, următorul lucru pentru Centrul Orașului!",
+      "hint_ro": "Felicitări! Ai găsit Cetatea Râșnov de la înălțime, caută apoi Centrul Orașului!",
       "quiz": {
         "question": "Who built the Citadel?",
+        "question_ro": "Cine a construit cetatea?",
         "answer": "Knights of the Teutonic Order",
-        "options": ["Knights of the Teutonic Order", "Lord of Râșnov", "King of Romania", "Unknown"]
+        "answer_ro": "Cavalerii Teutoni",
+        "options": ["Knights of the Teutonic Order", "Lord of Râșnov", "King of Romania", "Unknown"],
+        "options_ro": ["Cavalerii Teutoni", "Stăpânul Râșnovului", "Regele României", "Necunoscut"]
       }
     },
     "city_center": {
@@ -57,8 +66,11 @@
       "hint_ro": "Felicitări! Ai găsit Centrul Orașului, apoi caută Promenada Sissi!",
       "quiz": {
         "question": "What is Râșnov named after?",
+        "question_ro": "De unde vine numele Râșnov?",
         "answer": "Rose Meadow",
-        "options": ["Rose Meadow", "A river", "The lord", "Another fortress"]
+        "answer_ro": "Poiana Trandafirilor",
+        "options": ["Rose Meadow", "A river", "The lord", "Another fortress"],
+        "options_ro": ["Poiana Trandafirilor", "Un râu", "Un nobil", "O altă cetate"]
       }
     },
     "promenada": {
@@ -69,11 +81,14 @@
       "lat": 45.597057,
       "lng": 25.472071,
       "hint": "Congratulations! You found the Promenada Sissi next look for the Old Church!",
-      "hint_ro": "Felicitări! Ai găsit Promenada Sissi, următoarea căutare pentru Biserica Veche!",
+      "hint_ro": "Felicitări! Ai găsit Promenada Sissi, caută apoi Biserica Veche!",
       "quiz": {
         "question": "The Promenada Sissi was named after an Empress from what country?",
+        "question_ro": "Promenada Sissi a fost numită după o împărăteasă din ce țară?",
         "answer": "Austria-Hungary",
-        "options": ["Austria-Hungary", "Germany", "France", "Italy"]
+        "answer_ro": "Austro-Ungaria",
+        "options": ["Austria-Hungary", "Germany", "France", "Italy"],
+        "options_ro": ["Austro-Ungaria", "Germania", "Franța", "Italia"]
       }
     },
     "ski_jump": {
@@ -87,8 +102,11 @@
       "hint_ro": "Felicitări! Ai găsit Valea Cărbunării. Caută apoi Creasta Văii Cărbunării!",
       "quiz": {
         "question": "What year did the Valea Cărbunării host a round of the ladies' calendar of the FIS Ski Jumping World Cup?",
+        "question_ro": "În ce an a găzduit Valea Cărbunării o etapă din calendarul feminin al Cupei Mondiale FIS de Sărituri cu Schiurile?",
         "answer": "2013",
-        "options": ["2013", "2015", "2000", "2020"]
+        "answer_ro": "2013",
+        "options": ["2013", "2015", "2000", "2020"],
+        "options_ro": ["2013", "2015", "2000", "2020"]
       }
     },
     "top_of_ski_jump": {
@@ -102,8 +120,11 @@
       "hint_ro": "Felicitări! Ai găsit Creasta Văii Cărbunării. Caută apoi Poligon Râșnov!",
       "quiz": {
         "question": "Who was the first Romanian woman to compete in ski jumping at the Olympic Games?",
+        "question_ro": "Cine a fost prima femeie din România care a concurat la sărituri cu schiurile la Jocurile Olimpice?",
         "answer": "Daniela Haralambie",
-        "options": ["Daniela Haralambie", "Maria Popescu", "Ana Maria", "Ioana Radu"]
+        "answer_ro": "Daniela Haralambie",
+        "options": ["Daniela Haralambie", "Maria Popescu", "Ana Maria", "Ioana Radu"],
+        "options_ro": ["Daniela Haralambie", "Maria Popescu", "Ana Maria", "Ioana Radu"]
       }
     },
     "shooting_range": {
@@ -117,23 +138,29 @@
       "hint_ro": "Felicitări! Ai găsit Poligon Râșnov. Caută apoi Centrul Schubz!",
       "quiz": {
         "question": "What event is held at the Shooting Range?",
+        "question_ro": "Ce eveniment se desfășoară la Poligon?",
         "answer": "The Romanian Ski Biathlon Federation",
-        "options": ["The Romanian Ski Biathlon Federation", "The Romanian Winter Sports Association", "The Romanian Alpine Club", "The Romanian Shooting Sports Union"]
+        "answer_ro": "Federația Română de Biatlon și Schi",
+        "options": ["The Romanian Ski Biathlon Federation", "The Romanian Winter Sports Association", "The Romanian Alpine Club", "The Romanian Shooting Sports Union"],
+        "options_ro": ["Federația Română de Biatlon și Schi", "Asociația Română de Sporturi de Iarnă", "Clubul Alpin Român", "Uniunea Română de Tir Sportiv"]
       }
     },
     "cave": {
       "name": "Cave",
-      "name_ro": "Peștera Valea Cetatii",
+      "name_ro": "Peștera Valea Cetății",
       "qr": "CAVE",
       "difficulty": 2,
       "lat": 45.585639,
       "lng": 25.493802,
       "hint": "Congratulations! You found the Cave next look for the Dino Parc Entrance!",
-      "hint_ro": "Felicitări! Ai găsit Peștera Valea Cetatii, caută apoi Intrarea Dino Parc!",
+      "hint_ro": "Felicitări! Ai găsit Peștera Valea Cetății, caută apoi Intrarea Dino Parc!",
       "quiz": {
         "question": "What caused the cave to be discovered?",
+        "question_ro": "Ce a dus la descoperirea peșterii?",
         "answer": "A flood",
-        "options": ["A flood", "Earthquake", "Lava flow", "Human activity"]
+        "answer_ro": "O inundație",
+        "options": ["A flood", "Earthquake", "Lava flow", "Human activity"],
+        "options_ro": ["O inundație", "Un cutremur", "O scurgere de lavă", "Activitate umană"]
       }
     },
     "dino_parc_entrance": {
@@ -147,23 +174,11 @@
       "hint_ro": "Felicitări! Ai găsit Intrarea Dino Parc, caută apoi locația ascunsă sub un dinozaur mare!",
       "quiz": {
         "question": "How many dinosaurs are in Dino Parc?",
+        "question_ro": "Câți dinozauri sunt în Dino Parc?",
         "answer": "120",
-        "options": ["120", "111", "127", "77"]
-      }
-    },
-    "bronto": {
-      "name": "Dino Parc Under the Brontosaurus",
-      "name_ro": "Dino Parc Sub Brontosaurus",
-      "qr": "DINO_PARC_UNDER_BRONTO",
-      "difficulty": 2,
-      "lat": 45.591480,
-      "lng": 25.476188,
-      "hint": "Congratulations! You found the hidden location under the Brontosaurus next look for the Râșnov Citadel Gate!",
-      "hint_ro": "Felicitări! Ai găsit locul ascuns sub Brontozaur, apoi caută Poarta Cetății Râșnov!",
-      "quiz": {
-        "question": "What dinosaur was this hidden under?",
-        "answer": "Brontosaurus",
-        "options": ["Brontosaurus", "T-Rex", "Triceratops", "Velociraptor"]
+        "answer_ro": "120",
+        "options": ["120", "111", "127", "77"],
+        "options_ro": ["120", "111", "127", "77"]
       }
     },
     "cinema": {
@@ -177,23 +192,11 @@
       "hint_ro": "Felicitări! Ai găsit Amza Pellea, apoi caută Râul Ghimbășel!",
       "quiz": {
         "question": "When was the first Film and History Festival?",
+        "question_ro": "Când a fost primul Festival de Film și Istorie?",
         "answer": "September 2009",
-        "options": ["September 2009", "February 2009", "May 2009", "December 2009"]
-      }
-    },
-    "claca": {
-      "name": "Claca, Gospodărie Culturală",
-      "name_ro": "Claca, Gospodărie Culturală",
-      "qr": "CLACA",
-      "difficulty": 0,
-      "lat": 45.589462,
-      "lng": 25.4562018,
-      "hint": "Congratulations! You found the Claca, Gospodărie Culturală next look for the Schleif!",
-      "hint_ro": "Felicitări! Ai găsit Claca, Gospodărie Culturală, următoarea căutare pentru Schleif!",
-      "quiz": {
-        "question": "Filler?",
-        "answer": "filler1",
-        "options": ["filler1", "filler2", "filler3", "filler4"]
+        "answer_ro": "Septembrie 2009",
+        "options": ["September 2009", "February 2009", "May 2009", "December 2009"],
+        "options_ro": ["Septembrie 2009", "Februarie 2009", "Mai 2009", "Decembrie 2009"]
       }
     },
     "river": {
@@ -203,72 +206,15 @@
       "difficulty": 0,
       "lat": 45.589430,
       "lng": 25.459204,
-      "hint": "Congratulations! You found the River next look for the Claca, Gospodărie Culturală!",
-      "hint_ro": "Felicitări! Ai găsit Râul Ghimbășel, apoi caută Claca, Gospodărie Culturală!",
+      "hint": "Congratulations! You found the River next look for the Cave!",
+      "hint_ro": "Felicitări! Ai găsit Râul Ghimbășel, apoi caută Peștera Valea Cetatii!",
       "quiz": {
         "question": "How many public swimming pools used river water in the early 20th century?",
+        "question_ro": "Câte bazine publice foloseau apă de râu la începutul secolului 20?",
         "answer": "3",
-        "options": ["1", "2", "3", "4"]
-      }
-    },
-    "schubz_center": {
-      "name": "Schubz Center",
-      "name_ro": "Centrul Schubz",
-      "qr": "SCHUBZ_CENTER",
-      "difficulty": 0,
-      "lat": 45.5874184,
-      "lng": 25.4620149,
-      "hint": "Congratulations! You found the Schubz Center next look for the Cinema!",
-      "hint_ro": "Felicitări! Ai găsit Centrul Schubz, apoi caută Amza Pellea!",
-      "quiz": {
-          "question": "The Schubz Center is a part of what group?",
-          "answer": "Mioritics Association",
-          "options": ["Mioritics Association", "Nexora Labs", "Veridian Core", "Aurelix Group"]
-      }
-    },
-    "schleif": {
-      "name": "Schleif",
-      "name_ro": "Schleif",
-      "qr": "SCHLEIF",
-      "difficulty": 2,
-      "lat": 45.58718,
-      "lng": 25.46721,
-      "hint": "Congratulations! You found the Schleif next look for the Cave!",
-      "hint_ro": "Felicitări! Ai găsit Schleif, apoi caută Peștera Valea Cetatii!",
-      "quiz": {
-        "question": "What was Schleif used for in the Middle Ages??",
-        "answer": "A popular play area for children",
-        "options": ["A popular play area for children", "A residence for nobles", "A place of worship", "A marketplace"]
-      }
-    },
-    "orthodox_church": {
-      "name": "Orthodox Church",
-      "name_ro": "Biserica Ortodoxă",
-      "qr": "ORTHODOX_CHURCH",
-      "difficulty": 0,
-      "lat": 45.5838031,
-      "lng": 25.4634136,
-      "hint": "Congratulations! You found the Orthodox Church next look for the Ski Jump!",
-      "hint_ro": "Felicitări! Ai găsit Biserica Ortodoxă, caută apoi Valea Cărbunării!",
-      "quiz": {
-        "question": "Filler?",
-        "answer": "filler1",
-        "options": ["filler1", "filler2", "filler3", "filler4"]
-      }
-    },
-    "old_church": {
-      "name": "Old Church",
-      "name_ro": "Biserica Veche",
-      "qr": "OLD_CHURCH",
-      "difficulty": 0,
-      "lat": 45.5916357,
-      "lng": 25.465188,
-      "hint": "Congratulations! You found the Old Church next look for the Orthodox Church!",
-      "hint_ro": "Felicitări! Ai găsit Biserica Veche, apoi caută Biserica Ortodoxă!",
-      "quiz": {
-        "question": "Filler?",
-        "answer": "filler1",
-        "options": ["filler1", "filler2", "filler3", "filler4"]
+        "answer_ro": "3",
+        "options": ["1", "2", "3", "4"],
+        "options_ro": ["1", "2", "3", "4"]
       }
     }
   }
