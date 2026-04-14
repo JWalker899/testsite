@@ -20,7 +20,7 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const cloudinaryStorage = require('../cloudinary-storage');
+const storage = require('../storage');
 
 // Places to exclude from results regardless of what the API returns.
 // Names are matched case-insensitively; partial matches are NOT used – the
@@ -34,7 +34,7 @@ const BLACKLIST_LOWER = BLACKLIST.map(name => name.toLowerCase());
 const CONFIG = {
   CENTER_LAT: 45.5889,
   CENTER_LNG: 25.4631,
-  SEARCH_RADIUS: 5000, // 5km in meters – covers the full extent of Rasnov
+  SEARCH_RADIUS: 3000, // 3km in meters
   GOOGLE_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
   UNSPLASH_API_KEY: process.env.UNSPLASH_ACCESS_KEY,
   OUTPUT_FILE: path.join(__dirname, '../data/places-data.json'),
@@ -54,7 +54,7 @@ const PLACE_TYPES = {
   accommodations: 'lodging',
 };
 
-/** Returns the shared base name used for both local files and Cloudinary public IDs. */
+/** Returns the shared base name used for both local files and storage public IDs. */
 const photoBaseName = (placeId, index) => `${placeId}_${index}`;
 
 /**
@@ -228,13 +228,13 @@ async function downloadPhoto(photoReference, placeId, index) {
     fs.writeFileSync(filepath, imageData);
     console.log(`    📸 Saved photo: ${filename}`);
 
-    // Upload to Cloudinary for persistence across deploys
-    if (cloudinaryStorage.isConfigured()) {
+    // Upload to storage for persistence across deploys
+    if (storage.isConfigured()) {
       try {
-        await cloudinaryStorage.uploadImageBuffer(cloudinaryStorage.PUBLIC_IDS.photoId(baseName), imageData);
-        console.log(`    ☁️  Uploaded photo to Cloudinary: ${filename}`);
+        await storage.uploadImageBuffer(storage.PUBLIC_IDS.photoId(baseName), imageData);
+        console.log(`    ☁️  Uploaded photo to storage: ${filename}`);
       } catch (e) {
-        console.warn(`    ⚠️  Could not upload photo ${filename} to Cloudinary:`, e.message);
+        console.warn(`    ⚠️  Could not upload photo ${filename} to storage:`, e.message);
       }
     }
 
@@ -256,6 +256,41 @@ function getLocalPhotoPath(placeId, index) {
     }
   }
   return null;
+}
+
+/**
+ * Load existing places data from the output file or sample file.
+ * Used to detect which places already have cached photos so we can skip
+ * redundant Google Places Photo API calls.
+ */
+function loadExistingData() {
+  for (const file of [CONFIG.OUTPUT_FILE, CONFIG.SAMPLE_FILE]) {
+    if (fs.existsSync(file)) {
+      try {
+        return JSON.parse(fs.readFileSync(file, 'utf8'));
+      } catch (e) {
+        console.warn(`  ⚠️  Could not parse ${path.basename(file)}:`, e.message);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Build a Map of placeId → photos array from existing data.
+ * Only includes entries where the place has at least one photo.
+ */
+function buildPhotoLookup(data) {
+  const lookup = new Map();
+  if (!data) return lookup;
+  for (const key of ['locations', 'restaurants', 'accommodations']) {
+    for (const place of (data[key] || [])) {
+      if (place.id && Array.isArray(place.photos) && place.photos.length > 0) {
+        lookup.set(place.id, place.photos);
+      }
+    }
+  }
+  return lookup;
 }
 
 /**
@@ -300,7 +335,7 @@ async function fetchUnsplashPhoto(query) {
 /**
  * Process and format a single place
  */
-async function processPlace(place, index, total, downloadImages) {
+async function processPlace(place, index, total, downloadImages, existingPhotos) {
   console.log(`  Processing [${index + 1}/${total}] ${place.name}...`);
 
   const processedPlace = {
@@ -344,8 +379,12 @@ async function processPlace(place, index, total, downloadImages) {
     }
   }
 
-  // Process photos
-  if (place.photos && place.photos.length > 0) {
+  // Process photos — reuse cached photos when available to avoid extra API calls
+  const cachedPhotos = existingPhotos.get(place.place_id);
+  if (cachedPhotos && cachedPhotos.length > 0) {
+    console.log(`    📸 Reusing ${cachedPhotos.length} cached photo(s)`);
+    processedPlace.photos = cachedPhotos;
+  } else if (place.photos && place.photos.length > 0) {
     const photoCount = Math.min(place.photos.length, CONFIG.MAX_PHOTOS_PER_PLACE);
     for (let i = 0; i < photoCount; i++) {
       const photo = place.photos[i];
@@ -380,7 +419,7 @@ async function processPlace(place, index, total, downloadImages) {
 }
 
 /**
- * Remove photos (Cloudinary + local cache) that belong to place IDs no longer
+ * Remove photos (storage + local cache) that belong to place IDs no longer
  * present in the freshly-fetched data.  This keeps storage clean after places
  * rotate in/out of the search results or are blacklisted.
  */
@@ -395,35 +434,35 @@ async function cleanupOrphanedPhotos(newData) {
   // Build the full set of photo public IDs that are expected for the new places.
   // We include all possible index slots (0..MAX_PHOTOS_PER_PLACE-1) for every
   // place so that images for current places are never accidentally deleted.
-  const expectedCloudinaryIds = new Set();
+  const expectedStorageIds = new Set();
   for (const place of allPlaces) {
     for (let i = 0; i < CONFIG.MAX_PHOTOS_PER_PLACE; i++) {
-      expectedCloudinaryIds.add(cloudinaryStorage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
+      expectedStorageIds.add(storage.PUBLIC_IDS.photoId(photoBaseName(place.id, i)));
     }
   }
 
-  // ── Cloudinary cleanup ──────────────────────────────────────────────────
-  if (cloudinaryStorage.isConfigured()) {
+  // ── Storage cleanup ──────────────────────────────────────────────────
+  if (storage.isConfigured()) {
     try {
-      console.log('\n🧹 Checking for orphaned Cloudinary photos...');
-      const existing = await cloudinaryStorage.listImagesByPrefix('rasnov-photos/');
-      const toDelete = existing.filter(id => !expectedCloudinaryIds.has(id));
+      console.log('\n🧹 Checking for orphaned photos in storage...');
+      const existing = await storage.listImagesByPrefix('rasnov-photos/');
+      const toDelete = existing.filter(id => !expectedStorageIds.has(id));
 
       if (toDelete.length === 0) {
-        console.log('  ✅ No orphaned Cloudinary photos found');
+        console.log('  ✅ No orphaned photos found');
       } else {
-        console.log(`  🗑️  Deleting ${toDelete.length} orphaned Cloudinary photo(s)...`);
+        console.log(`  🗑️  Deleting ${toDelete.length} orphaned photo(s)...`);
         for (const publicId of toDelete) {
           try {
-            await cloudinaryStorage.deleteImage(publicId);
-            console.log(`    ✅ Deleted from Cloudinary: ${publicId}`);
+            await storage.deleteImage(publicId);
+            console.log(`    ✅ Deleted from storage: ${publicId}`);
           } catch (e) {
-            console.warn(`    ⚠️  Could not delete ${publicId} from Cloudinary:`, e.message);
+            console.warn(`    ⚠️  Could not delete ${publicId} from storage:`, e.message);
           }
         }
       }
     } catch (e) {
-      console.warn('⚠️  Could not clean up orphaned Cloudinary photos:', e.message);
+      console.warn('⚠️  Could not clean up orphaned photos:', e.message);
     }
   }
 
@@ -489,6 +528,14 @@ async function main() {
     process.exit(1);
   }
 
+  // Load existing data so we can reuse photos for places we've already fetched,
+  // avoiding redundant Google Places Photo API calls.
+  const existingData = loadExistingData();
+  const existingPhotos = buildPhotoLookup(existingData);
+  if (existingPhotos.size > 0) {
+    console.log(`📸 Found ${existingPhotos.size} place(s) with cached photos — will reuse where possible`);
+  }
+
   const result = {
     lastUpdated: new Date().toISOString(),
     center: {
@@ -507,7 +554,7 @@ async function main() {
     // Process each place
     for (let i = 0; i < places.length; i++) {
       try {
-        const processedPlace = await processPlace(places[i], i, places.length, downloadImages);
+        const processedPlace = await processPlace(places[i], i, places.length, downloadImages, existingPhotos);
         result[key].push(processedPlace);
         await sleep(CONFIG.RATE_LIMIT_DELAY); // Rate limiting
       } catch (error) {
@@ -536,14 +583,14 @@ async function main() {
   console.log(`💾 Overwriting sample data at ${CONFIG.SAMPLE_FILE}...`);
   fs.writeFileSync(CONFIG.SAMPLE_FILE, jsonOutput, 'utf8');
 
-  // Upload to Cloudinary for persistence across deploys
-  if (cloudinaryStorage.isConfigured()) {
+  // Upload to storage for persistence across deploys
+  if (storage.isConfigured()) {
     try {
-      console.log('☁️  Uploading places data to Cloudinary...');
-      await cloudinaryStorage.uploadJSON(cloudinaryStorage.PUBLIC_IDS.PLACES_DATA, result);
-      console.log('☁️  Places data uploaded to Cloudinary successfully');
+      console.log('☁️  Uploading places data to storage...');
+      await storage.uploadJSON(storage.PUBLIC_IDS.PLACES_DATA, result);
+      console.log('☁️  Places data uploaded to storage successfully');
     } catch (e) {
-      console.warn('⚠️  Could not upload places data to Cloudinary:', e.message);
+      console.warn('⚠️  Could not upload places data to storage:', e.message);
     }
   }
 
@@ -568,4 +615,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main };
+module.exports = { main, CONFIG };

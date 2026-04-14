@@ -143,14 +143,6 @@ hunt.sectionSubtitle,Explore Rasnov in a fun, interactive way!,Explorați Râșn
 hunt.nextSite,Next Site:,Locul următor:
 hunt.progress.title,Your Progress,Progresul tău
 hunt.progress.locationsFound,locations found,locații găsite
-hunt.items.fortress,Rasnov Fortress Gate,Poarta Cetății Râșnov
-hunt.items.well,Ancient Well,Fântâna Antică
-hunt.items.tower,Watch Tower,Turnul de Veghe
-hunt.items.church,Old Church,Biserica Veche
-hunt.items.museum,Village Museum,Muzeul Satului
-hunt.items.peak,Mountain Peak,Vârful Muntelui
-hunt.items.square,Town Square,Piața Orașului
-hunt.items.dino,Dino Park Entrance,Intrarea Dino Parc
 leaderboard.title,🏆 Leaderboard,🏆 Clasament
 leaderboard.subtitle,Top Rasnov Explorers - Ranked by Points,Cei mai buni exploratori din Râșnov - Clasați după puncte
 leaderboard.yourRank,Your Rank:,Locul tău:
@@ -244,7 +236,8 @@ messages.checkCameraSettings,Please check your camera settings.,Verificați set�
 messages.cameraRequiresHTTPS,Camera requires HTTPS. Please access the site via https://.,Camera necesită HTTPS. Accesați site-ul prin https://.
 messages.mapLoaded,Map loaded with all locations!,Harta încărcată cu toate locațiile!
 messages.mapLoadedSuccess,Map loaded successfully!,Harta a fost încărcată cu succes!
-messages.selectQR,Select a QR Code to Scan:,Selectați un cod QR pentru scanare:
+messages.cameraBlockedTitle,Camera Access Required,Acces la cameră necesar
+messages.cameraBlockedMessage,Please allow camera access in your browser settings to scan QR codes.,Vă rugăm să permiteți accesul la cameră în setările browserului pentru a scana codurile QR.
 messages.initializingCamera,Initializing Camera...,Se inițializează camera...
 messages.huntStarted,Treasure hunt started! Find all 8 locations.,Vânătoarea a început! Găsiți toate cele 8 locații.
 messages.huntStopped,Treasure hunt stopped.,Vânătoarea a fost oprită.

@@ -1,5 +1,5 @@
 {
-  "order": ["gate", "garden", "perch", "city_center", "promenada", "ski_jump", "top_of_ski_jump", "shooting_range", "cinema", "river", "cave", "dino_parc_entrance"],
+  "order": ["gate", "garden", "perch", "city_center", "promenada", "old_church", "orthodox_church", "ski_jump", "top_of_ski_jump", "shooting_range", "schubz_center", "cinema", "river", "claca", "schleif", "cave", "dino_parc_entrance", "bronto"],
   "locations": {
     "gate": {
       "name": "Râșnov Citadel Gate",
@@ -151,6 +151,21 @@
         "options": ["120", "111", "127", "77"]
       }
     },
+    "bronto": {
+      "name": "Dino Parc Under the Brontosaurus",
+      "name_ro": "Dino Parc Sub Brontosaurus",
+      "qr": "DINO_PARC_UNDER_BRONTO",
+      "difficulty": 2,
+      "lat": 45.591480,
+      "lng": 25.476188,
+      "hint": "Congratulations! You found the hidden location under the Brontosaurus next look for the Râșnov Citadel Gate!",
+      "hint_ro": "Felicitări! Ai găsit locul ascuns sub Brontozaur, apoi caută Poarta Cetății Râșnov!",
+      "quiz": {
+        "question": "What dinosaur was this hidden under?",
+        "answer": "Brontosaurus",
+        "options": ["Brontosaurus", "T-Rex", "Triceratops", "Velociraptor"]
+      }
+    },
     "cinema": {
       "name": "Cinema",
       "name_ro": "Amza Pellea",
@@ -166,6 +181,21 @@
         "options": ["September 2009", "February 2009", "May 2009", "December 2009"]
       }
     },
+    "claca": {
+      "name": "Claca, Gospodărie Culturală",
+      "name_ro": "Claca, Gospodărie Culturală",
+      "qr": "CLACA",
+      "difficulty": 0,
+      "lat": 45.589462,
+      "lng": 25.4562018,
+      "hint": "Congratulations! You found the Claca, Gospodărie Culturală next look for the Schleif!",
+      "hint_ro": "Felicitări! Ai găsit Claca, Gospodărie Culturală, următoarea căutare pentru Schleif!",
+      "quiz": {
+        "question": "Filler?",
+        "answer": "filler1",
+        "options": ["filler1", "filler2", "filler3", "filler4"]
+      }
+    },
     "river": {
       "name": "River",
       "name_ro": "Râul Ghimbășel",
@@ -173,12 +203,72 @@
       "difficulty": 0,
       "lat": 45.589430,
       "lng": 25.459204,
-      "hint": "Congratulations! You found the River next look for the Cave!",
-      "hint_ro": "Felicitări! Ai găsit Râul Ghimbășel, apoi caută Peștera Valea Cetatii!",
+      "hint": "Congratulations! You found the River next look for the Claca, Gospodărie Culturală!",
+      "hint_ro": "Felicitări! Ai găsit Râul Ghimbășel, apoi caută Claca, Gospodărie Culturală!",
       "quiz": {
         "question": "How many public swimming pools used river water in the early 20th century?",
         "answer": "3",
         "options": ["1", "2", "3", "4"]
+      }
+    },
+    "schubz_center": {
+      "name": "Schubz Center",
+      "name_ro": "Centrul Schubz",
+      "qr": "SCHUBZ_CENTER",
+      "difficulty": 0,
+      "lat": 45.5874184,
+      "lng": 25.4620149,
+      "hint": "Congratulations! You found the Schubz Center next look for the Cinema!",
+      "hint_ro": "Felicitări! Ai găsit Centrul Schubz, apoi caută Amza Pellea!",
+      "quiz": {
+          "question": "The Schubz Center is a part of what group?",
+          "answer": "Mioritics Association",
+          "options": ["Mioritics Association", "Nexora Labs", "Veridian Core", "Aurelix Group"]
+      }
+    },
+    "schleif": {
+      "name": "Schleif",
+      "name_ro": "Schleif",
+      "qr": "SCHLEIF",
+      "difficulty": 2,
+      "lat": 45.58718,
+      "lng": 25.46721,
+      "hint": "Congratulations! You found the Schleif next look for the Cave!",
+      "hint_ro": "Felicitări! Ai găsit Schleif, apoi caută Peștera Valea Cetatii!",
+      "quiz": {
+        "question": "What was Schleif used for in the Middle Ages??",
+        "answer": "A popular play area for children",
+        "options": ["A popular play area for children", "A residence for nobles", "A place of worship", "A marketplace"]
+      }
+    },
+    "orthodox_church": {
+      "name": "Orthodox Church",
+      "name_ro": "Biserica Ortodoxă",
+      "qr": "ORTHODOX_CHURCH",
+      "difficulty": 0,
+      "lat": 45.5838031,
+      "lng": 25.4634136,
+      "hint": "Congratulations! You found the Orthodox Church next look for the Ski Jump!",
+      "hint_ro": "Felicitări! Ai găsit Biserica Ortodoxă, caută apoi Valea Cărbunării!",
+      "quiz": {
+        "question": "Filler?",
+        "answer": "filler1",
+        "options": ["filler1", "filler2", "filler3", "filler4"]
+      }
+    },
+    "old_church": {
+      "name": "Old Church",
+      "name_ro": "Biserica Veche",
+      "qr": "OLD_CHURCH",
+      "difficulty": 0,
+      "lat": 45.5916357,
+      "lng": 25.465188,
+      "hint": "Congratulations! You found the Old Church next look for the Orthodox Church!",
+      "hint_ro": "Felicitări! Ai găsit Biserica Veche, apoi caută Biserica Ortodoxă!",
+      "quiz": {
+        "question": "Filler?",
+        "answer": "filler1",
+        "options": ["filler1", "filler2", "filler3", "filler4"]
       }
     }
   }

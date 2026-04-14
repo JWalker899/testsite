@@ -16,7 +16,7 @@ const resetHuntBtn = document.getElementById('reset-hunt');
 const progressFill = document.getElementById('progress-fill');
 const progressCount = document.getElementById('progress-count');
 const progressTotal = document.getElementById('progress-total');
-const huntItems = document.querySelectorAll('.hunt-item');
+// huntItems is no longer needed — hunt items are rendered dynamically by renderHuntItems()
 
 // AR Modal Elements
 const arModal = document.getElementById('ar-modal');
@@ -449,14 +449,15 @@ function showQuizModalForScannedLocation(locationKey, isFirstVisit = false) {
     const questionEl = document.getElementById('quiz-question');
 
     if (location.quiz && location.quiz.question) {
-        pendingQuizCorrectAnswer = location.quiz.answer;
+        pendingQuizCorrectAnswer = localizedField(location.quiz, 'answer') || location.quiz.answer;
         selectedQuizAnswer = null;
 
         if (questionEl) {
-            questionEl.textContent = location.quiz.question;
+            questionEl.textContent = localizedField(location.quiz, 'question') || location.quiz.question;
         }
 
-        const options = shuffleArray([...location.quiz.options]);
+        const quizOptions = (currentLang && currentLang !== 'en' && location.quiz['options_' + currentLang]) || location.quiz.options;
+        const options = shuffleArray([...quizOptions]);
         renderQuizOptions(options);
 
         const submitBtn = document.querySelector('#quiz-modal .cta-button');
@@ -573,7 +574,7 @@ function showUserProfile() {
                 </div>
                 <div class="profile-stat">
                     <span class="stat-label">Locations Found</span>
-                    <span class="stat-value">${currentUser.locationsFound.length} / 8</span>
+                    <span class="stat-value">${currentUser.locationsFound.length} / ${huntOrder.length}</span>
                 </div>
                 <div class="profile-stat">
                     <span class="stat-label">Hunt Status</span>
@@ -646,17 +647,8 @@ function resetProgress() {
     updateUserDisplayUI();
     updateProgress();
 
-    // Reset hunt item UI
-    huntItems.forEach(item => {
-        item.classList.remove('found');
-        const icon = item.querySelector('i');
-        if (icon) icon.className = 'fas fa-lock';
-        const photo = item.querySelector('.hunt-item-photo');
-        if (photo) photo.remove();
-    });
-
-    // Remove dynamically-added extra location cards
-    document.querySelectorAll('.hunt-item.extra-location').forEach(el => el.remove());
+    // Reset hunt item UI — re-render all items in their locked state
+    renderHuntItems();
 
     // Clear saved photos
     Object.keys(huntLocations).forEach(key => {
@@ -839,7 +831,7 @@ function displayLeaderboard(leaderboard) {
                     <span class="points-value">⭐ ${player.totalPoints}</span>
                 </td>
                 <td class="locations-col">
-                    ${player.locationsFound} / 8
+                    ${player.locationsFound} / ${huntOrder.length}
                 </td>
                 <td class="time-col">
                     <span class="${timeClass}">⏱️ ${timeDisplay}</span>
@@ -901,12 +893,60 @@ async function loadScavengerData() {
         const response = await fetch('./data/scavenger-data.json');
         if (!response.ok) throw new Error('Failed to fetch scavenger-data.json');
         const data = await response.json();
-        huntLocations = data.locations || {};
+        const allLocations = data.locations || {};
         huntOrder = data.order || [];
+        // Only include locations that are listed in the order array.
+        // Any location defined in the JSON but not in the order is ignored.
+        huntLocations = {};
+        for (const key of huntOrder) {
+            if (allLocations[key]) {
+                huntLocations[key] = allLocations[key];
+            }
+        }
         console.log('✅ Loaded scavenger data from scavenger-data.json');
     } catch (e) {
         console.error('❌ Could not load scavenger data:', e.message);
     }
+}
+
+// Build hunt item cards dynamically from scavenger-data.json.
+// Uses localizedField() so names update when the language changes.
+function renderHuntItems() {
+    const container = document.getElementById('hunt-items-container');
+    if (!container) return;
+
+    // Preserve extra-location cards (bonus locations) added dynamically
+    const extras = Array.from(container.querySelectorAll('.hunt-item.extra-location'));
+    extras.forEach(el => el.remove());
+
+    // Remove all existing regular hunt items (keep nothing)
+    container.innerHTML = '';
+
+    // Render items in the order defined in the JSON
+    huntOrder.forEach(key => {
+        const loc = huntLocations[key];
+        if (!loc) return;
+        const isFound = foundLocations.has(key);
+        const item = document.createElement('div');
+        item.className = 'hunt-item' + (isFound ? ' found' : '');
+        item.setAttribute('data-location', key);
+
+        const icon = document.createElement('i');
+        icon.className = isFound ? 'fas fa-check-circle' : 'fas fa-lock';
+        item.appendChild(icon);
+
+        const span = document.createElement('span');
+        span.textContent = localizedField(loc, 'name') || loc.name;
+        item.appendChild(span);
+
+        // Restore photo thumbnail if previously captured
+        addPhotoToHuntItem(key, item);
+
+        container.appendChild(item);
+    });
+
+    // Re-append any bonus location cards
+    extras.forEach(el => container.appendChild(el));
 }
 
 // Returns the next unvisited location in the circular order after currentKey.
@@ -1580,15 +1620,11 @@ function processQRCode(qrData) {
 
 function showQRCodeOptions() {
     const qrScanner = document.getElementById('qr-scanner');
-    const header = t('messages.selectQR');
     qrScanner.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
-            <h4>${header}</h4>
-            <div style="display: grid; gap: 1rem; margin-top: 1rem;">
-                ${Object.entries(huntLocations).map(([key, loc]) => `
-                    <button class="card-button" onclick="simulateQRScan('${key}')">${localizedField(loc, 'name') || loc.name}</button>
-                `).join('')}
-            </div>
+            <i class="fas fa-video-slash" style="font-size: 3rem; color: var(--secondary-color, #6c757d); margin-bottom: 1rem;"></i>
+            <h4>${t('messages.cameraBlockedTitle')}</h4>
+            <p style="margin-top: 0.5rem; color: var(--text-muted, #6c757d);">${t('messages.cameraBlockedMessage')}</p>
         </div>
     `;
 }
@@ -1653,15 +1689,7 @@ async function discoverExtraLocation(info) {
     checkCollageUnlocks();
 }
 
-function simulateQRScan(locationKey) {
-    if (huntLocations[locationKey] && !foundLocations.has(locationKey)) {
-        const isFirstVisit = foundLocations.size === 0;
-        closeModal('qr-modal');
-        showQuizModalForScannedLocation(locationKey, isFirstVisit);
-    } else if (foundLocations.has(locationKey)) {
-        showNotification('You already found this location!', 'info');
-    }
-}
+
 
 /* ==================== LOCATION-BASED DISCOVERY FUNCTIONS (Commented out) ====================
  * NOTE: These GPS/geolocation functions are preserved for potential future reimplementation.
@@ -3544,6 +3572,28 @@ function showAccommodationDetails(accommodationId) {
 // Map Loading Function
 let map = null;
 
+/**
+ * Destroy any existing map instance and re-initialize it so that
+ * translated strings (titles, popup labels, counters) are refreshed.
+ * Called whenever the active language changes.
+ */
+function reloadMap() {
+    const mapDiv = document.getElementById('interactive-map');
+    if (!mapDiv) return;
+
+    // Destroy the Leaflet instance if it exists
+    if (window.leafletMap) {
+        window.leafletMap.remove();
+        window.leafletMap = null;
+    }
+
+    // Clear the container and reset the loaded state so loadMap() runs fresh
+    mapDiv.innerHTML = '';
+    mapDiv.classList.remove('loaded');
+
+    loadMap();
+}
+
 function loadMap() {
     const mapDiv = document.getElementById('interactive-map');
     if (!mapDiv) return;
@@ -3658,10 +3708,14 @@ function loadMap() {
  * Load map markers from places data
  */
 async function loadMapMarkers(locationIcon, restaurantIcon, accommodationIcon, huntEasyIcon, huntHardIcon) {
+    // Capture the current map instance so we can detect if the map was
+    // replaced (e.g. by reloadMap()) while we were waiting for data.
+    const mapInstance = window.leafletMap;
+
     // Use event-based approach to wait for data
     const placesData = await waitForPlacesData();
     
-    if (!placesData) {
+    if (!placesData || window.leafletMap !== mapInstance) {
         console.error('❌ Could not load places data for map');
         return;
     }
@@ -3859,8 +3913,11 @@ async function waitForScavengerData() {
  * Must be called after loadMap() has created window.leafletMap.
  */
 async function loadScavengerMapMarkers() {
+    // Capture the current map instance so we can detect if the map was
+    // replaced (e.g. by reloadMap()) while we were waiting for data.
+    const mapInstance = window.leafletMap;
     const ok = await waitForScavengerData();
-    if (!ok || !window.leafletMap) return;
+    if (!ok || !window.leafletMap || window.leafletMap !== mapInstance) return;
 
     // Determine which locations have been found (works on both index & hunt pages)
     const foundSet = new Set(
@@ -3967,7 +4024,9 @@ document.addEventListener('languageChanged', (e) => {
     const lang = getCurrentLang().toUpperCase();
     langToggle.innerHTML = `<i class="fas fa-globe"></i><span class="lang-text"> ${lang}</span>`;
     langToggle.setAttribute('aria-label', `Change language (currently ${lang})`);
+    renderHuntItems();
     renderUnlocksTab();
+    reloadMap();
 });
 // ==================== Initialization ====================
 
@@ -4631,6 +4690,9 @@ loadScavengerData().then(() => {
     if (isHuntPage) {
         // Initialize button states (before restoreHuntState which may re-enable them)
         if (scanQrBtn) scanQrBtn.disabled = true;
+
+        // Build the hunt item list from scavenger-data.json
+        renderHuntItems();
 
         // Restore hunt state (found locations, photos, button states) from saved data
         restoreHuntState();

@@ -192,16 +192,6 @@
     "progress": {
       "title": "Your Progress",
       "locationsFound": "locations found"
-    },
-    "items": {
-      "fortress": "Rasnov Fortress Gate",
-      "well": "Ancient Well",
-      "tower": "Watch Tower",
-      "church": "Old Church",
-      "museum": "Village Museum",
-      "peak": "Mountain Peak",
-      "square": "Town Square",
-      "dino": "Dino Park Entrance"
     }
   },
   "leaderboard": {
@@ -340,7 +330,8 @@
     "cameraRequiresHTTPS": "Camera requires HTTPS. Please access the site via https://.",
     "mapLoaded": "Map loaded with all locations!",
     "mapLoadedSuccess": "Map loaded successfully!",
-    "selectQR": "Select a QR Code to Scan:",
+    "cameraBlockedTitle": "Camera Access Required",
+    "cameraBlockedMessage": "Please allow camera access in your browser settings to scan QR codes.",
     "initializingCamera": "Initializing Camera...",
     "huntStarted": "Treasure hunt started! Find all 8 locations.",
     "huntStopped": "Treasure hunt stopped.",
