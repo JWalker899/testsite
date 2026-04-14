@@ -209,12 +209,12 @@
       "hint": "Congratulations! You found the River next look for the Cave!",
       "hint_ro": "Felicitări! Ai găsit Râul Ghimbășel, apoi caută Peștera Valea Cetatii!",
       "quiz": {
-        "question": "How many public swimming pools used river water in the early 20th century?",
-        "question_ro": "Câte bazine publice foloseau apă de râu la începutul secolului 20?",
-        "answer": "3",
-        "answer_ro": "3",
-        "options": ["1", "2", "3", "4"],
-        "options_ro": ["1", "2", "3", "4"]
+        "question": "What animal makes it's home on the River?",
+        "question_ro": "Ce animal își face casa pe râu?",
+        "answer": "Beavers",
+        "answer_ro": "Beavers",
+        "options": ["Beavers", "Ducks", "Frogs", "Goats"],
+        "options_ro": ["Beavers", "Anas", "Buzei", "Capre"]
       }
     }
   }
