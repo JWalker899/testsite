@@ -2680,8 +2680,9 @@ body {
 .collage-style-hexagon .collage-grid {
     --hex-gap: 3px;
     --hex-padding: 0.5rem;
-    --hex-size-fit: calc((100% - (2 * var(--hex-padding, 0.5rem)) - (var(--hex-gap, 3px) * 2.5)) / 3.5);
-    --hex-size: max(36px, min(clamp(52px, 21vw, 108px), var(--hex-size-fit)));
+    --hex-size: clamp(52px, 21vw, 108px);
+    display: flex;
+    justify-content: center;
     padding: var(--hex-padding, 0.5rem);
     background: none;
     overflow: hidden;
@@ -2690,8 +2691,7 @@ body {
 .collage-style-hexagon .hex-grid-inner {
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    max-width: 100%;
+    align-items: flex-start;
     margin-left: auto;
     margin-right: auto;
 }
@@ -2700,8 +2700,6 @@ body {
 .hex-row {
     display: flex;
     gap: var(--hex-gap, 3px);
-    width: fit-content;
-    max-width: 100%;
 }
 
 /* Vertical spacing uses center-based formula for equal perpendicular gaps on all sides.
