@@ -4123,12 +4123,31 @@ function applyTheme(themeId) {
 }
 
 // Check if a new collage tier has been unlocked and show the popup
+function getMainLocationsCount() {
+    return huntOrder.length || Object.keys(huntLocations).length;
+}
+
+function getCollageTierThresholds() {
+    const mainCount = getMainLocationsCount();
+    return {
+        silver: Math.ceil(mainCount / 2),
+        gold: mainCount
+    };
+}
+
+function getCollageTier(mainFoundCount = foundLocations.size) {
+    const { silver, gold } = getCollageTierThresholds();
+    if (gold > 0 && mainFoundCount >= gold) return 'gold';
+    if (silver > 0 && mainFoundCount >= silver) return 'silver';
+    return '';
+}
+
 function checkCollageUnlocks() {
-    const total = foundLocations.size + foundExtraLocations.size;
-    if (total >= 10 && !localStorage.getItem('rasnov_collage_gold_shown')) {
+    const tier = getCollageTier(foundLocations.size);
+    if (tier === 'gold' && !localStorage.getItem('rasnov_collage_gold_shown')) {
         localStorage.setItem('rasnov_collage_gold_shown', '1');
         setTimeout(() => showCollageUnlockModal('gold'), 2500);
-    } else if (total >= 6 && !localStorage.getItem('rasnov_collage_silver_shown')) {
+    } else if (tier === 'silver' && !localStorage.getItem('rasnov_collage_silver_shown')) {
         localStorage.setItem('rasnov_collage_silver_shown', '1');
         setTimeout(() => showCollageUnlockModal('silver'), 2500);
     }
@@ -4155,9 +4174,11 @@ function setCollageStyle(style) {
     renderUnlocksTab();
 }
 
-function buildCollageHTML(totalFound) {
+function buildCollageHTML() {
     const locationKeys = Object.keys(huntLocations);
-    const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
+    const mainFound = foundLocations.size;
+    const mainTotal = getMainLocationsCount();
+    const tier = getCollageTier(mainFound);
     const borderClass = tier === 'gold' ? 'gold-border' : (tier === 'silver' ? 'silver-border' : '');
     const tierLabelHTML = tier
         ? `<div class="collage-tier-label ${tier}">${tier === 'gold' ? t('rewards.goldCollage') : t('rewards.silverCollage')}</div>`
@@ -4189,7 +4210,7 @@ function buildCollageHTML(totalFound) {
                 <span class="collage-empty-icon">📷</span>
                 <p>${t('rewards.collageEmpty')}</p>
             </div>
-            <div class="collage-footer">${totalFound} / ${locationKeys.length} ${t('rewards.collageTip')}</div>
+            <div class="collage-footer">${mainFound} / ${mainTotal} ${t('rewards.collageTip')}</div>
         </div>`;
     }
 
@@ -4209,7 +4230,7 @@ function buildCollageHTML(totalFound) {
             const oddClass = rowIdx % 2 === 1 ? 'hex-row-odd' : '';
             hexRows.push(`<div class="hex-row ${oddClass}">${rowCells}</div>`);
         }
-        cells = hexRows.join('');
+        cells = `<div class="hex-grid-inner">${hexRows.join('')}</div>`;
     } else {
         cells = photoKeys.map((key, i) => {
             const savedPhoto = localStorage.getItem(`ar_photo_${key}`);
@@ -4259,7 +4280,7 @@ function buildCollageHTML(totalFound) {
         ${tierLabelHTML}
         ${styleButtons}
         <div class="collage-grid">${cells}</div>
-        <div class="collage-footer">${photoKeys.length === 1 ? t('rewards.collageFooter', {photos: photoKeys.length, found: totalFound, total: locationKeys.length}) : t('rewards.collageFooterPlural', {photos: photoKeys.length, found: totalFound, total: locationKeys.length})}${tier ? '' : ' ' + t('rewards.collageTip')}</div>
+        <div class="collage-footer">${photoKeys.length === 1 ? t('rewards.collageFooter', {photos: photoKeys.length, found: mainFound, total: mainTotal}) : t('rewards.collageFooterPlural', {photos: photoKeys.length, found: mainFound, total: mainTotal})}${tier ? '' : ' ' + t('rewards.collageTip')}</div>
         ${shareHTML}
     </div>`;
 }
@@ -4325,9 +4346,10 @@ async function buildCollageCanvas() {
     });
     if (photoKeys.length === 0) return null;
 
-    const totalFound = foundLocations.size + foundExtraLocations.size;
-    const tier = totalFound >= 10 ? 'gold' : (totalFound >= 6 ? 'silver' : '');
-    const footerText = `${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} \u00b7 ${totalFound}/${locationKeys.length} places \u00b7 #discoverrasnov`;
+    const mainFound = foundLocations.size;
+    const mainTotal = getMainLocationsCount();
+    const tier = getCollageTier(mainFound);
+    const footerText = `${photoKeys.length} photo${photoKeys.length !== 1 ? 's' : ''} \u00b7 ${mainFound}/${mainTotal} places \u00b7 #discoverrasnov`;
 
     // ── Hexagon style ──────────────────────────────────────────────────────────
     if (style === 'hexagon') {
@@ -4671,7 +4693,7 @@ function renderUnlocksTab() {
         <div class="rewards-section">
             <div class="rewards-section-title">${t('rewards.collageTitle')}</div>
             <p class="collage-intro">${t('rewards.collageIntro')}</p>
-            ${buildCollageHTML(totalFound)}
+            ${buildCollageHTML()}
         </div>`;
 }
 
