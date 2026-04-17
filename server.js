@@ -581,7 +581,7 @@ app.get('/api/qrcode', (req, res) => {
   const domain = resolveQRDomain(req.query.domain);
   const huntUrl = `${domain}/hunt.html?location=${encodeURIComponent(location)}`;
 
-  QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
+  QRCode.toBuffer(huntUrl, { width: 200, margin: 2, errorCorrectionLevel: 'H' }, (err, buf) => {
     if (err) {
       console.error('QR generation error:', err.message);
       return res.status(500).send('QR generation failed');
@@ -617,7 +617,7 @@ app.get('/api/qrcode-extra', (req, res) => {
   const domain = resolveQRDomain(req.query.domain);
   const huntUrl = `${domain}/hunt.html?location=${encodeURIComponent(locationParam)}`;
 
-  QRCode.toBuffer(huntUrl, { width: 200, margin: 2 }, (err, buf) => {
+  QRCode.toBuffer(huntUrl, { width: 200, margin: 2, errorCorrectionLevel: 'H' }, (err, buf) => {
     if (err) {
       console.error('QR generation error:', err.message);
       return res.status(500).send('QR generation failed');
