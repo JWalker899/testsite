@@ -1541,7 +1541,11 @@ function scanQRCode() {
         if (code && code.data) {
             // QR code detected! Process it
             processQRCode(code.data);
-            return; // Stop scanning
+            // Continue scanning unless processQRCode() stopped the scanner (e.g. valid new location)
+            if (qrScannerActive) {
+                requestAnimationFrame(scanQRCode);
+            }
+            return;
         }
     }
     
