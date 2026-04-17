@@ -4336,6 +4336,18 @@ function _drawMetallicBorder(ctx, tier, totalW, totalH, border) {
     ctx.strokeRect(border, border, totalW - border * 2, totalH - border * 2);
 }
 
+function _createExportCanvas(totalW, totalH) {
+    const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 1));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(totalW * scale);
+    canvas.height = Math.round(totalH * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    return { canvas, ctx };
+}
+
 // Build an off-screen canvas with the collage photos, respecting the selected style
 async function buildCollageCanvas() {
     const style = localStorage.getItem('rasnov_collage_style') || 'polaroid';
@@ -4371,10 +4383,7 @@ async function buildCollageCanvas() {
         const totalW = Math.ceil(gridW + 2 * PAD + 2 * BORDER);
         const totalH = Math.ceil(gridH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER);
 
-        const canvas = document.createElement('canvas');
-        canvas.width = totalW;
-        canvas.height = totalH;
-        const ctx = canvas.getContext('2d');
+        const { canvas, ctx } = _createExportCanvas(totalW, totalH);
 
         ctx.fillStyle = '#1a1a2e';
         ctx.fillRect(0, 0, totalW, totalH);
@@ -4450,10 +4459,7 @@ async function buildCollageCanvas() {
         const totalW = innerW + 2 * PAD + 2 * BORDER;
         const totalH = innerH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER;
 
-        const canvas = document.createElement('canvas');
-        canvas.width = totalW;
-        canvas.height = totalH;
-        const ctx = canvas.getContext('2d');
+        const { canvas, ctx } = _createExportCanvas(totalW, totalH);
 
         const bg = ctx.createLinearGradient(0, 0, totalW, totalH);
         bg.addColorStop(0, '#f5e6c8');
@@ -4531,10 +4537,7 @@ async function buildCollageCanvas() {
     const totalW = innerW + 2 * PAD + 2 * BORDER;
     const totalH = innerH + 2 * PAD + HEADER_H + FOOTER_H + 2 * BORDER;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = totalW;
-    canvas.height = totalH;
-    const ctx = canvas.getContext('2d');
+    const { canvas, ctx } = _createExportCanvas(totalW, totalH);
 
     // Background
     const bg = ctx.createLinearGradient(0, 0, totalW, totalH);
@@ -4592,7 +4595,7 @@ async function downloadCollage() {
         if (!canvas) return;
         const link = document.createElement('a');
         link.download = 'rasnov-collage.jpg';
-        link.href = canvas.toDataURL('image/jpeg', 0.92);
+        link.href = canvas.toDataURL('image/jpeg', 0.98);
         link.click();
     } finally {
         if (btn && origText) btn.textContent = origText;
@@ -4607,7 +4610,7 @@ async function shareCollageNative() {
         const canvas = await buildCollageCanvas();
         if (!canvas) return;
 
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.98));
 
         let shared = false;
         try {
@@ -4633,7 +4636,7 @@ async function shareCollageNative() {
             // Fallback: download
             const link = document.createElement('a');
             link.download = 'rasnov-collage.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 0.92);
+            link.href = canvas.toDataURL('image/jpeg', 0.98);
             link.click();
         }
     } finally {
