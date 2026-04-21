@@ -782,7 +782,6 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 initializeLocationScanCounters();
-process.on('beforeExit', flushPendingLocationScanCounterSave);
 process.on('SIGINT', () => { flushPendingLocationScanCounterSave(); process.exit(0); });
 process.on('SIGTERM', () => { flushPendingLocationScanCounterSave(); process.exit(0); });
 app.listen(PORT, '0.0.0.0', () => {
