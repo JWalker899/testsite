@@ -782,8 +782,12 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 initializeLocationScanCounters();
-process.on('SIGINT', () => { flushPendingLocationScanCounterSave(); process.exit(0); });
-process.on('SIGTERM', () => { flushPendingLocationScanCounterSave(); process.exit(0); });
+function shutdownWithCounterFlush() {
+  flushPendingLocationScanCounterSave();
+  process.exit(0);
+}
+process.on('SIGINT', shutdownWithCounterFlush);
+process.on('SIGTERM', shutdownWithCounterFlush);
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Points system: ${POINTS_PER_LOCATION} points per location, ${COMPLETION_BONUS} point completion bonus`);
