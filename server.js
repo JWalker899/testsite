@@ -15,6 +15,7 @@ app.use(express.static(__dirname));
 
 // Persistent leaderboard file
 const LEADERBOARD_FILE = path.join(__dirname, 'data', 'leaderboard.json');
+const LOCATION_SCAN_COUNTER_FILE = path.join(__dirname, 'data', 'location-scan-counts.txt');
 
 // Load persisted user accounts on startup (keyed by UUID)
 let userAccounts = {};
@@ -99,6 +100,10 @@ const PHOTOS_DIR = path.join(__dirname, 'assets', 'place-photos');
 const PLACES_DATA_FILE = path.join(__dirname, 'data', 'places-data.json');
 const SAMPLE_DATA_FILE = path.join(__dirname, 'data', 'sample-places-data.json');
 const SCAVENGER_DATA_FILE = path.join(__dirname, 'data', 'scavenger-data.json');
+let locationScanCounts = {};
+let scavengerLocationKeys = [];
+let locationScanSaveTimer = null;
+let locationScanSaveDirty = false;
 
 // Load valid QR location keys from scavenger-data.json (falls back to empty set on error)
 function loadValidQRLocations() {
@@ -109,6 +114,134 @@ function loadValidQRLocations() {
     console.warn('Could not load scavenger data for QR validation:', e.message);
     return new Set();
   }
+}
+
+function loadScavengerLocationKeys() {
+  try {
+    const data = JSON.parse(fs.readFileSync(SCAVENGER_DATA_FILE, 'utf8'));
+    const locations = data.locations || {};
+    const order = Array.isArray(data.order) ? data.order : [];
+    const allKeys = Object.keys(locations);
+    if (!allKeys.length) return [];
+
+    const ordered = order.filter(k => Object.prototype.hasOwnProperty.call(locations, k));
+    const remaining = allKeys.filter(k => !ordered.includes(k));
+    return [...ordered, ...remaining];
+  } catch (e) {
+    console.warn('Could not load scavenger locations for scan counters:', e.message);
+    return [];
+  }
+}
+
+function createZeroScanCounts(keys) {
+  return keys.reduce((acc, key) => {
+    acc[key] = 0;
+    return acc;
+  }, {});
+}
+
+function parseLocationScanCounterFile(content) {
+  const lines = String(content || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const parsed = {};
+  for (const line of lines) {
+    const m = /^\(([^:]+):\s*(\d+)\)$/.exec(line);
+    if (!m) return null;
+    parsed[m[1]] = parseInt(m[2], 10);
+  }
+  return parsed;
+}
+
+function formatLocationScanCounterFile(keys, counts) {
+  return keys.map(key => `(${key}: ${counts[key] || 0})`).join('\n') + '\n';
+}
+
+function saveLocationScanCountersLocal() {
+  try {
+    const dir = path.dirname(LOCATION_SCAN_COUNTER_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const tmp = LOCATION_SCAN_COUNTER_FILE + '.tmp';
+    fs.writeFileSync(tmp, formatLocationScanCounterFile(scavengerLocationKeys, locationScanCounts));
+    try {
+      fs.renameSync(tmp, LOCATION_SCAN_COUNTER_FILE);
+    } catch (renameErr) {
+      try { fs.unlinkSync(tmp); } catch (_) {}
+      throw renameErr;
+    }
+  } catch (e) {
+    console.error('Failed to save location scan counters locally:', e.message);
+  }
+}
+
+function queueLocationScanCounterSave() {
+  locationScanSaveDirty = true;
+  if (locationScanSaveTimer) return;
+  locationScanSaveTimer = setTimeout(() => {
+    locationScanSaveTimer = null;
+    if (!locationScanSaveDirty) return;
+    locationScanSaveDirty = false;
+    saveLocationScanCountersLocal();
+  }, 250);
+}
+
+function flushPendingLocationScanCounterSave() {
+  if (!locationScanSaveDirty) return;
+  locationScanSaveDirty = false;
+  if (locationScanSaveTimer) {
+    clearTimeout(locationScanSaveTimer);
+    locationScanSaveTimer = null;
+  }
+  saveLocationScanCountersLocal();
+}
+
+function initializeLocationScanCounters() {
+  scavengerLocationKeys = loadScavengerLocationKeys();
+  if (!scavengerLocationKeys.length) {
+    locationScanCounts = {};
+    return;
+  }
+
+  let shouldRecreate = !fs.existsSync(LOCATION_SCAN_COUNTER_FILE);
+  let parsed = null;
+
+  if (!shouldRecreate) {
+    try {
+      parsed = parseLocationScanCounterFile(fs.readFileSync(LOCATION_SCAN_COUNTER_FILE, 'utf8'));
+      if (!parsed) {
+        shouldRecreate = true;
+      } else {
+        const parsedKeys = Object.keys(parsed);
+        const hasSameCount = parsedKeys.length === scavengerLocationKeys.length;
+        const hasSameKeys = scavengerLocationKeys.every(k => Object.prototype.hasOwnProperty.call(parsed, k));
+        shouldRecreate = !hasSameCount || !hasSameKeys;
+      }
+    } catch (e) {
+      console.warn('Could not load location scan counters:', e.message);
+      shouldRecreate = true;
+    }
+  }
+
+  if (shouldRecreate) {
+    locationScanCounts = createZeroScanCounts(scavengerLocationKeys);
+    saveLocationScanCountersLocal();
+    console.log('📍 Recreated location scan counters from scavenger data');
+    return;
+  }
+
+  locationScanCounts = {};
+  for (const key of scavengerLocationKeys) {
+    locationScanCounts[key] = Number.isFinite(parsed[key]) ? parsed[key] : 0;
+  }
+  console.log('📍 Loaded location scan counters from local file');
+}
+
+function incrementLocationScanCounter(locationKey) {
+  if (!locationKey || !Object.prototype.hasOwnProperty.call(locationScanCounts, locationKey)) {
+    console.warn('Skipping scan counter increment for unknown location key:', locationKey);
+    return;
+  }
+  locationScanCounts[locationKey] += 1;
+  queueLocationScanCounterSave();
 }
 
 /**
@@ -406,7 +539,8 @@ app.post('/api/user/:uuid/set-name', (req, res) => {
 // Award points for finding a location
 app.post('/api/user/:uuid/location-found', (req, res) => {
   const { uuid } = req.params;
-  const { locationKey, locationName, isCompletion } = req.body;
+  const { locationKey, locationName, isCompletion, scanSource } = req.body;
+  const normalizedScanSource = scanSource === 'sync' ? 'sync' : 'scan';
 
   if (!isValidUUID(uuid)) {
     return res.status(400).json({ error: 'Invalid UUID format' });
@@ -428,6 +562,9 @@ app.post('/api/user/:uuid/location-found', (req, res) => {
 
   // Add location to found list
   user.locationsFound.push(locationKey);
+  if (normalizedScanSource !== 'sync') {
+    incrementLocationScanCounter(locationKey);
+  }
 
   // Award points
   const points = POINTS_PER_LOCATION;
@@ -648,6 +785,13 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+initializeLocationScanCounters();
+function shutdownWithCounterFlush() {
+  flushPendingLocationScanCounterSave();
+  process.exit(0);
+}
+process.on('SIGINT', shutdownWithCounterFlush);
+process.on('SIGTERM', shutdownWithCounterFlush);
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Points system: ${POINTS_PER_LOCATION} points per location, ${COMPLETION_BONUS} point completion bonus`);
