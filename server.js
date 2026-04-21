@@ -236,7 +236,10 @@ function initializeLocationScanCounters() {
 }
 
 function incrementLocationScanCounter(locationKey) {
-  if (!locationKey || !Object.prototype.hasOwnProperty.call(locationScanCounts, locationKey)) return;
+  if (!locationKey || !Object.prototype.hasOwnProperty.call(locationScanCounts, locationKey)) {
+    console.warn('Skipping scan counter increment for unknown location key:', locationKey);
+    return;
+  }
   locationScanCounts[locationKey] += 1;
   queueLocationScanCounterSave();
 }
@@ -537,6 +540,7 @@ app.post('/api/user/:uuid/set-name', (req, res) => {
 app.post('/api/user/:uuid/location-found', (req, res) => {
   const { uuid } = req.params;
   const { locationKey, locationName, isCompletion, scanSource } = req.body;
+  const normalizedScanSource = scanSource === 'sync' ? 'sync' : 'scan';
 
   if (!isValidUUID(uuid)) {
     return res.status(400).json({ error: 'Invalid UUID format' });
@@ -558,7 +562,7 @@ app.post('/api/user/:uuid/location-found', (req, res) => {
 
   // Add location to found list
   user.locationsFound.push(locationKey);
-  if (scanSource !== 'sync') {
+  if (normalizedScanSource !== 'sync') {
     incrementLocationScanCounter(locationKey);
   }
 
