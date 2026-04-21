@@ -1,13 +1,13 @@
 {
-  "order": ["gate", "garden", "perch", "city_center", "promenada", "ski_jump", "top_of_ski_jump", "shooting_range", "cinema", "river", "cave", "dino_parc_entrance"],
+  "order": ["gate", "garden", "perch", "city_center", "promenada", "cinema", "river", "cave", "dino_parc_entrance"],
   "locations": {
     "gate": {
       "name": "Râșnov Citadel Gate",
       "name_ro": "Poarta Cetății Râșnov",
       "qr": "RASNOV_FORTRESS_GATE",
       "difficulty": 0,
-      "lat": 45.588897705078125,
-      "lng": 25.4700870513916,
+      "lat": 45.590515,
+      "lng": 25.470999,
       "hint": "Congratulations! You found the Râșnov Citadel Gate next look for the Râșnov Citadel Garden!",
       "hint_ro": "Felicitări! Ai găsit Poarta Cetății Râșnov, caută apoi Grădinile Cetății Râșnov!",
       "quiz": {
@@ -24,8 +24,8 @@
       "name_ro": "Grădinile Cetății Râșnov",
       "qr": "RASNOV_FORTRESS_GARDEN",
       "difficulty": 2,
-      "lat": 45.5905835,
-      "lng": 25.4693836,
+      "lat": 45.590337,
+      "lng": 25.470084,
       "hint": "Congratulations! You found the Râșnov Citadel Garden next look for the Râșnov Citadel Perch!",
       "hint_ro": "Felicitări! Ai găsit Grădinile Cetății Râșnov, caută apoi Cetatea Râșnov de la înălțime!",
       "quiz": {
@@ -42,8 +42,8 @@
       "name_ro": "Cetatea Râșnov de la înălțime",
       "qr": "RASNOV_FORTRESS_PERCH",
       "difficulty": 2,
-      "lat": 44.43154808935033,
-      "lng": 26.06017102393582,
+      "lat": 45.590324,
+      "lng": 25.467643,
       "hint": "Congratulations! You found the Râșnov Citadel Perch next look for the City Center!",
       "hint_ro": "Felicitări! Ai găsit Cetatea Râșnov de la înălțime, caută apoi Centrul Orașului!",
       "quiz": {
@@ -60,8 +60,8 @@
       "name_ro": "Centrul Orașului",
       "qr": "CITY_CENTER",
       "difficulty": 0,
-      "lat": 45.5906617,
-      "lng": 25.4648709,
+      "lat": 45.591082,
+      "lng": 25.465542,
       "hint": "Congratulations! You found the City Center next look for the Promenada Sissi!",
       "hint_ro": "Felicitări! Ai găsit Centrul Orașului, apoi caută Promenada Sissi!",
       "quiz": {
@@ -78,10 +78,10 @@
       "name_ro": "Promenada Sissi",
       "qr": "PROMENADA",
       "difficulty": 0,
-      "lat": 45.597057,
-      "lng": 25.472071,
-      "hint": "Congratulations! You found the Promenada Sissi next look for the Old Church!",
-      "hint_ro": "Felicitări! Ai găsit Promenada Sissi, caută apoi Biserica Veche!",
+      "lat": 45.599419,
+      "lng": 25.473651,
+      "hint": "Congratulations! You found the Promenada Sissi next look for the Cinema!",
+      "hint_ro": "Felicitări! Ai găsit Promenada Sissi, caută apoi Amza Pellea!",
       "quiz": {
         "question": "The Promenada Sissi was named after an Empress from what country?",
         "question_ro": "Promenada Sissi a fost numită după o împărăteasă din ce țară?",
@@ -91,67 +91,13 @@
         "options_ro": ["Austro-Ungaria", "Germania", "Franța", "Italia"]
       }
     },
-    "ski_jump": {
-      "name": "Ski Jump",
-      "name_ro": "Valea Cărbunării",
-      "qr": "SKI_JUMP",
-      "difficulty": 0,
-      "lat": 45.571920,
-      "lng": 25.471220,
-      "hint": "Congratulations! You found the Ski Jump next look for the Top of the Ski Jump!",
-      "hint_ro": "Felicitări! Ai găsit Valea Cărbunării. Caută apoi Creasta Văii Cărbunării!",
-      "quiz": {
-        "question": "What year did the Valea Cărbunării host a round of the ladies' calendar of the FIS Ski Jumping World Cup?",
-        "question_ro": "În ce an a găzduit Valea Cărbunării o etapă din calendarul feminin al Cupei Mondiale FIS de Sărituri cu Schiurile?",
-        "answer": "2013",
-        "answer_ro": "2013",
-        "options": ["2013", "2015", "2000", "2020"],
-        "options_ro": ["2013", "2015", "2000", "2020"]
-      }
-    },
-    "top_of_ski_jump": {
-      "name": "Top of Ski Jump",
-      "name_ro": "Creasta Văii Cărbunării",
-      "qr": "TOP_OF_SKI_JUMP",
-      "difficulty": 2,
-      "lat": 45.5874184,
-      "lng": 25.4620149,
-      "hint": "Congratulations! You found the Top of the Ski Jump next look for the Shooting Range!",
-      "hint_ro": "Felicitări! Ai găsit Creasta Văii Cărbunării. Caută apoi Poligon Râșnov!",
-      "quiz": {
-        "question": "Who was the first Romanian woman to compete in ski jumping at the Olympic Games?",
-        "question_ro": "Cine a fost prima femeie din România care a concurat la sărituri cu schiurile la Jocurile Olimpice?",
-        "answer": "Daniela Haralambie",
-        "answer_ro": "Daniela Haralambie",
-        "options": ["Daniela Haralambie", "Maria Popescu", "Ana Maria", "Ioana Radu"],
-        "options_ro": ["Daniela Haralambie", "Maria Popescu", "Ana Maria", "Ioana Radu"]
-      }
-    },
-    "shooting_range": {
-      "name": "Shooting Range",
-      "name_ro": "Poligon Râșnov",
-      "qr": "SHOOTING_RANGE",
-      "difficulty": 0,
-      "lat": 45.571902,
-      "lng": 25.471518,
-      "hint": "Congratulations! You found the Shooting Range next look for the Schubz Center!",
-      "hint_ro": "Felicitări! Ai găsit Poligon Râșnov. Caută apoi Centrul Schubz!",
-      "quiz": {
-        "question": "What event is held at the Shooting Range?",
-        "question_ro": "Ce eveniment se desfășoară la Poligon?",
-        "answer": "The Romanian Ski Biathlon Federation",
-        "answer_ro": "Federația Română de Biatlon și Schi",
-        "options": ["The Romanian Ski Biathlon Federation", "The Romanian Winter Sports Association", "The Romanian Alpine Club", "The Romanian Shooting Sports Union"],
-        "options_ro": ["Federația Română de Biatlon și Schi", "Asociația Română de Sporturi de Iarnă", "Clubul Alpin Român", "Uniunea Română de Tir Sportiv"]
-      }
-    },
     "cave": {
       "name": "Cave",
       "name_ro": "Peștera Valea Cetății",
       "qr": "CAVE",
       "difficulty": 2,
-      "lat": 45.585639,
-      "lng": 25.493802,
+      "lat": 45.582564,
+      "lng": 25.495679,
       "hint": "Congratulations! You found the Cave next look for the Dino Parc Entrance!",
       "hint_ro": "Felicitări! Ai găsit Peștera Valea Cetății, caută apoi Intrarea Dino Parc!",
       "quiz": {
@@ -170,8 +116,8 @@
       "difficulty": 0,
       "lat": 45.591266,
       "lng": 25.473929,
-      "hint": "Congratulations! You found the Dino Parc Entrance next look for the hidden location under a large dinosaur!",
-      "hint_ro": "Felicitări! Ai găsit Intrarea Dino Parc, caută apoi locația ascunsă sub un dinozaur mare!",
+      "hint": "Congratulations! You found the Dino Parc Entrance next look for the Râșnov Citadel Gate!",
+      "hint_ro": "Felicitări! Ai găsit Intrarea Dino Parc, caută apoi locația Poarta Cetății Râșnov!",
       "quiz": {
         "question": "How many dinosaurs are in Dino Parc?",
         "question_ro": "Câți dinozauri sunt în Dino Parc?",
@@ -186,8 +132,8 @@
       "name_ro": "Amza Pellea",
       "qr": "CINEMA",
       "difficulty": 0,
-      "lat": 45.590615,
-      "lng": 25.4625309,
+      "lat": 45.590072,
+      "lng": 25.464194,
       "hint": "Congratulations! You found the Cinema next look for the River!",
       "hint_ro": "Felicitări! Ai găsit Amza Pellea, apoi caută Râul Ghimbășel!",
       "quiz": {
