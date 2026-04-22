@@ -215,7 +215,7 @@ async function syncWithServer() {
                 fetch(`/api/user/${encodeURIComponent(currentUser.uuid)}/location-found`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ locationKey, locationName: location.name, isCompletion: false })
+                    body: JSON.stringify({ locationKey, locationName: location.name, isCompletion: false, scanSource: 'sync' })
                 }).catch(() => {});
             }
         } else if (response.ok) {
@@ -305,7 +305,8 @@ async function awardPoints(locationKey, locationName) {
             body: JSON.stringify({
                 locationKey,
                 locationName,
-                isCompletion
+                isCompletion,
+                scanSource: 'scan'
             })
         });
         
